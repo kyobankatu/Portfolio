@@ -1,1 +1,6 @@
 readme-generator.agent.md
+node_modules/
+.next/
+dist/
+.env*.local
+.DS_Store

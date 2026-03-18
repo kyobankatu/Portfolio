@@ -1,5 +1,27 @@
-# Vue 3 + Vite
+# Portfolio
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+ぽぼりむのポートフォリオサイト。
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+## Stack
+
+- **Next.js 15** (App Router) — static site generation
+- **React 19**
+- **CSS Modules** + global CSS
+
+## Development
+
+```bash
+npm install
+npm run dev      # http://localhost:3000
+```
+
+## Build
+
+```bash
+npm run build
+npm run start    # preview production build
+```
+
+## Deployment
+
+Recommended: [Vercel](https://vercel.com) — connect the GitHub repository and it deploys automatically on push.

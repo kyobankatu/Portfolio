@@ -1,0 +1,233 @@
+.selfInfo {
+    min-height: 100vh;
+    padding: 3.5rem 1.25rem;
+    background: transparent;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.selfInner {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    gap: 2rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    z-index: 2;
+}
+
+.orbLayer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: visible;
+}
+
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0;
+    transform-origin: center;
+    filter: blur(6px) saturate(120%);
+    mix-blend-mode: screen;
+    will-change: transform, opacity;
+    animation-name: orbFloat;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: 1;
+}
+
+@keyframes orbFloat {
+    0% {
+        opacity: 0;
+        transform: translate3d(-50%, -50%, 0) scale(0.85);
+        filter: blur(10px) saturate(90%);
+    }
+    10% {
+        opacity: 0.95;
+    }
+    30% {
+        transform: translate3d(calc(-50% + 6px), calc(-50% - 14px), 0) scale(1.02);
+    }
+    60% {
+        transform: translate3d(calc(-50% - 10px), calc(-50% + 10px), 0) scale(1);
+    }
+    90% {
+        opacity: 0.45;
+    }
+    100% {
+        opacity: 0;
+        transform: translate3d(calc(-50% + 14px), calc(-50% - 18px), 0) scale(0.92);
+        filter: blur(14px) saturate(70%);
+    }
+}
+
+.profileCard {
+    width: 260px;
+    max-width: 100%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 18px;
+    padding: 1.25rem;
+    text-align: center;
+    position: relative;
+    backdrop-filter: blur(6px) saturate(120%);
+    box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+    margin-bottom: 1.25rem;
+}
+
+.avatarWrap {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+    z-index: 2;
+}
+
+.avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+    box-shadow: 0 8px 30px rgba(11,18,32,0.6);
+    transform-origin: center;
+    background: linear-gradient(180deg, #f6f7fb, #e7eef8);
+}
+
+.profileText {
+    margin-top: 0.85rem;
+    color: #e6f5ff;
+}
+
+.profileText h3 {
+    margin: 0;
+    font-size: 1.05rem;
+}
+
+.selfContent {
+    width: 100%;
+    max-width: 640px;
+    text-align: center;
+}
+
+.eyebrow {
+    color: #bfa046;
+    font-weight: 600;
+    opacity: 0.95;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+.heroTitle {
+    font-size: 1.9rem;
+    margin: 0;
+    line-height: 1.05;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.gold {
+    color: #e6c777;
+}
+
+.role {
+    font-size: 1rem;
+    color: #cfe7ff;
+    opacity: 0.9;
+    margin-left: 0.25rem;
+}
+
+.tagline {
+    margin-top: 0.75rem;
+    color: #d6e9ff;
+    opacity: 0.9;
+    font-size: 1.05rem;
+    max-width: 36rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.skillList {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.skill {
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 0.35rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    color: #eaf6ff;
+    box-shadow: 0 6px 18px rgba(2,6,23,0.4);
+}
+
+.actions {
+    margin-top: 1.25rem;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.btn {
+    padding: 0.65rem 1rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.primary {
+    background: linear-gradient(180deg, #d7b262, #bfa046);
+    color: #071019;
+    box-shadow: 0 8px 24px rgba(191,160,70,0.18);
+}
+
+.ghost {
+    background: transparent;
+    color: #d6e9ff;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.sectionPlaceholder {
+    padding: 3rem 1.25rem;
+    max-width: 900px;
+    margin: 2rem auto;
+    color: #d6e9ff;
+    text-align: center;
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.05);
+    backdrop-filter: blur(6px) saturate(120%);
+    box-shadow: 0 8px 30px rgba(2,6,23,0.45);
+}
+
+@media (min-width: 880px) {
+    .selfInner {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 520px) {
+    .heroTitle {
+        font-size: 1.25rem;
+    }
+    .profileCard {
+        width: 220px;
+    }
+}
