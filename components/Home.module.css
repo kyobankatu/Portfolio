@@ -1,5 +1,4 @@
 .selfInfo {
-    min-height: 100vh;
     padding: 3.5rem 1.25rem;
     background: transparent;
     color: inherit;
@@ -113,6 +112,9 @@
     width: 100%;
     max-width: 640px;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .eyebrow {
@@ -155,11 +157,33 @@
     margin-right: auto;
 }
 
-.skillList {
+.skillGroups {
     margin-top: 1rem;
-    display: flex;
+    display: inline-flex;
+    flex-direction: column;
     gap: 0.5rem;
-    justify-content: center;
+}
+
+.skillGroup {
+    display: flex;
+    align-items: center;
+    flex-flow: column;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+}
+
+.skillCategory {
+    font-size: 1.0rem;
+    color: #bfa046;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    width: 5.5rem;
+    flex-shrink: 0;
+}
+
+.skillList {
+    display: flex;
+    gap: 0.4rem;
     flex-wrap: wrap;
 }
 
@@ -171,6 +195,31 @@
     font-size: 0.9rem;
     color: #eaf6ff;
     box-shadow: 0 6px 18px rgba(2,6,23,0.4);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.skillLevel {
+    display: inline-flex;
+    gap: 3px;
+    align-items: center;
+}
+
+.dotFilled,
+.dotEmpty {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+}
+
+.dotFilled {
+    background: #d7b262;
+}
+
+.dotEmpty {
+    background: rgba(255,255,255,0.18);
 }
 
 .actions {
@@ -186,6 +235,7 @@
     font-weight: 600;
     cursor: pointer;
     border: none;
+    outline: none;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -215,6 +265,50 @@
     border: 1px solid rgba(255,255,255,0.05);
     backdrop-filter: blur(6px) saturate(120%);
     box-shadow: 0 8px 30px rgba(2,6,23,0.45);
+}
+
+.contactList {
+    margin-top: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.contactCard {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    max-width: 420px;
+    padding: 1.1rem 1.5rem;
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.1);
+    text-decoration: none;
+    color: #eaf6ff;
+    transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.contactCard:hover {
+    border-color: rgba(191,160,70,0.6);
+    background: linear-gradient(180deg, rgba(191,160,70,0.12), rgba(191,160,70,0.05));
+    transform: scale(1.02);
+}
+
+.contactLabel {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #bfa046;
+    letter-spacing: 0.5px;
+    width: 4.5rem;
+    flex-shrink: 0;
+}
+
+.contactValue {
+    font-size: 1rem;
+    color: #cfe7ff;
+    word-break: break-all;
 }
 
 @media (min-width: 880px) {

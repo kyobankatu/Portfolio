@@ -4,9 +4,50 @@ import { useState, useEffect, useRef } from 'react'
 import styles from './Home.module.css'
 
 const name = 'ぽぼりむ'
-const role = '情報工学系 学生'
-const tagline = '創造と実装で世界を形にする'
-const skills = ['Vue', 'JavaScript', 'Python', 'Git']
+const role = 'Institute of Science Tokyo'
+const tagline = '睡眠？それはデプロイ後に。'
+const skillGroups = [
+    {
+        category: 'Languages',
+        skills: [
+            { name: 'Java', level: 5 },
+            { name: 'Python', level: 4 },
+            { name: 'C', level: 4 },
+            { name: 'Scala', level: 1 },
+            { name: 'MATLAB', level: 2 },
+            { name: 'Verilog-HDL', level: 1 },
+        ],
+    },
+    {
+        category: 'Web',
+        skills: [
+            { name: 'HTML/CSS', level: 4 },
+            { name: 'JavaScript', level: 3 },
+            { name: 'TypeScript', level: 3 },
+            { name: 'Next.js', level: 3 },
+            { name: 'React', level: 1 },
+        ],
+    },
+    {
+        category: 'Database',
+        skills: [
+            { name: 'SQL', level: 3 },
+        ],
+    },
+    {
+        category: 'Tools',
+        skills: [
+            { name: 'Git', level: 4 },
+            { name: 'Docker', level: 3 },
+        ],
+    },
+    {
+        category: 'Life Skills',
+        skills: [
+            { name: 'GenshinImpact', level: 5 },
+        ],
+    },
+]
 
 const config = {
     spawnInterval: 900,
@@ -63,26 +104,26 @@ export default function Home() {
 
     return (
         <>
-            <section className={styles.selfInfo}>
-                <div className={styles.orbLayer} aria-hidden="true">
-                    {orbs.map((orb) => (
-                        <div
-                            key={orb.id}
-                            className={styles.orb}
-                            style={{
-                                left: orb.left + '%',
-                                top: orb.top + '%',
-                                width: orb.size + 'px',
-                                height: orb.size + 'px',
-                                background: `radial-gradient(circle at 30% 30%, ${orb.color}, rgba(255,255,255,0.06))`,
-                                animationDuration: `${orb.duration}s`,
-                                animationDelay: `${orb.delay}s`,
-                                transform: 'translate3d(-50%, -50%, 0)',
-                            }}
-                        />
-                    ))}
-                </div>
+            <div className={styles.orbLayer} aria-hidden="true">
+                {orbs.map((orb) => (
+                    <div
+                        key={orb.id}
+                        className={styles.orb}
+                        style={{
+                            left: orb.left + '%',
+                            top: orb.top + '%',
+                            width: orb.size + 'px',
+                            height: orb.size + 'px',
+                            background: `radial-gradient(circle at 30% 30%, ${orb.color}, rgba(255,255,255,0.06))`,
+                            animationDuration: `${orb.duration}s`,
+                            animationDelay: `${orb.delay}s`,
+                            transform: 'translate3d(-50%, -50%, 0)',
+                        }}
+                    />
+                ))}
+            </div>
 
+            <section className={styles.selfInfo}>
                 <div className={styles.selfInner}>
                     <div className={styles.profileCard}>
                         <div className={styles.avatarWrap}>
@@ -102,14 +143,11 @@ export default function Home() {
                         </h1>
                         <p className={styles.tagline}>{tagline}</p>
 
-                        <div className={styles.skillList}>
-                            {skills.map((s) => (
-                                <span key={s} className={styles.skill}>{s}</span>
-                            ))}
-                        </div>
-
                         <div className={styles.actions}>
-                            <button className={`${styles.btn} ${styles.primary}`} onClick={() => scrollTo('projects')}>
+                            <button className={`${styles.btn} ${styles.ghost}`} onClick={() => scrollTo('skills')}>
+                                Skills
+                            </button>
+                            <button className={`${styles.btn} ${styles.ghost}`} onClick={() => scrollTo('projects')}>
                                 Projects
                             </button>
                             <button className={`${styles.btn} ${styles.ghost}`} onClick={() => scrollTo('contact')}>
@@ -120,14 +158,49 @@ export default function Home() {
                 </div>
             </section>
 
+            <section id="skills" className={styles.sectionPlaceholder}>
+                <h2>Skills</h2>
+                <div className={styles.skillGroups}>
+                    {skillGroups.map((g) => (
+                        <div key={g.category} className={styles.skillGroup}>
+                            <p className={styles.skillCategory}>{g.category}</p>
+                            <div className={styles.skillList}>
+                                {g.skills.map((s) => (
+                                    <span key={s.name} className={styles.skill}>
+                                        {s.name}
+                                        <span className={styles.skillLevel}>
+                                            {[1, 2, 3, 4, 5].map((i) => (
+                                                <span
+                                                    key={i}
+                                                    className={i <= s.level ? styles.dotFilled : styles.dotEmpty}
+                                                />
+                                            ))}
+                                        </span>
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
             <section id="projects" className={styles.sectionPlaceholder}>
                 <h2>Projects</h2>
                 <p>ここにプロジェクト一覧を追加できます。</p>
             </section>
 
-            <section id="contact" className={styles.sectionPlaceholder}>
+            <section id="contact" className={`${styles.sectionPlaceholder}`}>
                 <h2>Contact</h2>
-                <p>連絡先情報やフォームをここに置きます。</p>
+                <div className={styles.contactList}>
+                    <a className={styles.contactCard} href="mailto:ota.k.5051@m.isct.ac.jp">
+                        <span className={styles.contactLabel}>Email</span>
+                        <span className={styles.contactValue}>ota.k.5051@m.isct.ac.jp</span>
+                    </a>
+                    <a className={styles.contactCard} href="https://www.linkedin.com/in/kento-ota-84bb6a382" target="_blank" rel="noreferrer">
+                        <span className={styles.contactLabel}>LinkedIn</span>
+                        <span className={styles.contactValue}>kento-ota-84bb6a382</span>
+                    </a>
+                </div>
             </section>
         </>
     )
