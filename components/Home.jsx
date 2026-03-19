@@ -43,6 +43,13 @@ const skillGroups = [
         ],
     },
     {
+        category: 'Learning',
+        skills: [
+            { name: 'Chinese', level: null },
+            { name: 'Quantum Computing', level: null },
+        ],
+    },
+    {
         category: 'Qualifications',
         skills: [
             { name: 'TOEIC 925', level: null },
@@ -61,9 +68,16 @@ const skillGroups = [
 
 const projects = [
     {
+        name: 'Portfolio',
+        description: 'このポートフォリオサイト。Next.jsで構築し、Vercel でホスティングしています。',
+        techs: ['Next.js', 'Vercel'],
+        github: 'https://github.com/kyobankatu/Portfolio',
+        url: 'https://portfolio-katumons-projects.vercel.app/',
+    },
+    {
         name: 'PainRecorder',
         description: '慢性疼痛患者が痛みの強さを記録・可視化する日本語WebアプリをNext.js + PostgreSQLで構築。気象データ連携・PWA対応・グラフ分析機能を備えます。',
-        techs: ['Next.js', 'TypeScript', 'PostgreSQL', 'Prisma', 'Docker', 'Cloud Run'],
+        techs: ['Next.js', 'TypeScript', 'PostgreSQL', 'Prisma', 'Docker', 'Cloud Run', 'Neon'],
         github: 'https://github.com/kyobankatu/PainRecorder',
         url: 'https://painrecorder-474392225909.asia-northeast1.run.app/',
     },
@@ -225,6 +239,9 @@ export default function Home() {
                             <button className={`${styles.btn} ${styles.ghost}`} onClick={() => scrollTo('contact')}>
                                 Contact
                             </button>
+                            <button className={`${styles.btn} ${styles.ghost}`} onClick={() => scrollTo('hobbies')}>
+                                Hobbies
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -303,6 +320,15 @@ export default function Home() {
                         <span className={styles.contactLabel}>LinkedIn</span>
                         <span className={styles.contactValue}>kento-ota-84bb6a382</span>
                     </a>
+                </div>
+            </section>
+
+            <section id="hobbies" className={styles.sectionPlaceholder}>
+                <h2>Hobbies</h2>
+                <p className={styles.hobbiesNote}>原神が大好きでのめり込んでます。時々ジャグリングや料理もしてます。</p>
+                <p className={styles.hobbiesNote}>2026 / 3 から趣味でイラストを描き始めました。勉強中...</p>
+                <div className={styles.hobbiesGallery}>
+                    <img src="/hobbies/img0.jpg" alt="illust 0" className={styles.hobbiesImg} />
                 </div>
             </section>
         </>

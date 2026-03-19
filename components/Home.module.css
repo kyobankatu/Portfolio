@@ -396,6 +396,28 @@
     word-break: break-all;
 }
 
+.hobbiesNote {
+    margin: 0.5rem 0 1.25rem;
+    color: #b0cfe8;
+    font-size: 0.95rem;
+}
+
+.hobbiesGallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.hobbiesImg {
+    max-width: 100%;
+    width: 320px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 8px 24px rgba(2,6,23,0.5);
+    object-fit: cover;
+}
+
 @media (min-width: 880px) {
     .selfInner {
         flex-direction: column;
