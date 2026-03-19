@@ -43,8 +43,17 @@ const skillGroups = [
         ],
     },
     {
+        category: 'Qualifications',
+        skills: [
+            { name: 'TOEIC 925', level: null },
+            { name: '統計検定１級', level: null },
+        ],
+    },
+    {
         category: 'Life Skills',
         skills: [
+            { name: 'Cooking', level: 3 },
+            { name: 'Juggling', level: 2 },
             { name: 'GenshinImpact', level: 5 },
         ],
     },
@@ -207,6 +216,9 @@ export default function Home() {
                             <button className={`${styles.btn} ${styles.ghost}`} onClick={() => scrollTo('skills')}>
                                 Skills
                             </button>
+                            <button className={`${styles.btn} ${styles.ghost}`} onClick={() => scrollTo('research')}>
+                                Research
+                            </button>
                             <button className={`${styles.btn} ${styles.ghost}`} onClick={() => scrollTo('projects')}>
                                 Projects
                             </button>
@@ -228,20 +240,27 @@ export default function Home() {
                                 {g.skills.map((s) => (
                                     <span key={s.name} className={styles.skill}>
                                         {s.name}
-                                        <span className={styles.skillLevel}>
-                                            {[1, 2, 3, 4, 5].map((i) => (
-                                                <span
-                                                    key={i}
-                                                    className={i <= s.level ? styles.dotFilled : styles.dotEmpty}
-                                                />
-                                            ))}
-                                        </span>
+                                        {s.level !== null && (
+                                            <span className={styles.skillLevel}>
+                                                {[1, 2, 3, 4, 5].map((i) => (
+                                                    <span
+                                                        key={i}
+                                                        className={i <= s.level ? styles.dotFilled : styles.dotEmpty}
+                                                    />
+                                                ))}
+                                            </span>
+                                        )}
                                     </span>
                                 ))}
                             </div>
                         </div>
                     ))}
                 </div>
+            </section>
+
+            <section id="research" className={styles.sectionPlaceholder}>
+                <h2>Research</h2>
+                <p>未定</p>
             </section>
 
             <section id="projects" className={styles.sectionPlaceholder}>
