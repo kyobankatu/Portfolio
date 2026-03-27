@@ -329,6 +329,7 @@ export default function Home() {
                 <p className={styles.hobbiesNote}>2026 / 3 から趣味でイラストを描き始めました。勉強中...</p>
                 <div className={styles.hobbiesGallery}>
                     <img src="/hobbies/img0.jpg" alt="illust 0" className={styles.hobbiesImg} />
+                    <img src="/hobbies/img1.jpg" alt="illust 1" className={styles.hobbiesImg} />
                 </div>
             </section>
         </>
