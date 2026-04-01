@@ -13,19 +13,19 @@ const skillGroups = [
             { name: 'Java', level: 5 },
             { name: 'Python', level: 4 },
             { name: 'C', level: 4 },
-            { name: 'MATLAB', level: 2 },
-            { name: 'Scala', level: 1 },
-            { name: 'Verilog-HDL', level: 1 },
-        ],
-    },
-    {
-        category: 'Web',
-        skills: [
-            { name: 'HTML/CSS', level: 4 },
             { name: 'JavaScript', level: 3 },
             { name: 'TypeScript', level: 3 },
             { name: 'Next.js', level: 3 },
+            { name: 'MATLAB', level: 2 },
+            { name: 'Scala', level: 1 },
+            { name: 'Verilog-HDL', level: 1 },
             { name: 'React', level: 1 },
+        ],
+    },
+    {
+        category: 'Markup & Styling',
+        skills: [
+            { name: 'HTML/CSS', level: 4 },
         ],
     },
     {
