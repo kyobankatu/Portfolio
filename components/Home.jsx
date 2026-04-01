@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import styles from './Home.module.css'
 import ja from '../locales/ja.json'
 import en from '../locales/en.json'
+import { FaEnvelope, FaLinkedin, FaGithub } from 'react-icons/fa'
 
 const skillGroups = [
     {
@@ -318,12 +319,19 @@ export default function Home() {
                 <h2>Contact</h2>
                 <div className={styles.contactList}>
                     <a className={styles.contactCard} href="mailto:ota.k.5051@m.isct.ac.jp">
+                        <FaEnvelope size={20} className={styles.contactIcon} />
                         <span className={styles.contactLabel}>Email</span>
                         <span className={styles.contactValue}>ota.k.5051@m.isct.ac.jp</span>
                     </a>
                     <a className={styles.contactCard} href="https://www.linkedin.com/in/kento-ota-84bb6a382" target="_blank" rel="noreferrer">
+                        <FaLinkedin size={20} className={styles.contactIcon} />
                         <span className={styles.contactLabel}>LinkedIn</span>
                         <span className={styles.contactValue}>kento-ota-84bb6a382</span>
+                    </a>
+                    <a className={styles.contactCard} href="https://github.com/kyobankatu" target="_blank" rel="noreferrer">
+                        <FaGithub size={20} className={styles.contactIcon} />
+                        <span className={styles.contactLabel}>GitHub</span>
+                        <span className={styles.contactValue}>kyobankatu</span>
                     </a>
                 </div>
             </section>

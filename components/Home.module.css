@@ -428,6 +428,11 @@
     transform: scale(1.02);
 }
 
+.contactIcon {
+    color: #bfa046;
+    flex-shrink: 0;
+}
+
 .contactLabel {
     font-size: 0.8rem;
     font-weight: 600;
