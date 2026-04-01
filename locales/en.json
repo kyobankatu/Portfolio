@@ -1,0 +1,25 @@
+{
+    "name": "Povolim",
+    "tagline": "Sleep? That's for after the deploy.",
+    "role": "B4 Student @ Institute of Science Tokyo",
+    "bio": "B4 student in the Department of Computer Science, School of Computing, Institute of Science Tokyo. Joining the Rio Yokota Lab in 2026. Passionate about programming and gaming.",
+    "research": {
+        "labName": "Rio Yokota Lab",
+        "description": "TBD"
+    },
+    "hobbies": {
+        "note1": "I'm deeply into Genshin Impact. I also juggle and cook occasionally.",
+        "note2": "Started drawing illustrations as a hobby from March 2026. Still learning..."
+    },
+    "projects": {
+        "Portfolio": "This portfolio site. Built with Next.js and hosted on Vercel.",
+        "PainRecorder": "A Japanese web app for chronic pain patients to record and visualize pain intensity, built with Next.js + PostgreSQL. Features weather data integration, PWA support, and graph analysis.",
+        "ZZZ-Translator": "A Python program that collects and integrates Zenless Zone Zero terminology from 4 sources (Wiki, XML, etc.) and registers them as custom glossaries for the Google Cloud Translation API. Includes AI-powered cleaning functionality.",
+        "ZZZ-SearchApi": "An API server that searches and scrapes Zenless Zone Zero Wiki information and returns AI-generated summaries.",
+        "ZZZ-SearchOverlay": "An Electron desktop app for quickly looking up in-game terms while playing Zenless Zone Zero. Supports text search and image search via screenshot.",
+        "GenshinImpactDPSCalculator": "A time-driven combat simulator and DPS calculation tool for Genshin Impact. Accurately reproduces skill animations, elemental reactions, and ICD, with an artifact optimization pipeline and RL learning module.",
+        "ArtifactSimulator": "A web app that calculates and visualizes the score probability distribution after Genshin Impact artifact enhancement. Automatically recognizes sub-stats from screenshots and displays results as histograms and statistics.",
+        "ArtifactSimulator-Backend": "Backend API for the Genshin Impact artifact enhancement simulator. Analyzes images via OCR using the Google Cloud Vision API and returns score distribution and statistics after enhancement.",
+        "NeuralNetwork": "A neural network implemented from scratch in C. Learns via backpropagation and verifies sine wave approximation. Results are visualized in Jupyter Notebook."
+    }
+}

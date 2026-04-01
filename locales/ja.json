@@ -1,0 +1,25 @@
+{
+    "name": "ぽぼりむ",
+    "tagline": "睡眠？それはデプロイ後に。",
+    "role": "東京科学大学 B4",
+    "bio": "東京科学大学 情報理工学院 情報工学系 B4。2026年より横田理央研究室に所属。プログラミングとゲームが好き。",
+    "research": {
+        "labName": "横田理央研究室",
+        "description": "未定"
+    },
+    "hobbies": {
+        "note1": "原神が大好きでのめり込んでます。時々ジャグリングや料理もしてます。",
+        "note2": "2026 / 3 から趣味でイラストを描き始めました。勉強中..."
+    },
+    "projects": {
+        "Portfolio": "このポートフォリオサイト。Next.jsで構築し、Vercel でホスティングしている。",
+        "PainRecorder": "慢性疼痛患者が痛みの強さを記録・可視化する日本語WebアプリをNext.js + PostgreSQLで構築。気象データ連携・PWA対応・グラフ分析機能を備えている。",
+        "ZZZ-Translator": "「Zenless Zone Zero」の用語集をWiki・XMLなど4ソースから収集・統合し、Google Cloud Translation APIのカスタム用語集として登録するPythonプログラム。AIを用いたクリーニング機能を備えている。",
+        "ZZZ-SearchApi": "「Zenless Zone Zero」のWiki情報を検索・スクレイピングし、AIで要約して返すAPIサーバー。",
+        "ZZZ-SearchOverlay": "「Zenless Zone Zero」のプレイ中にゲーム用語を素早く調べられるElectronデスクトップアプリ。テキスト検索とスクリーンショットを用いた画像検索に対応している。",
+        "GenshinImpactDPSCalculator": "Genshin Impactの時間駆動型戦闘シミュレーターとDPS計算ツール。スキルアニメーション・元素反応・ICDを精密に再現し、聖遺物最適化パイプラインとRL学習モジュールを備えている。",
+        "ArtifactSimulator": "原神の聖遺物強化後のスコア確率分布を計算・可視化するWebアプリ。スクリーンショットからサブオプションを自動認識し、ヒストグラムや統計量で結果を表示する。",
+        "ArtifactSimulator-Backend": "原神の聖遺物強化シミュレーター用バックエンドAPI。Google Cloud Vision APIを用いたOCRで画像を解析し、強化後のスコア分布・統計情報を返す。",
+        "NeuralNetwork": "C言語でスクラッチ実装したニューラルネットワーク。逆誤差伝播法による学習を行い、sin波の近似を検証。結果をJupyter Notebookで可視化する。"
+    }
+}

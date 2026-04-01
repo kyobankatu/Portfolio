@@ -2,10 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react'
 import styles from './Home.module.css'
+import ja from '../locales/ja.json'
+import en from '../locales/en.json'
 
-const name = 'ぽぼりむ'
-const role = 'Institute of Science Tokyo'
-const tagline = '睡眠？それはデプロイ後に。'
 const skillGroups = [
     {
         category: 'Languages',
@@ -15,10 +14,16 @@ const skillGroups = [
             { name: 'C', level: 4 },
             { name: 'JavaScript', level: 3 },
             { name: 'TypeScript', level: 3 },
-            { name: 'Next.js', level: 3 },
             { name: 'MATLAB', level: 2 },
             { name: 'Scala', level: 1 },
             { name: 'Verilog-HDL', level: 1 },
+        ],
+    },
+    {
+        category: 'Frameworks',
+        skills: [
+            { name: 'Next.js', level: 3 },
+            { name: 'Vue.js', level: 3 },
             { name: 'React', level: 1 },
         ],
     },
@@ -31,7 +36,7 @@ const skillGroups = [
     {
         category: 'Database',
         skills: [
-            { name: 'SQL', level: 3 },
+            { name: 'PostgreSQL', level: 3 },
         ],
     },
     {
@@ -59,7 +64,6 @@ const skillGroups = [
     {
         category: 'Life Skills',
         skills: [
-            { name: 'Cooking', level: 3 },
             { name: 'Juggling', level: 2 },
             { name: 'GenshinImpact', level: 5 },
         ],
@@ -69,63 +73,54 @@ const skillGroups = [
 const projects = [
     {
         name: 'Portfolio',
-        description: 'このポートフォリオサイト。Next.jsで構築し、Vercel でホスティングしています。',
         techs: ['Next.js', 'Vercel'],
         github: 'https://github.com/kyobankatu/Portfolio',
         url: 'https://portfolio-katumons-projects.vercel.app/',
     },
     {
         name: 'PainRecorder',
-        description: '慢性疼痛患者が痛みの強さを記録・可視化する日本語WebアプリをNext.js + PostgreSQLで構築。気象データ連携・PWA対応・グラフ分析機能を備えます。',
         techs: ['Next.js', 'TypeScript', 'PostgreSQL', 'Prisma', 'Docker', 'Cloud Run', 'Neon'],
         github: 'https://github.com/kyobankatu/PainRecorder',
         url: 'https://painrecorder-474392225909.asia-northeast1.run.app/',
     },
     {
         name: 'ZZZ-Translator',
-        description: '「Zenless Zone Zero」の用語集をWiki・XMLなど4ソースから収集・統合し、Google Cloud Translation APIのカスタム用語集として登録するPythonツールセット。Gemini APIによるAIクリーニング機能付き。',
         techs: ['Python', 'Playwright', 'Google Cloud Translation API', 'BeautifulSoup4'],
         github: 'https://github.com/kyobankatu/ZZZ-Translator',
         url: null,
     },
     {
         name: 'ZZZ-SearchApi',
-        description: '「Zenless Zone Zero」のWiki情報を検索・スクレイピングし、OpenRouter経由のAIで要約して返すREST APIサーバー。ハイブリッド検索とカテゴリ別フォーマット出力に対応。',
         techs: ['Python', 'Flask', 'Google Cloud Translation API', 'BeautifulSoup4', 'Docker', 'Cloud Run'],
         github: 'https://github.com/kyobankatu/ZZZ-SearchApi',
         url: null,
     },
     {
         name: 'ZZZ-SearchOverlay',
-        description: '「Zenless Zone Zero」のプレイ中にゲーム用語を素早く調べられるElectronデスクトップオーバーレイ。テキスト検索とスクリーンショットOCRによるエリアスキャンに対応。',
         techs: ['Electron', 'Node.js'],
         github: 'https://github.com/kyobankatu/ZZZ-SearchOverlay',
         url: null,
     },
     {
         name: 'GenshinImpactDPSCalculator',
-        description: 'Genshin Impactの時間駆動型戦闘シミュレーターとDPS計算ツール。スキルアニメーション・元素反応・ICDを精密に再現し、アーティファクト最適化パイプラインとRL学習モジュールを備えます。',
         techs: ['Java', 'Gradle', 'Python'],
         github: 'https://github.com/kyobankatu/GenshinImpactDPSCalculator',
         url: 'https://kyobankatu.github.io/GenshinImpactDPSCalculator/simulation_report.html',
     },
     {
         name: 'ArtifactSimulator',
-        description: '原神の聖遺物強化後のスコア確率分布を計算・可視化するWebアプリ。スクリーンショットからサブオプションを自動認識し、ヒストグラムや統計量で結果を表示。',
         techs: ['Vue.js', 'Vercel'],
         github: 'https://github.com/kyobankatu/ArtifactSimulator-Vercel',
         url: 'https://artifact-simulator.vercel.app/',
     },
     {
         name: 'ArtifactSimulator-Backend',
-        description: '原神の聖遺物強化シミュレーター用バックエンドAPI。Google Cloud Vision APIによるOCRでスクリーンショットを解析し、強化後のスコア分布・統計情報を返します。',
         techs: ['Python', 'Flask', 'Google Cloud Vision API', 'Docker', 'Render'],
-        github: 'https://github.com/kyobankatu/Render-Docker',
+        github: 'https://github.com/kyobankatu/Artifact-Simulator-Backend',
         url: null,
     },
     {
         name: 'NeuralNetwork',
-        description: 'C言語でスクラッチ実装したニューラルネットワーク。逆誤差伝播法による学習を行い、sin波の近似を検証。結果をJupyter Notebookで可視化します。',
         techs: ['C', 'Python'],
         github: 'https://github.com/kyobankatu/NeuralNetwork',
         url: null,
@@ -151,6 +146,8 @@ const pick = (arr) => arr[Math.floor(Math.random() * arr.length)]
 
 export default function Home() {
     const [orbs, setOrbs] = useState([])
+    const [lang, setLang] = useState('ja')
+    const t = lang === 'ja' ? ja : en
     const nextId = useRef(1)
 
     const scrollTo = (id) => {
@@ -187,6 +184,12 @@ export default function Home() {
 
     return (
         <>
+            <button
+                className={styles.langToggle}
+                onClick={() => setLang(lang === 'ja' ? 'en' : 'ja')}
+            >
+                {lang === 'ja' ? 'EN' : 'JA'}
+            </button>
             <div className={styles.orbLayer} aria-hidden="true">
                 {orbs.map((orb) => (
                     <div
@@ -213,18 +216,19 @@ export default function Home() {
                             <img className={styles.avatar} src="/avatar-placeholder.png" alt="avatar" />
                         </div>
                         <div className={styles.profileText}>
-                            <h3>{name}</h3>
+                            <h3>{t.name}</h3>
                         </div>
                     </div>
 
                     <div className={styles.selfContent}>
                         <div className={styles.eyebrow}>Portfolio</div>
                         <h1 className={styles.heroTitle}>
-                            {name}
+                            {t.name}
                             <span className={styles.gold}> — </span>
-                            <span className={styles.role}>{role}</span>
+                            <span className={styles.role}>{t.role}</span>
                         </h1>
-                        <p className={styles.tagline}>{tagline}</p>
+                        <p className={styles.tagline}>{t.tagline}</p>
+                        <p className={styles.bio}>{t.bio}</p>
 
                         <div className={styles.actions}>
                             <button className={`${styles.btn} ${styles.ghost}`} onClick={() => scrollTo('skills')}>
@@ -277,7 +281,8 @@ export default function Home() {
 
             <section id="research" className={styles.sectionPlaceholder}>
                 <h2>Research</h2>
-                <p>未定</p>
+                <span className={styles.labLink}>{t.research.labName}</span>
+                <p>{t.research.description}</p>
             </section>
 
             <section id="projects" className={styles.sectionPlaceholder}>
@@ -298,7 +303,7 @@ export default function Home() {
                                     )}
                                 </div>
                             </div>
-                            <p className={styles.projectDesc}>{p.description}</p>
+                            <p className={styles.projectDesc}>{t.projects[p.name]}</p>
                             <div className={styles.techBadges}>
                                 {p.techs.map((t) => (
                                     <span key={t} className={styles.techBadge}>{t}</span>
@@ -325,8 +330,8 @@ export default function Home() {
 
             <section id="hobbies" className={styles.sectionPlaceholder}>
                 <h2>Hobbies</h2>
-                <p className={styles.hobbiesNote}>原神が大好きでのめり込んでます。時々ジャグリングや料理もしてます。</p>
-                <p className={styles.hobbiesNote}>2026 / 3 から趣味でイラストを描き始めました。勉強中...</p>
+                <p className={styles.hobbiesNote}>{t.hobbies.note1}</p>
+                <p className={styles.hobbiesNote}>{t.hobbies.note2}</p>
                 <div className={styles.hobbiesGallery}>
                     <img src="/hobbies/img0.jpg" alt="illust 0" className={styles.hobbiesImg} />
                     <img src="/hobbies/img1.jpg" alt="illust 1" className={styles.hobbiesImg} />
