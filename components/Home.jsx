@@ -23,7 +23,7 @@ const skillGroups = [
         ],
     },
     {
-        category: 'Markup & Styling',
+        category: 'Markup/Style',
         skills: [
             { name: 'HTML/CSS', level: 4 },
         ],
