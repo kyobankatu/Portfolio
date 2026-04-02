@@ -276,7 +276,7 @@ export default function Home() {
 
             <section id="research" className={styles.sectionPlaceholder}>
                 <h2>Research</h2>
-                <span className={styles.labLink}>{t.research.labName}</span>
+                {/*<span className={styles.labLink}>{t.research.labName}</span>*/}
                 <p>{t.research.description}</p>
             </section>
 
@@ -312,6 +312,11 @@ export default function Home() {
             <section id="contact" className={`${styles.sectionPlaceholder}`}>
                 <h2>Contact</h2>
                 <div className={styles.contactList}>
+                    <a className={styles.contactCard} href="mailto:kento.ota@rio.scrc.iir.isct.ac.jp">
+                        <FaEnvelope size={20} className={styles.contactIcon} />
+                        <span className={styles.contactLabel}>Email</span>
+                        <span className={styles.contactValue}>kento.ota@rio.scrc.iir.isct.ac.jp</span>
+                    </a>
                     <a className={styles.contactCard} href="mailto:ota.k.5051@m.isct.ac.jp">
                         <FaEnvelope size={20} className={styles.contactIcon} />
                         <span className={styles.contactLabel}>Email</span>
