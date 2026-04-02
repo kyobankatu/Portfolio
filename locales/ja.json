@@ -14,8 +14,7 @@
     "projects": {
         "Portfolio": "このポートフォリオサイト。Next.jsで構築し、Vercel でホスティングしている。",
         "PainRecorder": "慢性疼痛患者が痛みの強さを記録・可視化する日本語WebアプリをNext.js + PostgreSQLで構築。気象データ連携・PWA対応・グラフ分析機能を備えている。",
-        "ZZZ-Translator": "「Zenless Zone Zero」の用語集をWiki・XMLなど4ソースから収集・統合し、Google Cloud Translation APIのカスタム用語集として登録するPythonプログラム。AIを用いたクリーニング機能を備えている。",
-        "ZZZ-SearchApi": "「Zenless Zone Zero」のWiki情報を検索・スクレイピングし、AIで要約して返すAPIサーバー。",
+        "ZZZ-SearchApi": "「Zenless Zone Zero」のWiki情報を検索し、AIで要約して返すAPIサーバー。",
         "ZZZ-SearchOverlay": "「Zenless Zone Zero」のプレイ中にゲーム用語を素早く調べられるElectronデスクトップアプリ。テキスト検索とスクリーンショットを用いた画像検索に対応している。",
         "GenshinImpactDPSCalculator": "Genshin Impactの時間駆動型戦闘シミュレーターとDPS計算ツール。スキルアニメーション・元素反応・ICDを精密に再現し、聖遺物最適化パイプラインとRL学習モジュールを備えている。",
         "ArtifactSimulator": "原神の聖遺物強化後のスコア確率分布を計算・可視化するWebアプリ。スクリーンショットからサブオプションを自動認識し、ヒストグラムや統計量で結果を表示する。",

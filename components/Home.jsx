@@ -85,24 +85,6 @@ const projects = [
         url: 'https://painrecorder-474392225909.asia-northeast1.run.app/',
     },
     {
-        name: 'ZZZ-Translator',
-        techs: ['Python', 'Playwright', 'Google Cloud Translation API', 'BeautifulSoup4'],
-        github: 'https://github.com/kyobankatu/ZZZ-Translator',
-        url: null,
-    },
-    {
-        name: 'ZZZ-SearchApi',
-        techs: ['Python', 'Flask', 'Google Cloud Translation API', 'BeautifulSoup4', 'Docker', 'Cloud Run'],
-        github: 'https://github.com/kyobankatu/ZZZ-SearchApi',
-        url: null,
-    },
-    {
-        name: 'ZZZ-SearchOverlay',
-        techs: ['Electron', 'Node.js'],
-        github: 'https://github.com/kyobankatu/ZZZ-SearchOverlay',
-        url: null,
-    },
-    {
         name: 'GenshinImpactDPSCalculator',
         techs: ['Java', 'Gradle', 'Python'],
         github: 'https://github.com/kyobankatu/GenshinImpactDPSCalculator',
@@ -118,6 +100,18 @@ const projects = [
         name: 'ArtifactSimulator-Backend',
         techs: ['Python', 'Flask', 'Google Cloud Vision API', 'Docker', 'Render'],
         github: 'https://github.com/kyobankatu/Artifact-Simulator-Backend',
+        url: null,
+    },
+    {
+        name: 'ZZZ-SearchApi',
+        techs: ['Python', 'Flask', 'Google Cloud Translation API', 'BeautifulSoup4', 'Docker', 'Cloud Run'],
+        github: 'https://github.com/kyobankatu/ZZZ-SearchApi',
+        url: null,
+    },
+    {
+        name: 'ZZZ-SearchOverlay',
+        techs: ['Electron', 'Node.js'],
+        github: 'https://github.com/kyobankatu/ZZZ-SearchOverlay',
         url: null,
     },
     {

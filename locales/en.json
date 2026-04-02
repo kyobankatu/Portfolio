@@ -14,8 +14,7 @@
     "projects": {
         "Portfolio": "This portfolio site. Built with Next.js and hosted on Vercel.",
         "PainRecorder": "A Japanese web app for chronic pain patients to record and visualize pain intensity, built with Next.js + PostgreSQL. Features weather data integration, PWA support, and graph analysis.",
-        "ZZZ-Translator": "A Python program that collects and integrates Zenless Zone Zero terminology from 4 sources (Wiki, XML, etc.) and registers them as custom glossaries for the Google Cloud Translation API. Includes AI-powered cleaning functionality.",
-        "ZZZ-SearchApi": "An API server that searches and scrapes Zenless Zone Zero Wiki information and returns AI-generated summaries.",
+        "ZZZ-SearchApi": "An API server that searches Zenless Zone Zero Wiki information and returns AI-generated summaries.",
         "ZZZ-SearchOverlay": "An Electron desktop app for quickly looking up in-game terms while playing Zenless Zone Zero. Supports text search and image search via screenshot.",
         "GenshinImpactDPSCalculator": "A time-driven combat simulator and DPS calculation tool for Genshin Impact. Accurately reproduces skill animations, elemental reactions, and ICD, with an artifact optimization pipeline and RL learning module.",
         "ArtifactSimulator": "A web app that calculates and visualizes the score probability distribution after Genshin Impact artifact enhancement. Automatically recognizes sub-stats from screenshots and displays results as histograms and statistics.",
