@@ -76,7 +76,7 @@ const projects = [
         name: 'Portfolio',
         techs: ['Next.js', 'Vercel'],
         github: 'https://github.com/kyobankatu/Portfolio',
-        url: 'https://portfolio-katumons-projects.vercel.app/',
+        url: 'https://katumon-portfolio.vercel.app/',
     },
     {
         name: 'PainRecorder',
