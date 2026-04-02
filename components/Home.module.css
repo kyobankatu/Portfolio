@@ -8,14 +8,14 @@
     font-weight: 600;
     font-size: 0.85rem;
     cursor: pointer;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     color: #cfe7ff;
     transition: border-color 0.2s, color 0.2s;
 }
 
 .langToggle:hover {
-    border-color: rgba(191,160,70,0.5);
+    border-color: rgba(191, 160, 70, 0.5);
     color: #d7b262;
 }
 
@@ -67,18 +67,23 @@
         transform: translate3d(-50%, -50%, 0) scale(0.85);
         filter: blur(10px) saturate(90%);
     }
+
     10% {
         opacity: 0.95;
     }
+
     30% {
         transform: translate3d(calc(-50% + 6px), calc(-50% - 14px), 0) scale(1.02);
     }
+
     60% {
         transform: translate3d(calc(-50% - 10px), calc(-50% + 10px), 0) scale(1);
     }
+
     90% {
         opacity: 0.45;
     }
+
     100% {
         opacity: 0;
         transform: translate3d(calc(-50% + 14px), calc(-50% - 18px), 0) scale(0.92);
@@ -89,14 +94,14 @@
 .profileCard {
     width: 260px;
     max-width: 100%;
-    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-    border: 1px solid rgba(255,255,255,0.06);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 18px;
     padding: 1.25rem;
     text-align: center;
     position: relative;
     backdrop-filter: blur(6px) saturate(120%);
-    box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+    box-shadow: 0 10px 30px rgba(2, 6, 23, 0.6);
     margin-bottom: 1.25rem;
 }
 
@@ -114,7 +119,7 @@
     object-fit: cover;
     border-radius: 50%;
     display: block;
-    box-shadow: 0 8px 30px rgba(11,18,32,0.6);
+    box-shadow: 0 8px 30px rgba(11, 18, 32, 0.6);
     transform-origin: center;
     background: linear-gradient(180deg, #f6f7fb, #e7eef8);
 }
@@ -194,13 +199,13 @@
     font-weight: 600;
     color: #d7b262;
     text-decoration: none;
-    border-bottom: 1px solid rgba(215,178,98,0.4);
+    border-bottom: 1px solid rgba(215, 178, 98, 0.4);
     transition: border-color 0.2s, color 0.2s;
 }
 
 .labLink:hover {
     color: #e6c777;
-    border-color: rgba(215,178,98,0.8);
+    border-color: rgba(215, 178, 98, 0.8);
 }
 
 .skillGroups {
@@ -235,13 +240,13 @@
 }
 
 .skill {
-    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-    border: 1px solid rgba(255,255,255,0.06);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.06);
     padding: 0.35rem 0.65rem;
     border-radius: 999px;
     font-size: 0.9rem;
     color: #eaf6ff;
-    box-shadow: 0 6px 18px rgba(2,6,23,0.4);
+    box-shadow: 0 6px 18px rgba(2, 6, 23, 0.4);
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
@@ -266,12 +271,13 @@
 }
 
 .dotEmpty {
-    background: rgba(255,255,255,0.18);
+    background: rgba(255, 255, 255, 0.18);
 }
 
 .actions {
     margin-top: 1.25rem;
     display: flex;
+    flex-wrap: wrap;
     gap: 0.75rem;
     justify-content: center;
 }
@@ -292,32 +298,33 @@
 .primary {
     background: linear-gradient(180deg, #d7b262, #bfa046);
     color: #071019;
-    box-shadow: 0 8px 24px rgba(191,160,70,0.18);
+    box-shadow: 0 8px 24px rgba(191, 160, 70, 0.18);
 }
 
 .ghost {
     background: transparent;
     color: #d6e9ff;
-    border: 1px solid rgba(255,255,255,0.08);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     transition: border-color 0.2s, color 0.2s;
 }
 
 .ghost:hover {
-    border-color: rgba(191,160,70,0.5);
+    border-color: rgba(191, 160, 70, 0.5);
     color: #d7b262;
 }
 
 .sectionPlaceholder {
     padding: 3rem 1.25rem;
+    width: calc(100% - 2.5rem);
     max-width: 900px;
     margin: 2rem auto;
     color: #d6e9ff;
     text-align: center;
-    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
     border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.05);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(6px) saturate(120%);
-    box-shadow: 0 8px 30px rgba(2,6,23,0.45);
+    box-shadow: 0 8px 30px rgba(2, 6, 23, 0.45);
 }
 
 .projectList {
@@ -331,14 +338,14 @@
 .projectCard {
     padding: 1.25rem 1.5rem;
     border-radius: 12px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-    border: 1px solid rgba(255,255,255,0.1);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.1);
     transition: border-color 0.2s, background 0.2s;
 }
 
 .projectCard:hover {
-    border-color: rgba(191,160,70,0.4);
-    background: linear-gradient(180deg, rgba(191,160,70,0.07), rgba(191,160,70,0.02));
+    border-color: rgba(191, 160, 70, 0.4);
+    background: linear-gradient(180deg, rgba(191, 160, 70, 0.07), rgba(191, 160, 70, 0.02));
 }
 
 .projectCardHeader {
@@ -366,13 +373,13 @@
     font-size: 0.82rem;
     font-weight: 600;
     text-decoration: none;
-    border: 1px solid rgba(255,255,255,0.15);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     color: #cfe7ff;
     transition: border-color 0.2s, color 0.2s;
 }
 
 .projectLink:hover {
-    border-color: rgba(191,160,70,0.5);
+    border-color: rgba(191, 160, 70, 0.5);
     color: #d7b262;
 }
 
@@ -395,8 +402,8 @@
     font-size: 0.78rem;
     font-weight: 600;
     color: #bfa046;
-    background: rgba(191,160,70,0.1);
-    border: 1px solid rgba(191,160,70,0.25);
+    background: rgba(191, 160, 70, 0.1);
+    border: 1px solid rgba(191, 160, 70, 0.25);
 }
 
 .contactList {
@@ -415,16 +422,16 @@
     max-width: 420px;
     padding: 1.1rem 1.5rem;
     border-radius: 12px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-    border: 1px solid rgba(255,255,255,0.1);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.1);
     text-decoration: none;
     color: #eaf6ff;
     transition: border-color 0.2s, background 0.2s, transform 0.2s;
 }
 
 .contactCard:hover {
-    border-color: rgba(191,160,70,0.6);
-    background: linear-gradient(180deg, rgba(191,160,70,0.12), rgba(191,160,70,0.05));
+    border-color: rgba(191, 160, 70, 0.6);
+    background: linear-gradient(180deg, rgba(191, 160, 70, 0.12), rgba(191, 160, 70, 0.05));
     transform: scale(1.02);
 }
 
@@ -465,8 +472,8 @@
     max-width: 100%;
     width: 320px;
     border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.08);
-    box-shadow: 0 8px 24px rgba(2,6,23,0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 24px rgba(2, 6, 23, 0.5);
     object-fit: cover;
 }
 
@@ -480,7 +487,17 @@
     .heroTitle {
         font-size: 1.25rem;
     }
+
     .profileCard {
         width: 220px;
+    }
+
+    .actions {
+        gap: 0.5rem;
+    }
+
+    .btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
     }
 }
