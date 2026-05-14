@@ -21,7 +21,3 @@ npm run dev      # http://localhost:3000
 npm run build
 npm run start    # preview production build
 ```
-
-## Deployment
-
-Recommended: [Vercel](https://vercel.com) — connect the GitHub repository and it deploys automatically on push.
