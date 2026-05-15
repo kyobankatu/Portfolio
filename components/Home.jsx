@@ -74,15 +74,15 @@ const skillGroups = [
 const projects = [
     {
         name: 'Portfolio',
-        techs: ['Next.js', 'Vercel'],
+        techs: ['Next.js', 'k3s'],
         github: 'https://github.com/kyobankatu/Portfolio',
-        url: 'https://katumon-portfolio.vercel.app/',
+        url: 'https://portfolio.katumon.com/',
     },
     {
         name: 'PainRecorder',
-        techs: ['Next.js', 'TypeScript', 'PostgreSQL', 'Prisma', 'Docker', 'Cloud Run', 'Neon'],
+        techs: ['Next.js', 'TypeScript', 'PostgreSQL', 'Prisma', 'Docker', 'k3s'],
         github: 'https://github.com/kyobankatu/PainRecorder',
-        url: 'https://painrecorder-474392225909.asia-northeast1.run.app/',
+        url: 'https://pain.katumon.com/',
     },
     {
         name: 'GenshinImpactDPSCalculator',
@@ -92,14 +92,14 @@ const projects = [
     },
     {
         name: 'ArtifactSimulator',
-        techs: ['Vue.js', 'Vercel'],
-        github: 'https://github.com/kyobankatu/ArtifactSimulator-Vercel',
-        url: 'https://artifact-simulator.vercel.app/',
+        techs: ['Vue.js', 'Docker', 'k3s'],
+        github: 'https://github.com/kyobankatu/ArtifactSimulator-Frontend',
+        url: 'https://artifact.katumon.com',
     },
     {
         name: 'ArtifactSimulator-Backend',
-        techs: ['Python', 'Flask', 'Google Cloud Vision API', 'Docker', 'Render'],
-        github: 'https://github.com/kyobankatu/Artifact-Simulator-Backend',
+        techs: ['Python', 'Flask', 'Google Cloud Vision API', 'Docker', 'k3s'],
+        github: 'https://github.com/kyobankatu/ArtifactSimulator-Backend',
         url: null,
     },
     {

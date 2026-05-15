@@ -12,8 +12,8 @@
         "note2": "Started drawing illustrations as a hobby from March 2026. Still learning..."
     },
     "projects": {
-        "Portfolio": "This portfolio site. Built with Next.js and hosted on Vercel.",
-        "PainRecorder": "A Japanese web app for chronic pain patients to record and visualize pain intensity, built with Next.js + PostgreSQL. Features weather data integration, PWA support, and graph analysis.",
+        "Portfolio": "This portfolio site. Built with Next.js and hosted on a home server using k3s.",
+        "PainRecorder": "A Japanese web app for chronic pain patients to record and visualize pain intensity. Built with Next.js + PostgreSQL, with weather data integration, PWA support, and graph analysis.",
         "ZZZ-SearchApi": "An API server that searches Zenless Zone Zero Wiki information and returns AI-generated summaries.",
         "ZZZ-SearchOverlay": "An Electron desktop app for quickly looking up in-game terms while playing Zenless Zone Zero. Supports text search and image search via screenshot.",
         "GenshinImpactDPSCalculator": "A time-driven combat simulator and DPS calculation tool for Genshin Impact. Accurately reproduces skill animations, elemental reactions, and ICD, with an artifact optimization pipeline and RL learning module.",

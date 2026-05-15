@@ -12,8 +12,8 @@
         "note2": "2026 / 3 から趣味でイラストを描き始めました。勉強中..."
     },
     "projects": {
-        "Portfolio": "このポートフォリオサイト。Next.jsで構築し、Vercel でホスティングしている。",
-        "PainRecorder": "慢性疼痛患者が痛みの強さを記録・可視化する日本語WebアプリをNext.js + PostgreSQLで構築。気象データ連携・PWA対応・グラフ分析機能を備えている。",
+        "Portfolio": "このポートフォリオサイト。Next.jsで構築し、ホームサーバー上のk3sで運用している。",
+        "PainRecorder": "慢性疼痛患者が痛みの強さを記録・可視化する日本語Webアプリ。Next.js + PostgreSQLで構築し、気象データ連携・PWA対応・グラフ分析機能を備えている。",
         "ZZZ-SearchApi": "「Zenless Zone Zero」のWiki情報を検索し、AIで要約して返すAPIサーバー。",
         "ZZZ-SearchOverlay": "「Zenless Zone Zero」のプレイ中にゲーム用語を素早く調べられるElectronデスクトップアプリ。テキスト検索とスクリーンショットを用いた画像検索に対応している。",
         "GenshinImpactDPSCalculator": "Genshin Impactの時間駆動型戦闘シミュレーターとDPS計算ツール。スキルアニメーション・元素反応・ICDを精密に再現し、聖遺物最適化パイプラインとRL学習モジュールを備えている。",
