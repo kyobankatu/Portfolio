@@ -23,9 +23,10 @@ const skillGroups = [
     {
         category: 'Frameworks',
         skills: [
-            { name: 'Next.js', level: 3 },
+            { name: 'Next.js', level: 2 },
             { name: 'Vue.js', level: 3 },
-            { name: 'React', level: 1 },
+            { name: 'React', level: 2 },
+            { name: 'Spring Boot', level: 1}
         ],
     },
     {
@@ -37,7 +38,7 @@ const skillGroups = [
     {
         category: 'Database',
         skills: [
-            { name: 'PostgreSQL', level: 3 },
+            { name: 'PostgreSQL', level: 2 },
         ],
     },
     {
@@ -46,6 +47,7 @@ const skillGroups = [
             { name: 'Git', level: 4 },
             { name: 'Docker', level: 3 },
             { name: 'Google Cloud', level: 3 },
+            { name: 'Kubernetes', level: 2}
         ],
     },
     {
@@ -79,12 +81,6 @@ const projects = [
         url: 'https://portfolio.katumon.com/',
     },
     {
-        name: 'PainRecorder',
-        techs: ['Next.js', 'TypeScript', 'PostgreSQL', 'Prisma', 'Docker', 'k3s'],
-        github: 'https://github.com/kyobankatu/PainRecorder',
-        url: 'https://pain.katumon.com/',
-    },
-    {
         name: 'GenshinImpactDPSCalculator',
         techs: ['Java', 'Gradle', 'Python'],
         github: 'https://github.com/kyobankatu/GenshinImpactDPSCalculator',
@@ -100,6 +96,18 @@ const projects = [
         name: 'ArtifactSimulator-Backend',
         techs: ['Python', 'Flask', 'Google Cloud Vision API', 'Docker', 'k3s'],
         github: 'https://github.com/kyobankatu/ArtifactSimulator-Backend',
+        url: null,
+    },
+    {
+        name: 'PainRecorder',
+        techs: ['Next.js', 'TypeScript', 'PostgreSQL', 'Prisma', 'Docker', 'k3s'],
+        github: 'https://github.com/kyobankatu/PainRecorder',
+        url: 'https://pain.katumon.com/',
+    },
+    {
+        name: 'ClipboardSync',
+        techs: ['Java', 'Spring Boot', 'Gradle', 'WebSocket'],
+        github: 'https://github.com/kyobankatu/ClipboardSync',
         url: null,
     },
     {
@@ -276,7 +284,14 @@ export default function Home() {
 
             <section id="research" className={styles.sectionPlaceholder}>
                 <h2>Research</h2>
-                {/*<span className={styles.labLink}>{t.research.labName}</span>*/}
+                <a
+                    className={styles.labLink}
+                    href="https://www.rio.gsic.titech.ac.jp/jp/index.html"
+                    target="_blank"
+                    rel="noreferrer"
+                >
+                    {t.research.labName}
+                </a>
                 <p>{t.research.description}</p>
             </section>
 
