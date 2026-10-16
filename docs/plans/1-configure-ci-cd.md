@@ -9,7 +9,7 @@
 ## 進捗
 
 - [x] Phase 0：現状調査、方式決定、計画とCONTENTS.md整備
-- [ ] Phase 1：本番DockerイメージのE2EとGitHub Actions／GHCR公開
+- [x] Phase 1：本番DockerイメージのE2EとGitHub Actions／GHCR公開
 - [ ] Phase 2：成功したCIを取り込むデプロイ処理・検証・運用docs
 - [ ] Phase 3（最終Phase N）：全体検証、6分野レビュー、ユーザー最終確認
 
@@ -41,7 +41,7 @@
 | --- | --- |
 | 目的 | PRで検証し、masterの検証成功時だけGHCRへ公開する |
 | 意図 | E2Eしたものと同じDockerイメージをcommit SHAで特定できるようにする |
-| 編集ファイル | `.github/workflows/ci.yml`、Dockerfile、`.dockerignore`、package.json／lock、playwright.config.js、tests/e2e、tools/check_contents.py、関連索引 |
+| 編集ファイル | `.github/workflows/ci.yml`、Dockerfile、next.config.js、`.dockerignore`、`.gitignore`、package.json／lock、playwright.config.js、tests/e2e、tools/check_contents.py、tools/check_runtime.mjs、関連索引 |
 | テストケース | Docker内のトップ画面・言語切替・画像配信・404、イメージ内の非root実行と開発用ファイル除外、索引検査 |
 | 完了条件 | 本番用イメージへのE2Eが通り、PRは公開せずmasterだけが公開するworkflowが揃う |
 
@@ -65,6 +65,10 @@
 | 完了条件 | 修正箇所の表をユーザーへ提示し、必要な修正・再レビュー後に最終了承を得る |
 
 ## 検証・公開記録
+
+- Phase 0 commit：`269bf4e`。
+- Phase 1：Dockerビルド成功。standalone実行イメージに対してE2E 3件成功、非root・開発ファイル除外検査成功。Next.jsのoptional peer依存でPlaywrightが残ることを実行検査で検出し、standalone出力へ変更して成功を確認。GHCRへの実公開は最終了承・push・masterマージ後に検証する。
+- 既存依存関係のnpm auditは5件（high 4、critical 1）。Next.js等の既存バージョン由来であり、追加したPlaywrightの指摘はない。最終レビューの確認事項として残す。
 
 - 索引検査：共通の既定除外を使用し、追加で`.claude/settings.local.json`を除外する。秘密値やローカル設定内容は索引に転載しない。
 - 各phaseのcommitと検証結果は完了時にここへ追記し、Issue計画コメントを同期する。

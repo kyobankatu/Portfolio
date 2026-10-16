@@ -1,0 +1,68 @@
+name: Portfolio CI and publish
+
+on:
+    pull_request:
+        branches: [master]
+    push:
+        branches: [master]
+    workflow_dispatch:
+
+concurrency:
+    group: portfolio-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
+jobs:
+    test-and-publish:
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        permissions:
+            contents: read
+            packages: write
+        env:
+            LOCAL_IMAGE: portfolio-ci:${{ github.sha }}
+            IMAGE: ghcr.io/kyobankatu/portfolio
+            PORTFOLIO_BASE_URL: http://127.0.0.1:4173
+        steps:
+            - name: Checkout
+              uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+              with:
+                  persist-credentials: false
+            - name: Set up Node.js
+              uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+              with:
+                  node-version: '22'
+                  cache: npm
+            - name: Install dependencies
+              run: npm ci
+            - name: Check directory indexes
+              run: python3 -B tools/check_contents.py . --exclude .claude/settings.local.json --exclude test-results --exclude playwright-report
+            - name: Install browser
+              run: npx playwright install --with-deps chromium
+            - name: Build production image
+              run: docker build --pull --label org.opencontainers.image.source=https://github.com/kyobankatu/Portfolio --label org.opencontainers.image.revision="$GITHUB_SHA" -t "$LOCAL_IMAGE" .
+            - name: Check production runtime
+              run: docker run --rm -i "$LOCAL_IMAGE" node --input-type=module < tools/check_runtime.mjs
+            - name: Start production image
+              run: docker run -d --name portfolio-e2e -p 127.0.0.1:4173:3000 "$LOCAL_IMAGE"
+            - name: Browser E2E
+              run: npm run test:e2e
+            - name: Publish verified master image
+              if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+              env:
+                  GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GHCR_USER: ${{ github.actor }}
+              run: |
+                  printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+                  docker tag "$LOCAL_IMAGE" "$IMAGE:sha-$GITHUB_SHA"
+                  docker push "$IMAGE:sha-$GITHUB_SHA"
+            - name: Show server log on failure
+              if: failure()
+              run: docker logs portfolio-e2e || true
+            - name: Clean up
+              if: always()
+              run: |
+                  docker rm -f portfolio-e2e || true
+                  docker logout ghcr.io || true
