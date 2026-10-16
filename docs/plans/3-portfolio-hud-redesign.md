@@ -43,7 +43,7 @@
 
 ## Phase checklist
 
-- [ ] Phase 0：調査・計画をローカルとIssueコメントに記録し、commitする。
+- [x] Phase 0：調査・計画をローカルとIssueコメントに記録し、commitする。
 - [ ] Phase 1：HUD画面・掲載情報を実装し、E2EとCONTENTS検査を通してcommitする。
 - [ ] Phase 2：キャラクター演出・動きの軽減対応を実装し、E2EとCONTENTS検査を通してcommitする。
 - [ ] Phase N：全体検証・7分野レビュー・ユーザー最終了承を完了する。
@@ -52,7 +52,7 @@
 
 | Phase | Result | Commit SHA | Issue plan updated |
 | --- | --- | --- | --- |
-| 0 | In progress | Pending | Pending |
+| 0 | Complete | `d6bb27e45ac75c014b1924ba86fe4e1351f7cc16` | Yes ([Issue comment](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6216410535)) |
 | 1 | Pending | Pending | Pending |
 | 2 | Pending | Pending | Pending |
 | N | Pending | Pending | Pending |
