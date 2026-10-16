@@ -57,7 +57,7 @@
 - [x] Phase 0：調査・計画をローカルとIssueコメントに記録し、commitする。
 - [x] Phase 1：HUD画面・掲載情報を実装し、単体／結合／E2E、ビルドとCONTENTS検査を通してcommitする。
 - [x] Phase 2：キャラクター演出・動きの軽減対応を実装し、単体／結合／E2E、ビルドとCONTENTS検査を通してcommitする。
-- [ ] Phase N：全体検証・7分野レビュー・ユーザー最終了承を完了する。
+- [x] Phase N：全体検証・7分野レビュー・ユーザー最終了承を完了する。
 
 ## 実行記録
 
@@ -66,3 +66,4 @@
 | 0 | 完了 | d6bb27e45ac75c014b1924ba86fe4e1351f7cc16 | 済 ([初期計画](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6216410535)) |
 | 1 | 完了。単体／結合テスト8件、Chromium E2E 3件、本番ビルド、CONTENTS検査が成功 | 8d1e81c | 済 |
 | 2 | 完了。単体／結合テスト10件、Chromium E2E 4件、本番ビルド、CONTENTS検査が成功 | ee9c092 | 済 |
+| N | 完了。7分野の最終レビューで指摘なし。全検証成功、ユーザー最終了承済み | 0652aa7、0b11038 | 済 |
