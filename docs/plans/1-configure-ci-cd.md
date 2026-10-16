@@ -10,7 +10,7 @@
 
 - [x] Phase 0：現状調査、方式決定、計画とCONTENTS.md整備
 - [x] Phase 1：本番DockerイメージのE2EとGitHub Actions／GHCR公開
-- [ ] Phase 2：成功したCIを取り込むデプロイ処理・検証・運用docs
+- [x] Phase 2：成功したCIを取り込むデプロイ処理・検証・運用docs
 - [ ] Phase 3（最終Phase N）：全体検証、6分野レビュー、ユーザー最終確認
 
 ## 合意済みの構成・検証範囲
@@ -67,8 +67,10 @@
 ## 検証・公開記録
 
 - Phase 0 commit：`269bf4e`。
+- Phase 1 commit：`34e700c`。
 - Phase 1：Dockerビルド成功。standalone実行イメージに対してE2E 3件成功、非root・開発ファイル除外検査成功。Next.jsのoptional peer依存でPlaywrightが残ることを実行検査で検出し、standalone出力へ変更して成功を確認。GHCRへの実公開は最終了承・push・masterマージ後に検証する。
 - 既存依存関係のnpm auditは5件（high 4、critical 1）。Next.js等の既存バージョン由来であり、追加したPlaywrightの指摘はない。最終レビューの確認事項として残す。
+- Phase 2：Linuxコンテナでデプロイ処理11件成功（flock競合・例外後の解放を含む）。cp-1でGitHub APIのmaster取得200、必要ツールの実パス、Deploymentの既存イメージとready 1を確認。dry-runは未公開workflowのAPIが404のためエラー終了し、クラスタは更新していない。候補を選ぶ実サーバーdry-runはmasterマージ後の確認として残す。GitHub Actionsは有効、workflow内の明示的なpackages writeで公開する。CONTENTS検査は15ディレクトリ・指摘0件。
 
 - 索引検査：共通の既定除外を使用し、追加で`.claude/settings.local.json`を除外する。秘密値やローカル設定内容は索引に転載しない。
 - 各phaseのcommitと検証結果は完了時にここへ追記し、Issue計画コメントを同期する。

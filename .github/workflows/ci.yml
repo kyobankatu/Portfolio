@@ -39,7 +39,9 @@ jobs:
               run: npm ci
             - name: Check directory indexes
               run: python3 -B tools/check_contents.py . --exclude .claude/settings.local.json --exclude test-results --exclude playwright-report
-            - name: Install browser
+            - name: Test deployment controller
+              run: python3 -B -m unittest discover -s tests/deploy -p 'test_*.py' -v
+            - name: Install Chromium
               run: npx playwright install --with-deps chromium
             - name: Build production image
               run: docker build --pull --label org.opencontainers.image.source=https://github.com/kyobankatu/Portfolio --label org.opencontainers.image.revision="$GITHUB_SHA" -t "$LOCAL_IMAGE" .

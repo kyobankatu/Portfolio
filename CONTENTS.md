@@ -20,5 +20,6 @@ Portfolioの実装と運用に必要なファイル。
 | [portfolio.yaml](./portfolio.yaml) | KubernetesのDeployment・Service・Ingress定義 | 通常編集可 |
 | [public/](./public/CONTENTS.md) | ブラウザへ配信する静的アセット | 通常編集可 |
 | [README.md](./README.md) | プロジェクト概要と開始手順 | 通常編集可 |
+| [scripts/](./scripts/CONTENTS.md) | サーバーの自動デプロイ処理 | 通常編集可 |
 | [tests/](./tests/CONTENTS.md) | 画面とデプロイ処理の検証 | 通常編集可 |
 | [tools/](./tools/CONTENTS.md) | 開発用の機械検査 | 通常編集可 |
