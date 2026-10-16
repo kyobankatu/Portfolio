@@ -194,6 +194,7 @@ GHCR実公開、候補のあるcp-1 dry-run、初回SHAデプロイと公開URL�
 | セキュリティ | R8解消、新規指摘なし。PR検証の読取専用化、master限定公開、同一run・同一イメージの信頼境界を確認 |
 
 最終検証：本番Docker E2E 3件、Linuxデプロイテスト11件、workflow権限検査、actionlint、workflowのsave/load実行とイメージID一致、索引15ディレクトリ、差分チェックが成功。
+PR検証：GitHub Actions run [38896587613](https://github.com/kyobankatu/Portfolio/actions/runs/38896587613) がcommit `d0462fd15c4dda624d06c0209488dbed62f04a10`でsuccess。verify成功、PRではmaster限定publishをskip。
 既存依存関係のaudit指摘5件は別課題として残す。実際のGitHub artifact転送・GHCR公開・候補付きcp-1 dry-run・初回SHAデプロイ・公開URL確認はmasterでのCI実行後に確認する。
 ユーザー最終了承を受領。Phase 5を完了し、作業ブランチのpush、Issue計画コメント更新、PR作成へ進む。PRは自動マージせず、本番常駐設定はmasterの初回CI・公開成功確認後に行う。
 PR：[#2 ci: automate Portfolio image publishing and deployment](https://github.com/kyobankatu/Portfolio/pull/2)。作業ブランチ`1-configure-ci-cd`をpush済み。Git CLIのOAuth認証はworkflow scope不足で拒否されたため、既存SSH認証で同一commit履歴をpushした。
