@@ -52,6 +52,16 @@
 | テストケース | **単体・結合・E2E**: 依存更新後も全ケースが通る。**Security**: `npm audit`と`npm audit --omit=dev`で残存指摘を確認し、残る場合は実行経路と理由を記録する。**Docs**: CONTENTS checkerが全対象ディレクトリで成功し、開発規約・locale記述が現行実装と一致する。 |
 | 完了条件 | Node 22互換、全依存audit 0件、単体／結合12件、Chromium E2E 6件、デプロイテスト10件成功（cp-1専用lockテスト1件skip）、本番build、17ディレクトリCONTENTS検査が成功する。 |
 
+## Phase 5 — 最終レビュー記録の状態修正
+
+| 項目 | 記入内容 |
+| --- | --- |
+| 目的 | Phase Nの再レビューで見つかった古い承認状態の記述を更新し、計画書とIssueコメントの状態を一致させる。 |
+| 意図 | 再開する担当者が承認待ちと誤認しないよう、承認とPhase 3・4の修正完了を正確に残す。 |
+| 編集ファイル | `docs/plans/3-portfolio-hud-redesign.md`。同じ計画書をIssue #3の既存コメントへ反映する。 |
+| テストケース | **Docs**: レビュー指摘表・実行ログ・Phase checklistの状態が一致し、Issueコメントとローカル計画書が同一である。**CONTENTS**: 17ディレクトリの検査が成功する。**Diff**: `git diff --check`が成功する。 |
+| 完了条件 | 古い承認待ち表記と余分な表記を直し、Issueコメントを更新して計画書をcommitする。 |
+
 ## Phase N — 最終検証・分野別レビュー
 
 | 項目 | 記入内容 |
@@ -74,7 +84,7 @@
 | P3 | Docs: `CLAUDE.md` | locale JSONに全表示文言を置くという記述が、Home.jsx内の意図的な固定HUD見出し・ラベルと合わない。翻訳対象の文章と固定表記の範囲を区別する。 |
 | P3 | CONTENTS: `CONTENTS.md` | `package-lock.json`の生成元である`package.json`へのリンクがない。生成元リンクを戻す。 |
 
-これらの修正はユーザー承認待ち。レビューでは公開画面の直接的なXSS・秘密情報漏洩・不正な外部リンクは見つからなかった。 |
+これらの修正はユーザー承認済みで、Phase 3・4で反映済み。現在は修正後のPhase N再レビュー中。初回レビューでは公開画面の直接的なXSS・秘密情報漏洩・不正な外部リンクは見つからなかった。
 
 ## Phase checklist
 
@@ -83,6 +93,7 @@
 - [x] Phase 2：キャラクター演出・動きの軽減対応を実装し、単体／結合／E2E、ビルドとCONTENTS検査を通してcommitする。
 - [x] Phase 3：hash同期・翻訳／キーボード検証・CIゲートを追加し、全テストとCONTENTS検査を通してcommitする。
 - [x] Phase 4：承認済み依存・文書修正を行い、audit・全テスト・CONTENTS検査を通してcommitする。
+- [x] Phase 5：レビュー記録の承認状態を正確にし、Issueコメントと計画書を同期してcommitする。
 - [ ] Phase N：全体検証・修正後の7分野レビュー・ユーザー最終了承を完了する。
 
 ## Execution log
@@ -94,4 +105,5 @@
 | 2 | Complete; 10 unit/integration cases, 4 Chromium E2E cases, production build, and CONTENTS checker passed | `ee9c092` | Yes |
 | 3 | Complete; 12 unit/integration cases, 6 Chromium E2E cases, build, deployment tests, and CONTENTS checker passed; CI verify now runs `test:unit` | `39458b9` | Yes |
 | 4 | Complete; Next.js 15.5.28, Vitest 5.0.5, sharp 0.35.5 and PostCSS 8.5.30; both npm audits report zero vulnerabilities; 12 unit/integration tests, 6 Chromium E2E tests, build, 10 deployment tests (1 cp-1-only skip), and 17-directory CONTENTS check passed | `01327bb` | Yes |
+| 5 | Complete; approval status corrected, Issue plan synchronized; CONTENTS checker and diff check passed | Pending | Yes |
 | N | Pending re-review after correction phases | Pending | Pending |
