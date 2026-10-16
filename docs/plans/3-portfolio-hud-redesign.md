@@ -105,5 +105,5 @@
 | 2 | Complete; 10 unit/integration cases, 4 Chromium E2E cases, production build, and CONTENTS checker passed | `ee9c092` | Yes |
 | 3 | Complete; 12 unit/integration cases, 6 Chromium E2E cases, build, deployment tests, and CONTENTS checker passed; CI verify now runs `test:unit` | `39458b9` | Yes |
 | 4 | Complete; Next.js 15.5.28, Vitest 5.0.5, sharp 0.35.5 and PostCSS 8.5.30; both npm audits report zero vulnerabilities; 12 unit/integration tests, 6 Chromium E2E tests, build, 10 deployment tests (1 cp-1-only skip), and 17-directory CONTENTS check passed | `01327bb` | Yes |
-| 5 | Complete; approval status corrected, Issue plan synchronized; CONTENTS checker and diff check passed | Pending | Yes |
+| 5 | Complete; approval status corrected, Issue plan synchronized; CONTENTS checker and diff check passed | `56da43e` | Yes |
 | N | Pending re-review after correction phases | Pending | Pending |
