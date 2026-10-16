@@ -26,10 +26,10 @@
 
 | 項目 | 記入内容 |
 | --- | --- |
-| 目的 | ブロック型キャラクターがプロフィールを短く紹介し、ナビゲーション操作に控えめに反応する。 |
+| 目的 | ブロック型キャラクターが現在のセクションを短く紹介し、ナビゲーション操作に控えめに反応する。 |
 | 意図 | 遊び心を加えながら、読み込みや操作を待たせず、動きを望まない利用者にも配慮する。 |
-| 編集ファイル | `components/Home.jsx`（キャラクターと選択中セクションの状態・意味付け）、`components/Home.module.css`（登場・待機・反応アニメーションと`prefers-reduced-motion`）、`tests/integration/Home.test.jsx`（選択状態と表示の結合ケース）、`tests/e2e/portfolio.spec.js`（即時表示・操作反応・動き軽減）、必要な場合のみ `components/CONTENTS.md` を更新。 |
-| テストケース | **単体**: 正常系—有効なsection idで選択状態を更新する。異常系—未知のidでは既存の選択状態を保つ。**結合**: 正常系—目次クリックでhash・`aria-current`・紹介表示が一致する。異常系—対象セクションがDOMにない場合でも操作が例外を起こさず、他の目次が使える。**E2E**: `/`読込後に主要見出しとナビが即時に表示され、キャラクター演出の終了を待たない。通常設定では短い登場・待機演出、`prefers-reduced-motion: reduce`では動きなしで紹介・操作可能、マウス／Tab/Enterの選択後に対応セクションとキャラクター反応が一致する。 |
+| 編集ファイル | `components/Home.jsx`（選択セクションと紹介文の状態）、`components/Home.module.css`（短い登場・待機・反応アニメーションと`prefers-reduced-motion`）、`components/portfolioContent.js`（セクション選択状態の安全な判定）、`locales/ja.json`・`locales/en.json`（紹介文）、`tests/unit/portfolioContent.test.js`（有効・未知section id）、`tests/integration/Home.test.jsx`（選択状態と紹介表示）、`tests/e2e/portfolio.spec.js`（即時表示・操作反応・動き軽減）、必要な場合のみ`components/CONTENTS.md`を更新。 |
+| テストケース | **単体**: 正常系—有効なsection idで選択状態と紹介文を更新する。異常系—未知のidでは既存の選択状態を保ち、紹介文も空にしない。**結合**: 正常系—目次クリックで`aria-current`・対象セクション・キャラクター紹介が一致する。異常系—未知のhashでも画面と既存の目次操作が使える。**E2E**: `/`読込後に主要見出しとナビが即時に表示され、演出の終了を待たない。通常設定では短い登場・待機演出、`prefers-reduced-motion: reduce`ではアニメーションなしで紹介・操作可能。目次クリックとTab/Enterで対応する紹介へ切り替わる。 |
 | 完了条件 | 演出が非ブロッキングで、動きの軽減設定に対応する。追加E2Eとビルド、CONTENTS検査が成功する。 |
 
 ## Phase N — 最終検証・分野別レビュー
@@ -45,7 +45,7 @@
 
 - [x] Phase 0：調査・計画をローカルとIssueコメントに記録し、commitする。
 - [x] Phase 1：HUD画面・掲載情報を実装し、単体／結合／E2E、ビルドとCONTENTS検査を通してcommitする。
-- [ ] Phase 2：キャラクター演出・動きの軽減対応を実装し、E2EとCONTENTS検査を通してcommitする。
+- [x] Phase 2：キャラクター演出・動きの軽減対応を実装し、単体／結合／E2E、ビルドとCONTENTS検査を通してcommitする。
 - [ ] Phase N：全体検証・7分野レビュー・ユーザー最終了承を完了する。
 
 ## Execution log
@@ -54,5 +54,5 @@
 | --- | --- | --- | --- |
 | 0 | Complete | `d6bb27e45ac75c014b1924ba86fe4e1351f7cc16` | Yes ([Issue comment](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6216410535)) |
 | 1 | Complete; 8 unit/integration cases, 3 Chromium E2E cases, production build, and CONTENTS checker passed | `8d1e81c` | Yes |
-| 2 | Pending | Pending | Pending |
+| 2 | Complete; 10 unit/integration cases, 4 Chromium E2E cases, production build, and CONTENTS checker passed | Pending SHA | Yes, pending final commit SHA |
 | N | Pending | Pending | Pending |

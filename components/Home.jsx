@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { FaEnvelope, FaGithub, FaLinkedin } from 'react-icons/fa'
 import styles from './Home.module.css'
-import { getProjectCards, skillGroups } from './portfolioContent.js'
+import { getProjectCards, resolveActiveSection, skillGroups } from './portfolioContent.js'
 import en from '../locales/en.json'
 import ja from '../locales/ja.json'
 
@@ -21,6 +21,7 @@ export default function Home({ translations = { ja, en } }) {
     const [activeSection, setActiveSection] = useState('profile')
     const t = lang === 'ja' ? translations.ja : translations.en
     const projects = getProjectCards(t)
+    const selectSection = (sectionId) => setActiveSection((current) => resolveActiveSection(sectionId, current))
     const swallowUrl = lang === 'ja'
         ? 'https://swallow-llm.github.io/index.ja.html'
         : 'https://swallow-llm.github.io/index.en.html'
@@ -28,7 +29,7 @@ export default function Home({ translations = { ja, en } }) {
     return (
         <div className={styles.portfolioShell}>
             <aside className={styles.sidebar} aria-label={t.sidebarLabel}>
-                <a className={styles.brand} href="#overview" onClick={() => setActiveSection('profile')}>
+                <a className={styles.brand} href="#overview" onClick={() => selectSection('profile')}>
                     <span className={styles.avatarFrame}><img src="/avatar-placeholder.png" alt="" /></span>
                     <span className={styles.brandText}>
                         <strong>{t.name}</strong>
@@ -48,7 +49,7 @@ export default function Home({ translations = { ja, en } }) {
                             href={`#${item.id}`}
                             className={activeSection === item.id ? styles.navLinkActive : styles.navLink}
                             aria-current={activeSection === item.id ? 'location' : undefined}
-                            onClick={() => setActiveSection(item.id)}
+                            onClick={() => selectSection(item.id)}
                         >
                             <span>{t.sections[item.id]}</span>
                             <span className={styles.navNumber}>{item.number}</span>
@@ -84,7 +85,7 @@ export default function Home({ translations = { ja, en } }) {
                         <h1 id="hero-title">{t.name}<span className={styles.nameMark}>.</span></h1>
                         <p className={styles.heroSummary}>{t.tagline}</p>
                         <div className={styles.heroActions}>
-                            <a className={styles.primaryButton} href="#missions" onClick={() => setActiveSection('missions')}>
+                            <a className={styles.primaryButton} href="#missions" onClick={() => selectSection('missions')}>
                                 {t.viewMissions}<span aria-hidden="true">↗</span>
                             </a>
                             <a className={styles.secondaryButton} href="https://github.com/kyobankatu" target="_blank" rel="noreferrer">
@@ -99,7 +100,8 @@ export default function Home({ translations = { ja, en } }) {
                             <span>PLAYER 01</span>
                             <span>{t.readyStatus}</span>
                         </div>
-                        <div className={styles.characterTile}><img src="/avatar-placeholder.png" alt={t.characterAlt} /></div>
+                        <p className={styles.stageMessage} role="status" aria-live="polite" aria-atomic="true">{t.characterLines[activeSection]}</p>
+                        <div className={styles.characterTile} key={`character-${activeSection}`}><img src="/avatar-placeholder.png" alt={t.characterAlt} /></div>
                         <div className={styles.stageFloor} aria-hidden="true" />
                     </div>
                 </section>

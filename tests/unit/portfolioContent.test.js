@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getProjectCards } from '../../components/portfolioContent.js'
+import { getProjectCards, resolveActiveSection } from '../../components/portfolioContent.js'
 import ja from '../../locales/ja.json'
 import en from '../../locales/en.json'
 
@@ -19,5 +19,16 @@ describe('getProjectCards', () => {
         const invalidLocale = { ...ja, projects: { ...ja.projects, ArtifactSimulator: description } }
 
         expect(() => getProjectCards(invalidLocale)).toThrow(/Missing project description for ArtifactSimulator/i)
+    })
+})
+
+describe('resolveActiveSection', () => {
+    it('selects a known portfolio section', () => {
+        expect(resolveActiveSection('research', 'profile')).toBe('research')
+    })
+
+    it('preserves the current section for an unknown section id', () => {
+        expect(resolveActiveSection('missing-section', 'profile')).toBe('profile')
+        expect(resolveActiveSection('missing-section', 'research')).toBe('research')
     })
 })

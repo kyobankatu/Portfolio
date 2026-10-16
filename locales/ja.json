@@ -11,6 +11,14 @@
     "viewMissions": "作品を見る",
     "characterStageLabel": "ブロックキャラクターのステージ",
     "characterAlt": "四角いブロックのキャラクター",
+    "characterLines": {
+        "profile": "こんにちは。プロフィールを紹介します。",
+        "research": "イベントカメラとLLMを研究しています。",
+        "missions": "これまでに作った作品です。",
+        "equipment": "開発で使っている技術です。",
+        "interests": "ゲームが好きです。",
+        "contact": "こちらから連絡できます。"
+    },
     "liveLink": "公開ページ",
     "interestSummary": "ゲーム",
     "interestDescription": "ゲームが好きです。遊ぶのも、仕組みを考えたり作ったりするのも楽しんでいます。",

@@ -59,6 +59,16 @@ export const skillGroups = [
     { category: 'Tools & Cloud', skills: ['Git', 'Docker', 'Kubernetes', 'Google Cloud'] },
 ]
 
+export const sectionIds = ['profile', 'research', 'missions', 'equipment', 'interests', 'contact']
+
+export function resolveActiveSection(sectionId, currentSection) {
+    if (sectionIds.includes(sectionId)) {
+        return sectionId
+    }
+
+    return sectionIds.includes(currentSection) ? currentSection : 'profile'
+}
+
 export function getProjectCards(locale) {
     return projectDefinitions.map((project) => {
         const description = locale?.projects?.[project.key]

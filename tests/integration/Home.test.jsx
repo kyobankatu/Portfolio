@@ -38,6 +38,7 @@ describe('portfolio screen', () => {
         expect(screen.getByRole('link', { name: /研究テーマ/ })).toHaveAttribute('href', '#research')
         expect(screen.getByRole('link', { name: /研究テーマ/ })).toHaveAttribute('aria-current', 'location')
         expect(screen.getByRole('heading', { name: 'Research' }).closest('section').id).toBe('research')
+        expect(screen.getByRole('status')).toHaveTextContent('イベントカメラ')
     })
 
     it('fails with a clear message instead of rendering a missing project description', () => {

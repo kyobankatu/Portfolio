@@ -11,6 +11,14 @@
     "viewMissions": "View projects",
     "characterStageLabel": "Stage for the block character",
     "characterAlt": "A square block character",
+    "characterLines": {
+        "profile": "Hi! Here is a little about me.",
+        "research": "I work with event cameras and LLMs.",
+        "missions": "Here are a few things I have built.",
+        "equipment": "These are the tools I work with.",
+        "interests": "I am always up for a good game.",
+        "contact": "You can reach me here."
+    },
     "liveLink": "Live site",
     "interestSummary": "Games",
     "interestDescription": "I love games, both playing them and thinking about how they work.",

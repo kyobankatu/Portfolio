@@ -53,3 +53,23 @@ test('static image is served and an unknown route returns 404', async ({ request
     const missing = await request.get('/__portfolio_ci_missing_page__')
     expect(missing.status()).toBe(404)
 })
+
+test('character introduces the selected section and honors reduced motion', async ({ page }) => {
+    await page.goto('/')
+    const character = page.locator('[class*="characterTile"]')
+    const introduction = page.getByRole('status')
+    await expect(introduction).toContainText('プロフィール')
+
+    await page.getByRole('link', { name: /研究テーマ/ }).click()
+    await expect(introduction).toContainText('イベントカメラ')
+    await expect(page.getByRole('link', { name: /研究テーマ/ })).toHaveAttribute('aria-current', 'location')
+
+    await page.emulateMedia({ reducedMotion: 'no-preference' })
+    const normalMotion = await character.evaluate((element) => getComputedStyle(element).animationName)
+    expect(normalMotion).not.toBe('none')
+
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    const reducedMotion = await character.evaluate((element) => getComputedStyle(element).animationName)
+    expect(reducedMotion).toBe('none')
+    await expect(introduction).toContainText('イベントカメラ')
+})
