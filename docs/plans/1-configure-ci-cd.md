@@ -13,7 +13,7 @@
 - [x] Phase 2：成功したCIを取り込むデプロイ処理・検証・運用docs
 - [x] Phase 3：承諾済みR1〜R6の修正、R7は比較演算子の規約変更で対応
 - [x] Phase 4：承諾済みR8の修正、PR検証とGHCR公開の権限を分離
-- [ ] Phase 5（最終Phase N）：全体検証、セキュリティを含む7分野レビュー、ユーザー最終確認
+- [x] Phase 5（最終Phase N）：全体検証、セキュリティを含む7分野レビュー、ユーザー最終確認
 
 ## 合意済みの構成・検証範囲
 
@@ -96,6 +96,7 @@
 - Phase 1 commit：`34e700c`。
 - Phase 2 commit：`458d240`。
 - Phase 3 commit：`76a633a`。
+- Phase 4 commit：`dd59412`。
 - Phase 1：Dockerビルド成功。standalone実行イメージに対してE2E 3件成功、非root・開発ファイル除外検査成功。Next.jsのoptional peer依存でPlaywrightが残ることを実行検査で検出し、standalone出力へ変更して成功を確認。GHCRへの実公開は最終了承・push・masterマージ後に検証する。
 - 既存依存関係のnpm auditは5件（high 4、critical 1）。Next.js等の既存バージョン由来であり、追加したPlaywrightの指摘はない。最終レビューの確認事項として残す。
 - Phase 2：Linuxコンテナでデプロイ処理11件成功（flock競合・例外後の解放を含む）。cp-1でGitHub APIのmaster取得200、必要ツールの実パス、Deploymentの既存イメージとready 1を確認。dry-runは未公開workflowのAPIが404のためエラー終了し、クラスタは更新していない。候補を選ぶ実サーバーdry-runはmasterマージ後の確認として残す。GitHub Actionsは有効、workflow内の明示的なpackages writeで公開する。CONTENTS検査は15ディレクトリ・指摘0件。
@@ -176,3 +177,21 @@ GHCR実公開、候補のあるcp-1 dry-run、初回SHAデプロイと公開URL�
 - workflow内のsave/load shellブロックをLinuxコンテナで実行し、タグを一旦外してloadしてもイメージIDが一致することを確認した。
 - 全体検証：本番イメージE2E 3件、Linuxデプロイテスト11件、CONTENTS 15ディレクトリ・指摘0件、git diff --check成功。
 - 実際のGitHub上のartifact転送・GHCR公開はpushとmasterマージ後の確認事項として残る。
+
+## Phase 5：最終7分野レビュー（最終了承待ち）
+
+対象HEAD：`dd5941203bb16ea481b56c683d1a892c73f6873a`。7つの独立したサブエージェントが比較基点からの全差分と周辺コードを再確認した。
+
+| 分野 | 結果・確認範囲 |
+| --- | --- |
+| frontend | 指摘なし。実コンテナで200・主要セクション・双方向翻訳・画像・CSS・404・例外なしを独立確認 |
+| backend | 指摘なし。公開jobの成功まで含むCI選別、同一イメージ引渡し、競合・rollout処理を確認 |
+| テストケース | 指摘なし。R1の回帰検出維持、R8の権限・成功依存・引渡し検証を確認 |
+| mdの記入漏れ | 指摘なし。計画・承諾・phase履歴・索引15ディレクトリの実体との一致を確認 |
+| docsの記入漏れ | 指摘なし。artifact・権限分離・無料枠・設置・停止・復旧手順を実装と照合 |
+| 規約違反 | 指摘なし。33ファイル、現行規約、skill、承諾範囲、phaseコミットを確認 |
+| セキュリティ | R8解消、新規指摘なし。PR検証の読取専用化、master限定公開、同一run・同一イメージの信頼境界を確認 |
+
+最終検証：本番Docker E2E 3件、Linuxデプロイテスト11件、workflow権限検査、actionlint、workflowのsave/load実行とイメージID一致、索引15ディレクトリ、差分チェックが成功。
+既存依存関係のaudit指摘5件は別課題として残す。実際のGitHub artifact転送・GHCR公開・候補付きcp-1 dry-run・初回SHAデプロイ・公開URL確認はmasterでのCI実行後に確認する。
+ユーザー最終了承を受領。Phase 5を完了し、作業ブランチのpush、Issue計画コメント更新、PR作成へ進む。PRは自動マージせず、本番常駐設定はmasterの初回CI・公開成功確認後に行う。
