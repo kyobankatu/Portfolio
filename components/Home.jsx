@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FaEnvelope, FaGithub, FaLinkedin } from 'react-icons/fa'
 import styles from './Home.module.css'
 import { getProjectCards, resolveActiveSection, skillGroups } from './portfolioContent.js'
@@ -22,6 +22,22 @@ export default function Home({ translations = { ja, en } }) {
     const t = lang === 'ja' ? translations.ja : translations.en
     const projects = getProjectCards(t)
     const selectSection = (sectionId) => setActiveSection((current) => resolveActiveSection(sectionId, current))
+
+    useEffect(() => {
+        const syncSectionFromHash = () => {
+            const sectionId = window.location.hash.slice(1)
+            if (sectionId === '') {
+                setActiveSection('profile')
+                return
+            }
+
+            setActiveSection((current) => resolveActiveSection(sectionId, current))
+        }
+
+        syncSectionFromHash()
+        window.addEventListener('hashchange', syncSectionFromHash)
+        return () => window.removeEventListener('hashchange', syncSectionFromHash)
+    }, [])
     const swallowUrl = lang === 'ja'
         ? 'https://swallow-llm.github.io/index.ja.html'
         : 'https://swallow-llm.github.io/index.en.html'

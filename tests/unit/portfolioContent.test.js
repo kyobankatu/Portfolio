@@ -27,6 +27,10 @@ describe('resolveActiveSection', () => {
         expect(resolveActiveSection('research', 'profile')).toBe('research')
     })
 
+    it('maps the overview anchor to the profile section', () => {
+        expect(resolveActiveSection('overview', 'missions')).toBe('profile')
+    })
+
     it('preserves the current section for an unknown section id', () => {
         expect(resolveActiveSection('missing-section', 'profile')).toBe('profile')
         expect(resolveActiveSection('missing-section', 'research')).toBe('research')

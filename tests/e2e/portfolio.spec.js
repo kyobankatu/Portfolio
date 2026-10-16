@@ -35,6 +35,8 @@ test('language toggle and keyboard navigation work at desktop and mobile widths'
 
     await page.getByRole('button', { name: 'Switch language to English' }).click()
     await expect(page.getByRole('heading', { level: 1, name: 'Katumon.' })).toBeVisible()
+    await expect(page.getByText('Computer vision with event cameras', { exact: true })).toBeVisible()
+    await expect(page.getByText('A Genshin Impact combat simulator for modeling damage and calculating DPS.', { exact: true })).toBeVisible()
     await expect(page.getByRole('link', { name: /Swallow LLM/ })).toHaveAttribute('href', 'https://swallow-llm.github.io/index.en.html')
     await page.getByRole('button', { name: '日本語に切り替え' }).click()
     await expect(page.getByRole('heading', { level: 1, name: 'かつもん.' })).toBeVisible()
@@ -72,4 +74,37 @@ test('character introduces the selected section and honors reduced motion', asyn
     const reducedMotion = await character.evaluate((element) => getComputedStyle(element).animationName)
     expect(reducedMotion).toBe('none')
     await expect(introduction).toContainText('イベントカメラ')
+})
+
+test('keyboard navigation and browser history keep the section state synchronized', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.goto('/')
+    await page.keyboard.press('Tab')
+    await page.keyboard.press('Tab')
+    await page.keyboard.press('Tab')
+    await expect(page.locator(':focus')).toHaveAttribute('href', '#research')
+    await page.keyboard.press('Enter')
+    await expect(page).toHaveURL(/#research$/)
+    await expect(page.getByRole('link', { name: /研究テーマ/ })).toHaveAttribute('aria-current', 'location')
+    await expect(page.getByRole('status')).toContainText('イベントカメラとLLMを研究しています。')
+
+    await page.getByRole('navigation').getByRole('link', { name: /作品/ }).click()
+    await expect(page).toHaveURL(/#missions$/)
+    await expect(page.getByRole('status')).toContainText('これまでに作った作品です。')
+    await page.goBack()
+    await expect(page).toHaveURL(/#research$/)
+    await expect(page.getByRole('link', { name: /研究テーマ/ })).toHaveAttribute('aria-current', 'location')
+    await expect(page.getByRole('status')).toContainText('イベントカメラとLLMを研究しています。')
+    await page.goForward()
+    await expect(page.getByRole('status')).toContainText('これまでに作った作品です。')
+})
+
+test('a direct section URL and a reload select the matching section', async ({ page }) => {
+    await page.goto('/#research')
+    await expect(page.getByRole('link', { name: /研究テーマ/ })).toHaveAttribute('aria-current', 'location')
+    await expect(page.getByRole('status')).toContainText('イベントカメラとLLMを研究しています。')
+
+    await page.reload()
+    await expect(page.getByRole('link', { name: /研究テーマ/ })).toHaveAttribute('aria-current', 'location')
+    await expect(page.getByRole('status')).toContainText('イベントカメラとLLMを研究しています。')
 })

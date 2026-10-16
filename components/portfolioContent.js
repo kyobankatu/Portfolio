@@ -62,6 +62,10 @@ export const skillGroups = [
 export const sectionIds = ['profile', 'research', 'missions', 'equipment', 'interests', 'contact']
 
 export function resolveActiveSection(sectionId, currentSection) {
+    if (sectionId === 'overview') {
+        return 'profile'
+    }
+
     if (sectionIds.includes(sectionId)) {
         return sectionId
     }
