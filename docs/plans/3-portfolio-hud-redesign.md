@@ -32,92 +32,37 @@
 | テストケース | **単体**: 正常系—有効なsection idで選択状態と紹介文を更新する。異常系—未知のidでは既存の選択状態を保ち、紹介文も空にしない。**結合**: 正常系—目次クリックで`aria-current`・対象セクション・キャラクター紹介が一致する。異常系—未知のhashでも画面と既存の目次操作が使える。**E2E**: `/`読込後に主要見出しとナビが即時に表示され、演出の終了を待たない。通常設定では短い登場・待機演出、`prefers-reduced-motion: reduce`ではアニメーションなしで紹介・操作可能。目次クリックとTab/Enterで対応する紹介へ切り替わる。 |
 | 完了条件 | 演出が非ブロッキングで、動きの軽減設定に対応する。追加E2Eとビルド、CONTENTS検査が成功する。 |
 
-## Phase 3 — ナビゲーション同期・テスト・CIゲート
-
-| 項目 | 記入内容 |
-| --- | --- |
-| 目的 | URL hash、選択中セクション、キャラクター紹介を直接アクセス・履歴操作でも同期させ、テストの検証力とCIゲートを補強する。 |
-| 意図 | 実際の日本語／英語本文、キーボード操作、戻る／進むを検査し、単体・結合テストの失敗が公開を止めるようにする。 |
-| 編集ファイル | `components/Home.jsx`（初期hashと`hashchange`同期）、`tests/integration/Home.test.jsx`（日英の研究・作品本文、初期hashと未知hash）、`tests/e2e/portfolio.spec.js`（目次Tab/Enter、hash履歴）、`.github/workflows/ci.yml`（`npm run test:unit`をverifyへ追加）。 |
-| テストケース | **単体**: 有効hashは選択状態を解決し、未知idは有効な現在値を維持する。**結合**: 正常系—日英切替で研究・DPSCalculator本文が各辞書と一致し、hash初期表示とナビ紹介が同期する。異常系—未知hashでも現在の画面が使え、`undefined`を表示しない。**E2E**: Tabで目次項目へ進みEnterでhash・`aria-current`・紹介が更新される。直リンク・再読込・戻る／進むで状態が一致する。CI verifyで単体・結合テスト失敗がpublishを止める。 |
-| 完了条件 | 単体／結合／E2E、本番build、workflow検証、CONTENTS検査が成功する。 |
-
-## Phase 4 — 依存セキュリティ・開発文書整備
-
-| 項目 | 記入内容 |
-| --- | --- |
-| 目的 | CIのNode 22環境と互換性を保って指摘された依存を更新し、既存開発規約と文書索引を実態に合わせる。 |
-| 意図 | audit指摘を減らしつつproduction build・テストを維持する。開発規約の内容を保ち、翻訳対象と固定HUD表記を区別する。 |
-| 編集ファイル | `package.json`・`package-lock.json`（Next.js、sharp、PostCSS、Vitest系依存）、`CLAUDE.md`（既存規約を維持してCommands／Architecture／Stylingを更新）、ルート`CONTENTS.md`（lockfile生成元リンク）。 |
-| テストケース | **単体・結合・E2E**: 依存更新後も全ケースが通る。**Security**: `npm audit`と`npm audit --omit=dev`で残存指摘を確認し、残る場合は実行経路と理由を記録する。**Docs**: CONTENTS checkerが全対象ディレクトリで成功し、開発規約・locale記述が現行実装と一致する。 |
-| 完了条件 | Node 22互換、全依存audit 0件、単体／結合12件、Chromium E2E 6件、デプロイテスト10件成功（cp-1専用lockテスト1件skip）、本番build、17ディレクトリCONTENTS検査が成功する。 |
-
-## Phase 5 — 最終レビュー記録の状態修正
-
-| 項目 | 記入内容 |
-| --- | --- |
-| 目的 | Phase Nの再レビューで見つかった古い承認状態の記述を更新し、計画書とIssueコメントの状態を一致させる。 |
-| 意図 | 再開する担当者が承認待ちと誤認しないよう、承認とPhase 3・4の修正完了を正確に残す。 |
-| 編集ファイル | `docs/plans/3-portfolio-hud-redesign.md`。同じ計画書をIssue #3の既存コメントへ反映する。 |
-| テストケース | **Docs**: レビュー指摘表・実行ログ・Phase checklistの状態が一致し、Issueコメントとローカル計画書が同一である。**CONTENTS**: 17ディレクトリの検査が成功する。**Diff**: `git diff --check`が成功する。 |
-| 完了条件 | 古い承認待ち表記と余分な表記を直し、Issueコメントを更新して計画書をcommitする。 |
-
 ## Phase N — 最終検証・分野別レビュー
 
 | 項目 | 記入内容 |
 | --- | --- |
-| 目的・意図 | 全受け入れ条件、実装と説明の一致、応答性とアクセシビリティを確認し、変更前に合意した比較基点からの差分をレビューする。 |
-| テストケース | `npm run test:unit`、`npm run build`、`npm run test:e2e`、`python -B -m unittest discover -s tests/deploy -v`、`npm audit --omit=dev`、CONTENTS checkerを実行する。E2Eで日本語／英語、表示リンク、キーボード、通常／動き軽減、390px／1440px幅を確認する。依存監査の指摘はセキュリティレビューで影響を確認し、修正が必要なら変更一覧を提示して承諾後に修正phaseを挿入する。未実施項目は理由と範囲を記録する。 |
-| レビュー分野 | frontend／backend／テストケース／md記入漏れ／docs記入漏れ／規約違反／セキュリティをそれぞれ別のサブエージェントが読み取り専用で確認する。 |
-| 完了条件 | 全検証と7分野レビューを記録する。指摘修正は一覧を示してユーザー承認後、修正phaseを挿入してTDD・commitし、7分野レビューと全体検証を再実行する。修正がなくユーザーが最終了承したらPhase Nをcommitし、その後push、Issue計画コメント更新、PR作成へ進む。 |
+| 目的・意図 | 全受け入れ条件、実装と説明の一致、応答性とアクセシビリティを確認し、合意した比較基点からの差分をレビューする。 |
+| テストケース | npm run test:unit、npm run build、npm run test:e2e、python -B -m unittest discover -s tests/deploy -v、npm audit、npm audit --omit=dev、CONTENTS checkerを実行する。E2Eで日本語／英語、リンク、キーボード、動きの軽減、390px／1440px幅を確認する。未実施項目は理由と範囲を記録する。 |
+| レビュー分野 | frontend／backend／テストケース／md記入漏れ／docs記入漏れ／規約違反／セキュリティを別々のサブエージェントが読み取り専用で確認する。 |
+| 完了条件 | 全体検証と7分野レビューが完了し、修正があれば承認済みの修正ラウンドと全分野の再レビューを終えて、ユーザーが最終成果を了承する。レビュー・修正の詳細は初期計画へ差し込まず、Issueの後続コメントに記録する。 |
 
-## Phase N review findings — user approved; repairs inserted into Phases 3 and 4
+## Review and repair history
 
-| 優先度 | 分野・箇所 | 指摘と提案する修正 |
-| --- | --- | --- |
-| P2 | Frontend: `components/Home.jsx` | `activeSection`はクリック時のみ変わるため、有効hashへの直接アクセス・再読込・戻る／進むでナビ選択とキャラクター紹介がURLとずれる。初期hashと`hashchange`を同期し、未知hashでは有効な現在値を保つ。ブラウザ履歴のE2Eを追加する。 |
-| P2 | Tests: `tests/integration/Home.test.jsx`, `tests/e2e/portfolio.spec.js` | 英語切替テストが固定見出し・DPSCalculatorタイトル・Swallow URLしか確認せず、研究／作品説明が日本語のままでも通る。翻訳本文を両言語で検証する。E2EのTab/Enterは`#overview`までなので、目次へキーボード移動してhash・`aria-current`・紹介文が更新されるケースを追加する。 |
-| P2 | CI: `.github/workflows/ci.yml` | `npm run test:unit`がverifyジョブで実行されず、新設単体・結合テストがmaster公開前のゲートになっていない。verifyに追加し、テスト失敗がpublishを止めることを検証する。 |
-| P2 | Security: `package.json`, `package-lock.json` | 今回追加したVitest 3.2.7系に開発依存の監査指摘がある。Node 22 CIと互換の修正版へ更新し、全依存audit・テスト・ビルド・E2Eを再実行する。 |
-| P2 | Security: `package-lock.json` | 作業開始時から存在するNext.js 15.5.13、PostCSS 8.4.31、sharp 0.34.5に本番依存auditのcritical 1件・high 2件が報告された。現在の静的portfolioに該当する攻撃入力経路はレビューで確認されていないが、修正版と互換性を検証して更新する。 |
-| P2 | Docs/rules: `CLAUDE.md` | 開発案内の更新時に既存のMandatory Rules、変更前確認、Security Rules、Notationなどを削除した。既存ルールを戻し、必要なArchitecture／Commands／Styling記述のみ更新する。 |
-| P3 | Docs: `CLAUDE.md` | locale JSONに全表示文言を置くという記述が、Home.jsx内の意図的な固定HUD見出し・ラベルと合わない。翻訳対象の文章と固定表記の範囲を区別する。 |
-| P3 | CONTENTS: `CONTENTS.md` | `package-lock.json`の生成元である`package.json`へのリンクがない。生成元リンクを戻す。 |
+| 記録 | 結果 | Issue comment | 関連commit |
+| --- | --- | --- | --- |
+| Review round 1 — findings | 8件を確認。すべてユーザー承認済み。 | [レビュー結果](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6217564914) | — |
+| Repair round 1 — implementation and verification | ナビ・テスト・CI、依存・文書の修正完了。 | [修正計画と結果](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6217567477) | 39458b9, 01327bb |
+| Review round 2 — documentation status | 計画書に残った古い承認待ち表記を修正。 | [指摘と対応](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6217569927) | 56da43e, 9d3a43f |
+| Final re-review | 9d3a43fを7分野で確認し、追加指摘なし。最終了承待ち。 | [最終レビュー](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6217571535) | 0652aa7 |
 
-これらの修正はユーザー承認済みで、Phase 3・4で反映済み。現在は修正後のPhase N再レビュー中。初回レビューでは公開画面の直接的なXSS・秘密情報漏洩・不正な外部リンクは見つからなかった。
-
-### Phase N 再レビュー結果（HEAD `9d3a43f`）
-
-| 分野 | 結果 |
-| --- | --- |
-| Frontend | 追加指摘なし。hash・履歴・表示状態を確認。 |
-| Backend／デプロイ | 追加指摘なし。テストゲート・master限定公開・artifact検証を確認。 |
-| テストケース | 追加指摘なし。翻訳本文・キーボード・履歴・CIゲートの修正を確認。 |
-| Markdown／CONTENTS | 追加指摘なし。Issueコメントとローカル計画書の全文一致、17ディレクトリ検査成功を確認。 |
-| Docs | 追加指摘なし。承認状態・実行ログ・ガイド記述を確認。 |
-| 規約 | 追加指摘なし。既存ルールと実装・テストの整合を確認。 |
-| Security | 追加指摘なし。`npm audit`と`npm audit --omit=dev`はいずれも0件。 |
-
-Phase 4の最終検証：単体／結合12件、通常Chromium E2E 6件、Docker本番イメージのruntime契約とChromium E2E 6件、本番build、デプロイテスト10件成功（cp-1専用lockテスト1件skip）、npm監査0件、17ディレクトリCONTENTS検査成功。Phase 5の文書更新後にもCONTENTS検査と`git diff --check`が成功。全分野の再レビューは完了し、新規指摘はない。ユーザーの最終了承を待っている。
+**Issue運用**：Phase Nのレビュー結果、承認された修正計画、修正結果、再レビュー結果は、それぞれ新しいIssueコメントとして時系列に記録する。初期計画にはこの一覧とコメントへのリンクだけを残す。Phase Nはユーザーの最終了承まで未完了とする。
 
 ## Phase checklist
 
 - [x] Phase 0：調査・計画をローカルとIssueコメントに記録し、commitする。
 - [x] Phase 1：HUD画面・掲載情報を実装し、単体／結合／E2E、ビルドとCONTENTS検査を通してcommitする。
 - [x] Phase 2：キャラクター演出・動きの軽減対応を実装し、単体／結合／E2E、ビルドとCONTENTS検査を通してcommitする。
-- [x] Phase 3：hash同期・翻訳／キーボード検証・CIゲートを追加し、全テストとCONTENTS検査を通してcommitする。
-- [x] Phase 4：承認済み依存・文書修正を行い、audit・全テスト・CONTENTS検査を通してcommitする。
-- [x] Phase 5：レビュー記録の承認状態を正確にし、Issueコメントと計画書を同期してcommitする。
-- [ ] Phase N：全体検証・修正後の7分野レビュー・ユーザー最終了承を完了する。
+- [ ] Phase N：全体検証・7分野レビュー・ユーザー最終了承を完了する。
 
 ## Execution log
 
 | Phase | Result | Commit SHA | Issue plan updated |
 | --- | --- | --- | --- |
-| 0 | Complete | `d6bb27e45ac75c014b1924ba86fe4e1351f7cc16` | Yes ([Issue comment](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6216410535)) |
-| 1 | Complete; 8 unit/integration cases, 3 Chromium E2E cases, production build, and CONTENTS checker passed | `8d1e81c` | Yes |
-| 2 | Complete; 10 unit/integration cases, 4 Chromium E2E cases, production build, and CONTENTS checker passed | `ee9c092` | Yes |
-| 3 | Complete; 12 unit/integration cases, 6 Chromium E2E cases, build, deployment tests, and CONTENTS checker passed; CI verify now runs `test:unit` | `39458b9` | Yes |
-| 4 | Complete; Next.js 15.5.28, Vitest 5.0.5, sharp 0.35.5 and PostCSS 8.5.30; both npm audits report zero vulnerabilities; 12 unit/integration tests, 6 Chromium E2E tests, build, 10 deployment tests (1 cp-1-only skip), and 17-directory CONTENTS check passed | `01327bb` | Yes |
-| 5 | Complete; approval status corrected, Issue plan synchronized; CONTENTS checker and diff check passed | `56da43e` | Yes |
-| N | Seven-domain re-review complete with no findings; verification passed; pending user’s final approval before publication | Pending | Yes |
+| 0 | Complete | d6bb27e45ac75c014b1924ba86fe4e1351f7cc16 | Yes ([initial plan](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6216410535)) |
+| 1 | Complete; 8 unit/integration cases, 3 Chromium E2E cases, production build, and CONTENTS checker passed | 8d1e81c | Yes |
+| 2 | Complete; 10 unit/integration cases, 4 Chromium E2E cases, production build, and CONTENTS checker passed | ee9c092 | Yes |
