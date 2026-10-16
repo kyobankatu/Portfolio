@@ -86,6 +86,20 @@
 
 これらの修正はユーザー承認済みで、Phase 3・4で反映済み。現在は修正後のPhase N再レビュー中。初回レビューでは公開画面の直接的なXSS・秘密情報漏洩・不正な外部リンクは見つからなかった。
 
+### Phase N 再レビュー結果（HEAD `9d3a43f`）
+
+| 分野 | 結果 |
+| --- | --- |
+| Frontend | 追加指摘なし。hash・履歴・表示状態を確認。 |
+| Backend／デプロイ | 追加指摘なし。テストゲート・master限定公開・artifact検証を確認。 |
+| テストケース | 追加指摘なし。翻訳本文・キーボード・履歴・CIゲートの修正を確認。 |
+| Markdown／CONTENTS | 追加指摘なし。Issueコメントとローカル計画書の全文一致、17ディレクトリ検査成功を確認。 |
+| Docs | 追加指摘なし。承認状態・実行ログ・ガイド記述を確認。 |
+| 規約 | 追加指摘なし。既存ルールと実装・テストの整合を確認。 |
+| Security | 追加指摘なし。`npm audit`と`npm audit --omit=dev`はいずれも0件。 |
+
+Phase 4の最終検証：単体／結合12件、通常Chromium E2E 6件、Docker本番イメージのruntime契約とChromium E2E 6件、本番build、デプロイテスト10件成功（cp-1専用lockテスト1件skip）、npm監査0件、17ディレクトリCONTENTS検査成功。Phase 5の文書更新後にもCONTENTS検査と`git diff --check`が成功。全分野の再レビューは完了し、新規指摘はない。ユーザーの最終了承を待っている。
+
 ## Phase checklist
 
 - [x] Phase 0：調査・計画をローカルとIssueコメントに記録し、commitする。
@@ -106,4 +120,4 @@
 | 3 | Complete; 12 unit/integration cases, 6 Chromium E2E cases, build, deployment tests, and CONTENTS checker passed; CI verify now runs `test:unit` | `39458b9` | Yes |
 | 4 | Complete; Next.js 15.5.28, Vitest 5.0.5, sharp 0.35.5 and PostCSS 8.5.30; both npm audits report zero vulnerabilities; 12 unit/integration tests, 6 Chromium E2E tests, build, 10 deployment tests (1 cp-1-only skip), and 17-directory CONTENTS check passed | `01327bb` | Yes |
 | 5 | Complete; approval status corrected, Issue plan synchronized; CONTENTS checker and diff check passed | `56da43e` | Yes |
-| N | Pending re-review after correction phases | Pending | Pending |
+| N | Seven-domain re-review complete with no findings; verification passed; pending user’s final approval before publication | Pending | Yes |
