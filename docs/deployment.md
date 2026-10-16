@@ -15,7 +15,17 @@ cp-1は公開GitHub APIで`ci.yml`の成功を確認し、現在のmasterと一�
 - GHCRはprivateのまま。クラスタのdefault ServiceAccountに既存の
   `ghcr-pull-secret`が設定されていること。内容を表示したりGitへ保存したりしない。
 - cp-1でPython 3.10以降、kubectl、crontab、timeout、loggerを利用できること。
-  実行ユーザーのkubectl contextが本番クラスタを指し、portfolio Deploymentをget／patchできること。
+  実行ユーザーのkubectl contextが本番クラスタを指し、Deploymentのget／list／watch／patchが可能なこと。
+  rollout statusにはlist／watchも必要。cp-1で次の権限確認がすべてyesとなり、rollout確認が成功することを確認する。
+
+```text
+kubectl -n default auth can-i get deployments.apps
+kubectl -n default auth can-i list deployments.apps
+kubectl -n default auth can-i watch deployments.apps
+kubectl -n default auth can-i patch deployments.apps
+kubectl -n default rollout status deployment/portfolio --timeout=180s
+```
+
 - 標準LinuxのGitHub-hosted runnerと既存サーバーを使う。課金runnerや新しい有料サービスは不要。
   GitHubからクラスタへ接続する鍵や公開ポートは追加しない。
 
@@ -36,8 +46,7 @@ masterへのマージ後、最初のCIとGHCR公開の成功を確認してか�
 
 ```cron
 # BEGIN portfolio-deploy
-PATH=/usr/local/bin:/usr/bin:/bin
-*/5 * * * * timeout 280s /usr/bin/python3 /home/katumon/.local/lib/portfolio-deploy/auto_deploy.py 2>&1 | /usr/bin/logger -t portfolio-deploy
+*/5 * * * * PATH=/usr/local/bin:/usr/bin:/bin /usr/bin/timeout 280s /usr/bin/python3 /home/katumon/.local/lib/portfolio-deploy/auto_deploy.py 2>&1 | /usr/bin/logger -t portfolio-deploy
 # END portfolio-deploy
 ```
 

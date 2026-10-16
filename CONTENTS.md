@@ -14,7 +14,7 @@ Portfolioの実装と運用に必要なファイル。
 | [docs/](./docs/CONTENTS.md) | 開発計画と運用説明 | 通常編集可 |
 | [locales/](./locales/CONTENTS.md) | 日本語・英語の表示文言 | 通常編集可 |
 | [next.config.js](./next.config.js) | Next.jsのビルド設定 | 通常編集可 |
-| [package-lock.json](./package-lock.json) | 依存パッケージの固定バージョン | 生成元を編集（package.jsonとnpm installで更新） |
+| [package-lock.json](./package-lock.json) | 依存パッケージの固定バージョン | 生成元を編集（[package.json](./package.json)とnpm installで更新） |
 | [package.json](./package.json) | 依存関係と開発コマンド | 通常編集可 |
 | [playwright.config.js](./playwright.config.js) | ブラウザE2Eの実行設定 | 通常編集可 |
 | [portfolio.yaml](./portfolio.yaml) | KubernetesのDeployment・Service・Ingress定義 | 通常編集可 |

@@ -11,7 +11,8 @@
 - [x] Phase 0：現状調査、方式決定、計画とCONTENTS.md整備
 - [x] Phase 1：本番DockerイメージのE2EとGitHub Actions／GHCR公開
 - [x] Phase 2：成功したCIを取り込むデプロイ処理・検証・運用docs
-- [ ] Phase 3（最終Phase N）：全体検証、6分野レビュー、ユーザー最終確認
+- [x] Phase 3：承諾済みR1〜R6の修正、R7は比較演算子の規約変更で対応
+- [ ] Phase 4（最終Phase N）：全体検証、セキュリティを含む7分野レビュー、ユーザー最終確認
 
 ## 合意済みの構成・検証範囲
 
@@ -55,24 +56,76 @@
 | テストケース | 成功／失敗／PR／古いSHA／別リポジトリのCI選別、API失敗・タイムアウト、更新競合、rollout失敗、既に更新済みの場合、dry-run、同時実行抑止 |
 | 完了条件 | デプロイ処理のテストとcp-1での読み取り専用確認が通り、設置・有効化・復旧手順が揃う |
 
-## Phase 3（最終Phase N）
+## Phase 3：承諾済みレビュー修正
+
+| 項目 | 内容 |
+| --- | --- |
+| 目的 | R1〜R6の指摘を修正し、R7はユーザー指定どおり規約側で対応する |
+| 意図 | 安全な更新設定の回帰を検出し、計画・索引・規約・運用手順を実態と揃える |
+| 編集ファイル | tests/deploy/test_auto_deploy.py、CLAUDE.md、CONTENTS.md、docs/deployment.md、この計画書。併用skillはリポジトリ外のC:/develop/shared/skills/implementation-harness/SKILL.mdへセキュリティ分野を追加する |
+| テストケース | patch適用後の対象イメージ・probe・RollingUpdate・deadlineの検証、各安全設定を除いたmutationで失敗すること、デプロイ全テスト、本番Docker E2E、索引検査、skill検証、文書とコマンドの照合 |
+| 完了条件 | 承諾済み修正が検証を通りcommitされ、Issue計画が同期されている |
+
+承諾：ユーザーはR1〜R6を修正するよう指示。R7はスクリプトの比較演算子を反転せず、CLAUDE.mdの演算子の制限を改める。implementation-harnessにセキュリティを追加し、以後は7分野でレビューする。
+
+## Phase 4（最終Phase N）
 
 | 項目 | 内容 |
 | --- | --- |
 | 目的・意図 | 本番での自動更新を有効化する前に、実装・検証・運用を独立に確認する |
 | テストケース | 本番用DockerイメージのE2E、デプロイ処理全テスト、索引検査、workflowと運用手順の照合 |
-| レビュー結果 | frontend／backend／テストケース／mdの記入漏れ／docsの記入漏れ／規約違反を別のサブエージェントで確認する |
+| レビュー結果 | frontend／backend／テストケース／mdの記入漏れ／docsの記入漏れ／規約違反／セキュリティを別のサブエージェントで確認する |
 | 完了条件 | 修正箇所の表をユーザーへ提示し、必要な修正・再レビュー後に最終了承を得る |
 
 ## 検証・公開記録
 
 - Phase 0 commit：`269bf4e`。
 - Phase 1 commit：`34e700c`。
+- Phase 2 commit：`458d240`。
 - Phase 1：Dockerビルド成功。standalone実行イメージに対してE2E 3件成功、非root・開発ファイル除外検査成功。Next.jsのoptional peer依存でPlaywrightが残ることを実行検査で検出し、standalone出力へ変更して成功を確認。GHCRへの実公開は最終了承・push・masterマージ後に検証する。
 - 既存依存関係のnpm auditは5件（high 4、critical 1）。Next.js等の既存バージョン由来であり、追加したPlaywrightの指摘はない。最終レビューの確認事項として残す。
 - Phase 2：Linuxコンテナでデプロイ処理11件成功（flock競合・例外後の解放を含む）。cp-1でGitHub APIのmaster取得200、必要ツールの実パス、Deploymentの既存イメージとready 1を確認。dry-runは未公開workflowのAPIが404のためエラー終了し、クラスタは更新していない。候補を選ぶ実サーバーdry-runはmasterマージ後の確認として残す。GitHub Actionsは有効、workflow内の明示的なpackages writeで公開する。CONTENTS検査は15ディレクトリ・指摘0件。
 
-- 索引検査：共通の既定除外を使用し、追加で`.claude/settings.local.json`を除外する。秘密値やローカル設定内容は索引に転載しない。
+- 索引検査：共通の既定除外を使用し、追加で`.claude/settings.local.json`、`test-results`、`playwright-report`を除外する。共通コマンドは `python -X utf8 tools/check_contents.py . --exclude .claude/settings.local.json --exclude test-results --exclude playwright-report`。秘密値やローカル設定内容は索引に転載しない。
 - 各phaseのcommitと検証結果は完了時にここへ追記し、Issue計画コメントを同期する。
 - push・サーバー設定の有効化・PR作成は最終了承後。GHCRの既存packageにGITHUB_TOKENで書き込む権限が必要であり、実際の公開結果で確認する。
 - GitHub APIの障害／レート制限時は更新しない。CIが失敗・未完了の場合も現行版を維持する。rollout失敗の記録と復旧方法をdocsへ残す。
+
+## Phase N：初回レビュー記録（修正承諾済み）
+
+対象HEAD：`458d24012a58fd3e87166b938eb9c706de2f8a5d`。比較基点からの全差分を6つの独立したサブエージェントへ渡して確認した。
+
+| 分野 | 結果・確認範囲 |
+| --- | --- |
+| frontend | 指摘なし。standaloneイメージへ独立したブラウザ確認を実施。表示・双方向翻訳・画像3点・CSS・404・ブラウザ例外なしを確認 |
+| backend | 指摘なし。CI選別、master再確認、resourceVersion、固定対象、ロック、probe、rollout、公開条件を確認 |
+| テストケース | R1。安全なrollout設定を外しても既存テストが通ることを変更なしで検証 |
+| mdの記入漏れ | R2〜R4。計画・15索引と実体・編集方針・リンクを照合 |
+| docsの記入漏れ | R5〜R6。設置・権限・cron・障害・停止・復旧・workflowとの一致を確認 |
+| 規約違反 | R7。全差分・CLAUDE.md・skillsの手順・phaseコミットを照合 |
+
+| ID・重要度 | 修正箇所 | 問題・推奨修正 | 検証 |
+| --- | --- | --- | --- |
+| R1・P2 | tests/deploy/test_auto_deploy.py | patch適用後のprobe・strategy・deadline・対象イメージを検証し、安全な更新設定の欠落を検出する | 対象設定を外すと失敗し、正しいpatchで成功すること |
+| R2・P2 | この計画書 | 索引検査の共通除外にtest-results、playwright-reportも明記する | 記載コマンドとCIの除外一致・索引検査 |
+| R3・P3 | CLAUDE.md | テスト基盤なしの説明をPlaywrightとデプロイテストの実態に更新する。規約ファイルのため明示承諾後に変更する | コマンドと実装の照合 |
+| R4・P3 | CONTENTS.md | package-lock.jsonの生成元をpackage.jsonへのリンクで示す | リンクと索引検査 |
+| R5・P2 | docs/deployment.md | rollout確認で必要なlist/watchも必要権限と事前確認に記載する | cp-1でget/list/watch/patchすべてyes、rollout status成功を追加確認済み |
+| R6・P3 | docs/deployment.md | cronのPATHをコマンド行だけに適用し、後続の既存cronへ影響させない | cronの環境変数適用範囲の確認 |
+| R7・P3 | tools/check_contents.py | 規約で避ける比較演算子を等価な向きに反転する。共有skillからのコピーとの差異も記録する | 索引検査と既存checkerテスト |
+
+上表は初回指摘の履歴。ユーザーがR1〜R6の修正とR7の規約変更を承諾したため、Phase 3を挿入し、最終Phaseを4へ変更した。修正後はセキュリティを加えた7分野で再レビューする。
+最終全体検証：本番イメージE2E 3件、Linuxデプロイテスト11件、実行環境検査、索引15ディレクトリ、YAML構文、git diff --checkはいずれも成功。
+GHCR実公開、候補のあるcp-1 dry-run、初回SHAデプロイと公開URL確認は未実施。既存依存関係のaudit指摘5件は別途対応判断が必要。
+
+## Phase 3：修正結果
+
+- R1：JSON Patchをテスト用Deploymentへ適用し、対象イメージ・strategy・deadline・readiness/startup probeの最終状態を検証。4種類の安全設定を個別に除くmutationはすべて失敗し、正しい処理は成功した。
+- R2：計画書の索引検査コマンドと除外設定をCIと統一した。
+- R3：CLAUDE.mdにPlaywright・unittest・実行手順へのリンクを記載した。
+- R4：CONTENTS.mdのlockファイル行に生成元package.jsonのリンクを追加した。
+- R5：運用手順へget/list/watch/patchの必要権限と事前確認コマンドを記載した。cp-1で全権限yes、rollout確認成功を実施済み。
+- R6：cronのPATHをデプロイコマンド行の環境変数に限定した。
+- R7：ユーザー指定どおりCLAUDE.mdの比較演算子の規約を変更。tools/check_contents.pyは変更せず、共有skillのスクリプトとの一致を確認した。
+- リポジトリ外のimplementation-harnessを更新し、セキュリティ担当の独立レビューと修正後の7分野再レビューを必須化。skill形式検証成功。
+- 検証：本番イメージE2E 3件、Linuxデプロイテスト11件、索引15ディレクトリ・指摘0件、git diff --checkが成功。

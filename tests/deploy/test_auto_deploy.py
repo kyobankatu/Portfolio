@@ -116,6 +116,17 @@ class DeploymentTests(unittest.TestCase):
             commands.append(args)
             if "get" in args:
                 return current
+            if "patch" in args:
+                for operation in json.loads(args[-1]):
+                    parts = operation["path"].strip("/").split("/")
+                    target = current
+                    for part in parts[:-1]:
+                        target = target[int(part)] if isinstance(target, list) else target[part]
+                    key = int(parts[-1]) if isinstance(target, list) else parts[-1]
+                    if operation["op"] == "test":
+                        self.assertEqual(target[key], operation["value"])
+                    else:
+                        target[key] = copy.deepcopy(operation["value"])
             return {}
 
         result = deploy.run_once(lambda path: next(responses), command)
@@ -124,6 +135,21 @@ class DeploymentTests(unittest.TestCase):
         self.assertEqual(patch[0], {"op": "test", "path": "/metadata/resourceVersion", "value": "12"})
         self.assertIn("ghcr.io/kyobankatu/portfolio:sha-" + sha,
                       __import__("json").dumps(patch))
+        updated = current["spec"]
+        container = updated["template"]["spec"]["containers"][0]
+        self.assertEqual(container["name"], "portfolio")
+        self.assertEqual(container["image"], "ghcr.io/kyobankatu/portfolio:sha-" + sha)
+        self.assertEqual(updated["strategy"], {
+            "type": "RollingUpdate", "rollingUpdate": {"maxUnavailable": 0, "maxSurge": 1}
+        })
+        self.assertEqual(updated["progressDeadlineSeconds"], 240)
+        self.assertEqual(container["readinessProbe"], {
+            "httpGet": {"path": "/", "port": 3000}, "periodSeconds": 5, "timeoutSeconds": 2
+        })
+        self.assertEqual(container["startupProbe"], {
+            "httpGet": {"path": "/", "port": 3000}, "periodSeconds": 5, "timeoutSeconds": 2,
+            "failureThreshold": 30
+        })
         self.assertIn("rollout", commands[2])
         self.assertIn("status", commands[2])
 

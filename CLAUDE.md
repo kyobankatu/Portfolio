@@ -35,7 +35,7 @@ Wait for explicit approval before proceeding.
 - Indent must be 4
 - Don't insert extra spaces
 - Don't omit "{}"
-- Don't use left symbol like ">" and ">=". Please use right symbol like "<" and "<="
+- Use comparison operators (`>`, `>=`, `<`, `<=`) in the direction that makes the condition easiest to read.
 - Avoid using goto
 - Consider readability
 
@@ -54,7 +54,13 @@ npm run build    # Production build → .next/
 npm run start    # Serve production build locally
 ```
 
-No test framework is configured.
+Playwright browser tests live in `tests/e2e`; deployment controller tests use Python's unittest in `tests/deploy`.
+See [deployment.md](docs/deployment.md#ローカル検証) for production Docker E2E setup.
+
+```bash
+npm run test:e2e
+python -B -m unittest discover -s tests/deploy -v
+```
 
 ## Architecture
 
