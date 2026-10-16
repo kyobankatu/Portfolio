@@ -92,6 +92,6 @@
 | 0 | Complete | `d6bb27e45ac75c014b1924ba86fe4e1351f7cc16` | Yes ([Issue comment](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6216410535)) |
 | 1 | Complete; 8 unit/integration cases, 3 Chromium E2E cases, production build, and CONTENTS checker passed | `8d1e81c` | Yes |
 | 2 | Complete; 10 unit/integration cases, 4 Chromium E2E cases, production build, and CONTENTS checker passed | `ee9c092` | Yes |
-| 3 | Complete; 12 unit/integration cases, 6 Chromium E2E cases, build, deployment tests, and CONTENTS checker passed; CI verify now runs `test:unit` | Pending SHA | Yes, pending final commit SHA |
+| 3 | Complete; 12 unit/integration cases, 6 Chromium E2E cases, build, deployment tests, and CONTENTS checker passed; CI verify now runs `test:unit` | `39458b9` | Yes |
 | 4 | Pending | Pending | Pending |
 | N | Pending re-review after correction phases | Pending | Pending |
