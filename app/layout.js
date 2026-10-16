@@ -1,15 +1,15 @@
 import './globals.css'
 
 export const metadata = {
-    title: 'Portfolio',
-    description: 'ぽぼりむのポートフォリオ',
+    title: 'Katumon | Portfolio',
+    description: 'Portfolio of Katumon, featuring research, projects, and technology.',
     icons: { icon: '/fav.png' },
 }
 
 export default function RootLayout({ children }) {
     return (
         <html lang="ja">
-            <body suppressHydrationWarning>{children}</body>
+            <body>{children}</body>
         </html>
     )
 }

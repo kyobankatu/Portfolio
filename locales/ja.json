@@ -1,25 +1,55 @@
 {
     "name": "かつもん",
-    "tagline": "睡眠？それはデプロイ後に。",
+    "tagline": "研究も、ものづくりも、遊び心を忘れずに。",
     "role": "東京科学大学 B4",
-    "bio": "東京科学大学 情報理工学院 情報工学系 B4。2026年より横田理央研究室に所属。プログラミングとゲームが好き。",
+    "bio": "東京科学大学でコンピュータサイエンスを学んでいます。プログラミングとゲームが好きです。",
+    "sidebarLabel": "プレイヤープロフィール",
+    "currentSave": "CURRENT SAVE",
+    "navigationLabel": "ページ内ナビゲーション",
+    "readyStatus": "READY",
+    "heroEyebrow": "PLAYER PROFILE / PORTFOLIO",
+    "viewMissions": "作品を見る",
+    "characterStageLabel": "ブロックキャラクターのステージ",
+    "characterAlt": "四角いブロックのキャラクター",
+    "liveLink": "公開ページ",
+    "interestSummary": "ゲーム",
+    "interestDescription": "ゲームが好きです。遊ぶのも、仕組みを考えたり作ったりするのも楽しんでいます。",
+    "footerNote": "プレイしてくれてありがとう。",
+    "sections": {
+        "profile": "プロフィール",
+        "research": "研究テーマ",
+        "missions": "作品",
+        "equipment": "技術",
+        "interests": "興味",
+        "contact": "連絡先"
+    },
+    "sectionNotes": {
+        "profile": "プレイヤーの基本情報",
+        "research": "現在取り組んでいるテーマ",
+        "missions": "これまでに作ったもの",
+        "equipment": "開発で使っている技術",
+        "interests": "ゲームが好きです",
+        "contact": "お気軽にご連絡ください"
+    },
+    "profileFields": {
+        "education": "所属",
+        "lab": "研究室",
+        "interest": "好きなこと"
+    },
     "research": {
         "labName": "横田理央研究室",
-        "description": "未定"
-    },
-    "hobbies": {
-        "note1": "原神が大好きでのめり込んでます。時々ジャグリングや料理もしてます。",
-        "note2": "2026 / 3 から趣味でイラストを描き始めました。勉強中..."
+        "eventCameraLabel": "イベントカメラ",
+        "eventCamera": "イベントカメラを用いたコンピュータビジョン",
+        "llm": "大規模言語モデルの研究"
     },
     "projects": {
-        "Portfolio": "このポートフォリオサイト。Next.jsで構築し、ホームサーバー上のk3sで運用している。",
-        "PainRecorder": "慢性疼痛患者が痛みの強さを記録・可視化する日本語Webアプリ。Next.js + PostgreSQLで構築し、気象データ連携・PWA対応・グラフ分析機能を備えている。",
-        "ZZZ-SearchApi": "「Zenless Zone Zero」のWiki情報を検索し、AIで要約して返すAPIサーバー。",
-        "ZZZ-SearchOverlay": "「Zenless Zone Zero」のプレイ中にゲーム用語を素早く調べられるElectronデスクトップアプリ。テキスト検索とスクリーンショットを用いた画像検索に対応している。",
-        "GenshinImpactDPSCalculator": "Genshin Impactの時間駆動型戦闘シミュレーターとDPS計算ツール。スキルアニメーション・元素反応・ICDを精密に再現し、聖遺物最適化パイプラインとRL学習モジュールを備えている。",
-        "ArtifactSimulator": "原神の聖遺物強化後のスコア確率分布を計算・可視化するWebアプリ。スクリーンショットからサブオプションを自動認識し、ヒストグラムや統計量で結果を表示する。",
-        "ArtifactSimulator-Backend": "原神の聖遺物強化シミュレーター用バックエンドAPI。Google Cloud Vision APIを用いたOCRで画像を解析し、強化後のスコア分布・統計情報を返す。",
-        "ClipboardSync": "WindowsとmacOS間でテキストのコピー&ペーストを同期する常駐型CLIアプリ。WebSocket中継、Ed25519による端末認証、XChaCha20-Poly1305によるエンドツーエンド暗号化に対応している。",
-        "NeuralNetwork": "C言語でスクラッチ実装したニューラルネットワーク。逆誤差伝播法による学習を行い、sin波の近似を検証。結果をJupyter Notebookで可視化する。"
+        "ArtifactSimulator": "原神の聖遺物強化後のスコア分布を計算・可視化するWebアプリ。画像からサブステータスを読み取り、結果をグラフで表示します。",
+        "DPSCalculator": "原神の戦闘を再現し、ダメージやDPSを計算するシミュレーターです。",
+        "ClipboardSync": "WindowsとmacOS間でクリップボードを同期する、暗号化対応の常駐ツールです。",
+        "Portfolio": "Next.jsで制作したポートフォリオサイトです。",
+        "ArtifactSimulator-Backend": "ArtifactSimulatorの画像解析とスコア計算を行うバックエンドAPIです。",
+        "ZZZ-SearchApi": "ゼンレスゾーンゼロのWiki情報を検索するAPIです。",
+        "ZZZ-SearchOverlay": "ゲーム中に用語をすばやく調べられるデスクトップアプリです。",
+        "NeuralNetwork": "C言語で一から実装したニューラルネットワークです。"
     }
 }

@@ -1,364 +1,197 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
+import { FaEnvelope, FaGithub, FaLinkedin } from 'react-icons/fa'
 import styles from './Home.module.css'
-import ja from '../locales/ja.json'
+import { getProjectCards, skillGroups } from './portfolioContent.js'
 import en from '../locales/en.json'
-import { FaEnvelope, FaLinkedin, FaGithub } from 'react-icons/fa'
+import ja from '../locales/ja.json'
 
-const skillGroups = [
-    {
-        category: 'Languages',
-        skills: [
-            { name: 'Java', level: 5 },
-            { name: 'Python', level: 4 },
-            { name: 'C', level: 4 },
-            { name: 'JavaScript', level: 3 },
-            { name: 'TypeScript', level: 3 },
-            { name: 'MATLAB', level: 2 },
-            { name: 'Scala', level: 1 },
-            { name: 'Verilog-HDL', level: 1 },
-        ],
-    },
-    {
-        category: 'Frameworks',
-        skills: [
-            { name: 'Next.js', level: 2 },
-            { name: 'Vue.js', level: 3 },
-            { name: 'React', level: 2 },
-            { name: 'Spring Boot', level: 1}
-        ],
-    },
-    {
-        category: 'Markup/Style',
-        skills: [
-            { name: 'HTML/CSS', level: 4 },
-        ],
-    },
-    {
-        category: 'Database',
-        skills: [
-            { name: 'PostgreSQL', level: 2 },
-        ],
-    },
-    {
-        category: 'Tools',
-        skills: [
-            { name: 'Git', level: 4 },
-            { name: 'Docker', level: 3 },
-            { name: 'Google Cloud', level: 3 },
-            { name: 'Kubernetes', level: 2}
-        ],
-    },
-    {
-        category: 'Learning',
-        skills: [
-            { name: 'Chinese', level: null },
-            { name: 'Quantum Computing', level: null },
-        ],
-    },
-    {
-        category: 'Qualifications',
-        skills: [
-            { name: 'TOEIC 925', level: null },
-            { name: '統計検定１級', level: null },
-        ],
-    },
-    {
-        category: 'Life Skills',
-        skills: [
-            { name: 'Juggling', level: 2 },
-            { name: 'GenshinImpact', level: 5 },
-        ],
-    },
+const navigation = [
+    { id: 'profile', number: '01' },
+    { id: 'research', number: '02' },
+    { id: 'missions', number: '03' },
+    { id: 'equipment', number: '04' },
+    { id: 'interests', number: '05' },
+    { id: 'contact', number: '06' },
 ]
 
-const projects = [
-    {
-        name: 'Portfolio',
-        techs: ['Next.js', 'k3s'],
-        github: 'https://github.com/kyobankatu/Portfolio',
-        url: 'https://portfolio.katumon.com/',
-    },
-    {
-        name: 'GenshinImpactDPSCalculator',
-        techs: ['Java', 'Gradle', 'Python'],
-        github: 'https://github.com/kyobankatu/GenshinImpactDPSCalculator',
-        url: 'https://kyobankatu.github.io/GenshinImpactDPSCalculator/simulation_report.html',
-    },
-    {
-        name: 'ArtifactSimulator',
-        techs: ['Vue.js', 'Docker', 'k3s'],
-        github: 'https://github.com/kyobankatu/ArtifactSimulator-Frontend',
-        url: 'https://artifact.katumon.com',
-    },
-    {
-        name: 'ArtifactSimulator-Backend',
-        techs: ['Python', 'Flask', 'Google Cloud Vision API', 'Docker', 'k3s'],
-        github: 'https://github.com/kyobankatu/ArtifactSimulator-Backend',
-        url: null,
-    },
-    {
-        name: 'PainRecorder',
-        techs: ['Next.js', 'TypeScript', 'PostgreSQL', 'Prisma', 'Docker', 'k3s'],
-        github: 'https://github.com/kyobankatu/PainRecorder',
-        url: 'https://pain.katumon.com/',
-    },
-    {
-        name: 'ClipboardSync',
-        techs: ['Java', 'Spring Boot', 'Gradle', 'WebSocket'],
-        github: 'https://github.com/kyobankatu/ClipboardSync',
-        url: null,
-    },
-    {
-        name: 'ZZZ-SearchApi',
-        techs: ['Python', 'Flask', 'Google Cloud Translation API', 'BeautifulSoup4', 'Docker', 'Cloud Run'],
-        github: 'https://github.com/kyobankatu/ZZZ-SearchApi',
-        url: null,
-    },
-    {
-        name: 'ZZZ-SearchOverlay',
-        techs: ['Electron', 'Node.js'],
-        github: 'https://github.com/kyobankatu/ZZZ-SearchOverlay',
-        url: null,
-    },
-    {
-        name: 'NeuralNetwork',
-        techs: ['C', 'Python'],
-        github: 'https://github.com/kyobankatu/NeuralNetwork',
-        url: null,
-    },
-]
-
-const config = {
-    spawnInterval: 900,
-    maxOrbs: 6,
-    colors: [
-        'rgba(191,160,70,0.95)',
-        'rgba(102,200,210,0.9)',
-        'rgba(141,230,203,0.9)',
-        'rgba(255,220,160,0.95)',
-    ],
-    sizeRange: [28, 110],
-    durationRange: [3.8, 9.5],
-    verticalPaddingPercent: 8,
-}
-
-const rand = (min, max) => Math.random() * (max - min) + min
-const pick = (arr) => arr[Math.floor(Math.random() * arr.length)]
-
-export default function Home() {
-    const [orbs, setOrbs] = useState([])
+export default function Home({ translations = { ja, en } }) {
     const [lang, setLang] = useState('ja')
-    const t = lang === 'ja' ? ja : en
-    const nextId = useRef(1)
-
-    const scrollTo = (id) => {
-        const el = document.getElementById(id)
-        if (el) el.scrollIntoView({ behavior: 'smooth' })
-    }
-
-    useEffect(() => {
-        function spawnOrb() {
-            setOrbs((prev) => {
-                if (prev.length >= config.maxOrbs) return prev
-
-                const size = Math.round(rand(config.sizeRange[0], config.sizeRange[1]))
-                const left = Math.round(rand(4, 96))
-                const top = Math.round(rand(config.verticalPaddingPercent, 100 - config.verticalPaddingPercent))
-                const duration = +rand(config.durationRange[0], config.durationRange[1]).toFixed(2)
-                const delay = +rand(0, 1.2).toFixed(2)
-                const color = pick(config.colors)
-                const id = nextId.current++
-
-                const totalMs = Math.round((delay + duration) * 1000) + 300
-                setTimeout(() => {
-                    setOrbs((o) => o.filter((orb) => orb.id !== id))
-                }, totalMs)
-
-                return [...prev, { id, left, top, size, duration, delay, color }]
-            })
-        }
-
-        for (let i = 0; i < 3; i++) spawnOrb()
-        const timer = setInterval(spawnOrb, config.spawnInterval)
-        return () => clearInterval(timer)
-    }, [])
+    const [activeSection, setActiveSection] = useState('profile')
+    const t = lang === 'ja' ? translations.ja : translations.en
+    const projects = getProjectCards(t)
+    const swallowUrl = lang === 'ja'
+        ? 'https://swallow-llm.github.io/index.ja.html'
+        : 'https://swallow-llm.github.io/index.en.html'
 
     return (
-        <>
-            <button
-                className={styles.langToggle}
-                onClick={() => setLang(lang === 'ja' ? 'en' : 'ja')}
-            >
-                {lang === 'ja' ? 'EN' : 'JA'}
-            </button>
-            <div className={styles.orbLayer} aria-hidden="true">
-                {orbs.map((orb) => (
-                    <div
-                        key={orb.id}
-                        className={styles.orb}
-                        style={{
-                            left: orb.left + '%',
-                            top: orb.top + '%',
-                            width: orb.size + 'px',
-                            height: orb.size + 'px',
-                            background: `radial-gradient(circle at 30% 30%, ${orb.color}, rgba(255,255,255,0.06))`,
-                            animationDuration: `${orb.duration}s`,
-                            animationDelay: `${orb.delay}s`,
-                            transform: 'translate3d(-50%, -50%, 0)',
-                        }}
-                    />
-                ))}
-            </div>
-
-            <section className={styles.selfInfo}>
-                <div className={styles.selfInner}>
-                    <div className={styles.profileCard}>
-                        <div className={styles.avatarWrap}>
-                            <img className={styles.avatar} src="/avatar-placeholder.png" alt="avatar" />
-                        </div>
-                        <div className={styles.profileText}>
-                            <h3>{t.name}</h3>
-                        </div>
-                    </div>
-
-                    <div className={styles.selfContent}>
-                        <div className={styles.eyebrow}>Portfolio</div>
-                        <h1 className={styles.heroTitle}>
-                            {t.name}
-                            <span className={styles.gold}> — </span>
-                            <span className={styles.role}>{t.role}</span>
-                        </h1>
-                        <p className={styles.tagline}>{t.tagline}</p>
-                        <p className={styles.bio}>{t.bio}</p>
-
-                        <div className={styles.actions}>
-                            <button className={`${styles.btn} ${styles.ghost}`} onClick={() => scrollTo('skills')}>
-                                Skills
-                            </button>
-                            <button className={`${styles.btn} ${styles.ghost}`} onClick={() => scrollTo('research')}>
-                                Research
-                            </button>
-                            <button className={`${styles.btn} ${styles.ghost}`} onClick={() => scrollTo('projects')}>
-                                Projects
-                            </button>
-                            <button className={`${styles.btn} ${styles.ghost}`} onClick={() => scrollTo('contact')}>
-                                Contact
-                            </button>
-                            <button className={`${styles.btn} ${styles.ghost}`} onClick={() => scrollTo('hobbies')}>
-                                Hobbies
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="skills" className={styles.sectionPlaceholder}>
-                <h2>Skills</h2>
-                <div className={styles.skillGroups}>
-                    {skillGroups.map((g) => (
-                        <div key={g.category} className={styles.skillGroup}>
-                            <p className={styles.skillCategory}>{g.category}</p>
-                            <div className={styles.skillList}>
-                                {g.skills.map((s) => (
-                                    <span key={s.name} className={styles.skill}>
-                                        {s.name}
-                                        {s.level !== null && (
-                                            <span className={styles.skillLevel}>
-                                                {[1, 2, 3, 4, 5].map((i) => (
-                                                    <span
-                                                        key={i}
-                                                        className={i <= s.level ? styles.dotFilled : styles.dotEmpty}
-                                                    />
-                                                ))}
-                                            </span>
-                                        )}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
-
-            <section id="research" className={styles.sectionPlaceholder}>
-                <h2>Research</h2>
-                <a
-                    className={styles.labLink}
-                    href="https://www.rio.gsic.titech.ac.jp/jp/index.html"
-                    target="_blank"
-                    rel="noreferrer"
-                >
-                    {t.research.labName}
+        <div className={styles.portfolioShell}>
+            <aside className={styles.sidebar} aria-label={t.sidebarLabel}>
+                <a className={styles.brand} href="#overview" onClick={() => setActiveSection('profile')}>
+                    <span className={styles.avatarFrame}><img src="/avatar-placeholder.png" alt="" /></span>
+                    <span className={styles.brandText}>
+                        <strong>{t.name}</strong>
+                        <span>PLAYER 01 / ONLINE</span>
+                    </span>
                 </a>
-                <p>{t.research.description}</p>
-            </section>
 
-            <section id="projects" className={styles.sectionPlaceholder}>
-                <h2>Projects</h2>
-                <div className={styles.projectList}>
-                    {projects.map((p) => (
-                        <div key={p.name} className={styles.projectCard}>
-                            <div className={styles.projectCardHeader}>
-                                <span className={styles.projectName}>{p.name}</span>
-                                <div className={styles.projectLinks}>
-                                    <a href={p.github} target="_blank" rel="noreferrer" className={styles.projectLink}>
-                                        GitHub
-                                    </a>
-                                    {p.url && (
-                                        <a href={p.url} target="_blank" rel="noreferrer" className={`${styles.projectLink}`}>
-                                            Live
-                                        </a>
-                                    )}
-                                </div>
-                            </div>
-                            <p className={styles.projectDesc}>{t.projects[p.name]}</p>
-                            <div className={styles.techBadges}>
-                                {p.techs.map((t) => (
-                                    <span key={t} className={styles.techBadge}>{t}</span>
-                                ))}
-                            </div>
-                        </div>
+                <div className={styles.saveCard}>
+                    <span className={styles.cardLabel}>{t.currentSave}</span>
+                    <p>{t.bio}</p>
+                </div>
+
+                <nav className={styles.navigation} aria-label={t.navigationLabel}>
+                    {navigation.map((item) => (
+                        <a
+                            key={item.id}
+                            href={`#${item.id}`}
+                            className={activeSection === item.id ? styles.navLinkActive : styles.navLink}
+                            aria-current={activeSection === item.id ? 'location' : undefined}
+                            onClick={() => setActiveSection(item.id)}
+                        >
+                            <span>{t.sections[item.id]}</span>
+                            <span className={styles.navNumber}>{item.number}</span>
+                        </a>
                     ))}
-                </div>
-            </section>
+                </nav>
 
-            <section id="contact" className={`${styles.sectionPlaceholder}`}>
-                <h2>Contact</h2>
-                <div className={styles.contactList}>
-                    <a className={styles.contactCard} href="mailto:kento.ota@rio.scrc.iir.isct.ac.jp">
-                        <FaEnvelope size={20} className={styles.contactIcon} />
-                        <span className={styles.contactLabel}>Email</span>
-                        <span className={styles.contactValue}>kento.ota@rio.scrc.iir.isct.ac.jp</span>
-                    </a>
-                    <a className={styles.contactCard} href="mailto:ota.k.5051@m.isct.ac.jp">
-                        <FaEnvelope size={20} className={styles.contactIcon} />
-                        <span className={styles.contactLabel}>Email</span>
-                        <span className={styles.contactValue}>ota.k.5051@m.isct.ac.jp</span>
-                    </a>
-                    <a className={styles.contactCard} href="https://www.linkedin.com/in/kento-ota-84bb6a382" target="_blank" rel="noreferrer">
-                        <FaLinkedin size={20} className={styles.contactIcon} />
-                        <span className={styles.contactLabel}>LinkedIn</span>
-                        <span className={styles.contactValue}>kento-ota-84bb6a382</span>
-                    </a>
-                    <a className={styles.contactCard} href="https://github.com/kyobankatu" target="_blank" rel="noreferrer">
-                        <FaGithub size={20} className={styles.contactIcon} />
-                        <span className={styles.contactLabel}>GitHub</span>
-                        <span className={styles.contactValue}>kyobankatu</span>
-                    </a>
+                <div className={styles.sidebarFooter}>
+                    <span className={styles.statusDot} />
+                    <span>{t.readyStatus}</span>
                 </div>
-            </section>
+            </aside>
 
-            <section id="hobbies" className={styles.sectionPlaceholder}>
-                <h2>Hobbies</h2>
-                <p className={styles.hobbiesNote}>{t.hobbies.note1}</p>
-                <p className={styles.hobbiesNote}>{t.hobbies.note2}</p>
-                <div className={styles.hobbiesGallery}>
-                    <img src="/hobbies/img0.jpg" alt="illust 0" className={styles.hobbiesImg} />
-                    <img src="/hobbies/img1.jpg" alt="illust 1" className={styles.hobbiesImg} />
-                </div>
-            </section>
-        </>
+            <main className={styles.mainContent}>
+                <header className={styles.topbar}>
+                    <span className={styles.breadcrumb}>PORTFOLIO <span>/</span> PERSONAL ARCADE</span>
+                    <div className={styles.topbarActions}>
+                        <span className={styles.statusLabel}><span className={styles.statusDot} /> {t.readyStatus}</span>
+                        <button
+                            type="button"
+                            className={styles.langToggle}
+                            onClick={() => setLang(lang === 'ja' ? 'en' : 'ja')}
+                            aria-label={lang === 'ja' ? 'Switch language to English' : '日本語に切り替え'}
+                        >
+                            {lang === 'ja' ? 'EN' : 'JA'}
+                        </button>
+                    </div>
+                </header>
+
+                <section id="overview" className={styles.hero} aria-labelledby="hero-title">
+                    <div className={styles.heroCopy}>
+                        <p className={styles.eyebrow}>{t.heroEyebrow}</p>
+                        <h1 id="hero-title">{t.name}<span className={styles.nameMark}>.</span></h1>
+                        <p className={styles.heroSummary}>{t.tagline}</p>
+                        <div className={styles.heroActions}>
+                            <a className={styles.primaryButton} href="#missions" onClick={() => setActiveSection('missions')}>
+                                {t.viewMissions}<span aria-hidden="true">↗</span>
+                            </a>
+                            <a className={styles.secondaryButton} href="https://github.com/kyobankatu" target="_blank" rel="noreferrer">
+                                GitHub <span aria-hidden="true">↗</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div className={styles.characterStage} aria-label={t.characterStageLabel}>
+                        <div className={styles.stageGrid} aria-hidden="true" />
+                        <div className={styles.stageReadout}>
+                            <span>PLAYER 01</span>
+                            <span>{t.readyStatus}</span>
+                        </div>
+                        <div className={styles.characterTile}><img src="/avatar-placeholder.png" alt={t.characterAlt} /></div>
+                        <div className={styles.stageFloor} aria-hidden="true" />
+                    </div>
+                </section>
+
+                <section id="profile" className={styles.contentSection} aria-labelledby="profile-heading">
+                    <div className={styles.sectionHeading}>
+                        <div className={styles.headingTitle}><span>01</span><h2 id="profile-heading">Profile</h2></div>
+                        <p>{t.sectionNotes.profile}</p>
+                    </div>
+                    <div className={styles.profileGrid}>
+                        <article className={styles.infoCard}><span className={styles.cardLabel}>{t.profileFields.education}</span><strong>{t.role}</strong></article>
+                        <article className={styles.infoCard}><span className={styles.cardLabel}>{t.profileFields.lab}</span><strong>{t.research.labName}</strong></article>
+                        <article className={styles.infoCard}><span className={styles.cardLabel}>{t.profileFields.interest}</span><strong>{t.interestSummary}</strong></article>
+                    </div>
+                </section>
+
+                <section id="research" className={styles.contentSection} aria-labelledby="research-heading">
+                    <div className={styles.sectionHeading}>
+                        <div className={styles.headingTitle}><span>02</span><h2 id="research-heading">Research</h2></div>
+                        <p>{t.sectionNotes.research}</p>
+                    </div>
+                    <div className={styles.researchPanel}>
+                        <article className={styles.researchTopic}><span className={styles.cardLabel}>01 / {t.research.eventCameraLabel}</span><h3>{t.research.eventCamera}</h3></article>
+                        <article className={styles.researchTopic}>
+                            <span className={styles.cardLabel}>02 / LLM</span>
+                            <h3>{t.research.llm}</h3>
+                            <a className={styles.textLink} href={swallowUrl} target="_blank" rel="noreferrer">Swallow LLM <span aria-hidden="true">↗</span></a>
+                        </article>
+                    </div>
+                </section>
+
+                <section id="missions" className={styles.contentSection} aria-labelledby="missions-heading">
+                    <div className={styles.sectionHeading}>
+                        <div className={styles.headingTitle}><span>03</span><h2 id="missions-heading">Missions</h2></div>
+                        <p>{t.sectionNotes.missions}</p>
+                    </div>
+                    <div className={styles.projectList}>
+                        {projects.map((project, index) => (
+                            <article className={styles.projectCard} key={project.key}>
+                                <span className={styles.projectNumber}>M-{String(index + 1).padStart(2, '0')}</span>
+                                <div className={styles.projectBody}>
+                                    <span className={styles.cardLabel}>{project.kind}</span>
+                                    <h3>{project.key}</h3>
+                                    <p>{project.description}</p>
+                                    <div className={styles.techList}>{project.techs.map((tech) => <span className={styles.techTag} key={tech}>{tech}</span>)}</div>
+                                </div>
+                                <div className={styles.projectLinks}>
+                                    <a href={project.github} target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+                                    {project.url && <a href={project.url} target="_blank" rel="noreferrer">{t.liveLink} <span aria-hidden="true">↗</span></a>}
+                                </div>
+                            </article>
+                        ))}
+                    </div>
+                </section>
+
+                <section id="equipment" className={styles.contentSection} aria-labelledby="equipment-heading">
+                    <div className={styles.sectionHeading}>
+                        <div className={styles.headingTitle}><span>04</span><h2 id="equipment-heading">Equipment</h2></div>
+                        <p>{t.sectionNotes.equipment}</p>
+                    </div>
+                    <div className={styles.skillsGrid}>
+                        {skillGroups.map((group) => (
+                            <article className={styles.skillGroup} key={group.category}>
+                                <h3>{group.category}</h3>
+                                <div className={styles.skillList}>{group.skills.map((skill) => <span className={styles.skillTag} key={skill}>{skill}</span>)}</div>
+                            </article>
+                        ))}
+                    </div>
+                </section>
+
+                <section id="interests" className={styles.contentSection} aria-labelledby="interests-heading">
+                    <div className={styles.sectionHeading}>
+                        <div className={styles.headingTitle}><span>05</span><h2 id="interests-heading">Interests</h2></div>
+                        <p>{t.sectionNotes.interests}</p>
+                    </div>
+                    <div className={styles.interestPanel}><span className={styles.interestIcon} aria-hidden="true">▧</span><p>{t.interestDescription}</p></div>
+                </section>
+
+                <section id="contact" className={styles.contentSection} aria-labelledby="contact-heading">
+                    <div className={styles.sectionHeading}>
+                        <div className={styles.headingTitle}><span>06</span><h2 id="contact-heading">Contact</h2></div>
+                        <p>{t.sectionNotes.contact}</p>
+                    </div>
+                    <div className={styles.contactList}>
+                        <a href="mailto:kento.ota@rio.scrc.iir.isct.ac.jp" className={styles.contactLink}><FaEnvelope aria-hidden="true" /><span>Email</span><strong>kento.ota@rio.scrc.iir.isct.ac.jp</strong><span aria-hidden="true">↗</span></a>
+                        <a href="https://www.linkedin.com/in/kento-ota-84bb6a382" target="_blank" rel="noreferrer" className={styles.contactLink}><FaLinkedin aria-hidden="true" /><span>LinkedIn</span><strong>kento-ota-84bb6a382</strong><span aria-hidden="true">↗</span></a>
+                        <a href="https://github.com/kyobankatu" target="_blank" rel="noreferrer" className={styles.contactLink}><FaGithub aria-hidden="true" /><span>GitHub</span><strong>kyobankatu</strong><span aria-hidden="true">↗</span></a>
+                    </div>
+                </section>
+
+                <footer className={styles.pageFooter}><span>© 2026 KATUMON</span><span>{t.footerNote}</span></footer>
+            </main>
+        </div>
     )
 }
