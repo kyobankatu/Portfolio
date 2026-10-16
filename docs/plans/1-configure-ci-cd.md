@@ -97,6 +97,7 @@
 - Phase 2 commit：`458d240`。
 - Phase 3 commit：`76a633a`。
 - Phase 4 commit：`dd59412`。
+- Phase 5 approval commit：`7ba997f`。
 - Phase 1：Dockerビルド成功。standalone実行イメージに対してE2E 3件成功、非root・開発ファイル除外検査成功。Next.jsのoptional peer依存でPlaywrightが残ることを実行検査で検出し、standalone出力へ変更して成功を確認。GHCRへの実公開は最終了承・push・masterマージ後に検証する。
 - 既存依存関係のnpm auditは5件（high 4、critical 1）。Next.js等の既存バージョン由来であり、追加したPlaywrightの指摘はない。最終レビューの確認事項として残す。
 - Phase 2：Linuxコンテナでデプロイ処理11件成功（flock競合・例外後の解放を含む）。cp-1でGitHub APIのmaster取得200、必要ツールの実パス、Deploymentの既存イメージとready 1を確認。dry-runは未公開workflowのAPIが404のためエラー終了し、クラスタは更新していない。候補を選ぶ実サーバーdry-runはmasterマージ後の確認として残す。GitHub Actionsは有効、workflow内の明示的なpackages writeで公開する。CONTENTS検査は15ディレクトリ・指摘0件。
@@ -195,3 +196,4 @@ GHCR実公開、候補のあるcp-1 dry-run、初回SHAデプロイと公開URL�
 最終検証：本番Docker E2E 3件、Linuxデプロイテスト11件、workflow権限検査、actionlint、workflowのsave/load実行とイメージID一致、索引15ディレクトリ、差分チェックが成功。
 既存依存関係のaudit指摘5件は別課題として残す。実際のGitHub artifact転送・GHCR公開・候補付きcp-1 dry-run・初回SHAデプロイ・公開URL確認はmasterでのCI実行後に確認する。
 ユーザー最終了承を受領。Phase 5を完了し、作業ブランチのpush、Issue計画コメント更新、PR作成へ進む。PRは自動マージせず、本番常駐設定はmasterの初回CI・公開成功確認後に行う。
+PR：[#2 ci: automate Portfolio image publishing and deployment](https://github.com/kyobankatu/Portfolio/pull/2)。作業ブランチ`1-configure-ci-cd`をpush済み。Git CLIのOAuth認証はworkflow scope不足で拒否されたため、既存SSH認証で同一commit履歴をpushした。
