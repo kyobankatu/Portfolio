@@ -1,0 +1,16 @@
+.git
+.github
+.claude
+.next
+node_modules
+docs
+scripts
+tests
+tools
+playwright.config.js
+playwright-report
+test-results
+**/CONTENTS.md
+.env*
+*.log
+.DS_Store
