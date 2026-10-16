@@ -7,6 +7,13 @@ PRではテストだけを実行する。masterではテストした本番Docker
 cp-1は公開GitHub APIで`ci.yml`の成功を確認し、現在のmasterと一致するSHAだけを反映する。
 デプロイ対象はnamespace `default`のDeployment／container `portfolio`に固定している。
 
+検証jobは`contents: read`だけを持ち、PRではGHCRへ書き込めない。
+masterの検証成功後、Dockerイメージをartifactで同じworkflow runの公開jobへ引き渡す。
+公開jobだけに`packages: write`を与え、再ビルドせず、load後のイメージIDが検証時と一致することを確認して公開する。
+引渡し用artifactはmaster実行時だけ作成し、保持期間は1日とする。
+標準runnerのpublicリポジトリ実行時間は無料だが、artifact保存はアカウントの無料枠内で運用する。
+保持を短くして圧縮する構成とし、利用量・課金上限は[GitHubの料金説明](https://docs.github.com/en/billing/concepts/product-billing/github-actions)で確認する。
+
 ## 必要な設定
 
 - GitHub Actionsを有効にする。既存GHCR packageのSettings → Manage Actions accessで

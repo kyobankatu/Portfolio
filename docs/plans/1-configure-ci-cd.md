@@ -12,7 +12,8 @@
 - [x] Phase 1：本番DockerイメージのE2EとGitHub Actions／GHCR公開
 - [x] Phase 2：成功したCIを取り込むデプロイ処理・検証・運用docs
 - [x] Phase 3：承諾済みR1〜R6の修正、R7は比較演算子の規約変更で対応
-- [ ] Phase 4（最終Phase N）：全体検証、セキュリティを含む7分野レビュー、ユーザー最終確認
+- [x] Phase 4：承諾済みR8の修正、PR検証とGHCR公開の権限を分離
+- [ ] Phase 5（最終Phase N）：全体検証、セキュリティを含む7分野レビュー、ユーザー最終確認
 
 ## 合意済みの構成・検証範囲
 
@@ -68,7 +69,19 @@
 
 承諾：ユーザーはR1〜R6を修正するよう指示。R7はスクリプトの比較演算子を反転せず、CLAUDE.mdの演算子の制限を改める。implementation-harnessにセキュリティを追加し、以後は7分野でレビューする。
 
-## Phase 4（最終Phase N）
+## Phase 4：R8の権限分離
+
+| 項目 | 内容 |
+| --- | --- |
+| 目的 | PR検証にGHCRの書込権限を与えず、masterの検証成功後だけ公開する |
+| 意図 | 検証と公開の信頼境界をjob単位で分け、E2Eで検証した同一イメージを維持する |
+| 編集ファイル | .github/workflows/ci.yml、docs/deployment.md、関連CONTENTS.md、この計画書 |
+| テストケース | 現行workflowでPRジョブの書込権限を検出して失敗、新構成で読取専用とmaster限定・成功依存を確認、docker save/load前後のイメージID一致、本番イメージE2E、デプロイ全テスト、workflow構文・索引検査 |
+| 完了条件 | 権限分離と同一イメージの引渡しが検証を通り、commitとIssue計画更新が完了する |
+
+承諾：ユーザーの「修正して」に基づきR8を修正する。公開jobは検証jobの成功に依存し、同じworkflow runのartifactのみを取得する。
+
+## Phase 5（最終Phase N）
 
 | 項目 | 内容 |
 | --- | --- |
@@ -82,6 +95,7 @@
 - Phase 0 commit：`269bf4e`。
 - Phase 1 commit：`34e700c`。
 - Phase 2 commit：`458d240`。
+- Phase 3 commit：`76a633a`。
 - Phase 1：Dockerビルド成功。standalone実行イメージに対してE2E 3件成功、非root・開発ファイル除外検査成功。Next.jsのoptional peer依存でPlaywrightが残ることを実行検査で検出し、standalone出力へ変更して成功を確認。GHCRへの実公開は最終了承・push・masterマージ後に検証する。
 - 既存依存関係のnpm auditは5件（high 4、critical 1）。Next.js等の既存バージョン由来であり、追加したPlaywrightの指摘はない。最終レビューの確認事項として残す。
 - Phase 2：Linuxコンテナでデプロイ処理11件成功（flock競合・例外後の解放を含む）。cp-1でGitHub APIのmaster取得200、必要ツールの実パス、Deploymentの既存イメージとready 1を確認。dry-runは未公開workflowのAPIが404のためエラー終了し、クラスタは更新していない。候補を選ぶ実サーバーdry-runはmasterマージ後の確認として残す。GitHub Actionsは有効、workflow内の明示的なpackages writeで公開する。CONTENTS検査は15ディレクトリ・指摘0件。
@@ -129,3 +143,36 @@ GHCR実公開、候補のあるcp-1 dry-run、初回SHAデプロイと公開URL�
 - R7：ユーザー指定どおりCLAUDE.mdの比較演算子の規約を変更。tools/check_contents.pyは変更せず、共有skillのスクリプトとの一致を確認した。
 - リポジトリ外のimplementation-harnessを更新し、セキュリティ担当の独立レビューと修正後の7分野再レビューを必須化。skill形式検証成功。
 - 検証：本番イメージE2E 3件、Linuxデプロイテスト11件、索引15ディレクトリ・指摘0件、git diff --checkが成功。
+
+## Phase N：7分野再レビュー履歴（R8修正承諾済み）
+
+対象HEAD：`76a633ad717a0d3d19bfbfb390c861f9d0e57052`。7つの独立したサブエージェントが比較基点からの全差分と周辺コードを確認した。
+
+| 分野 | 結果 |
+| --- | --- |
+| frontend | 新規指摘なし。実コンテナの表示・翻訳・画像・CSS・404・例外なしを再確認 |
+| backend | 新規指摘なし。CI選別・競合・ロック・probe・rolloutを再確認。権限の指摘はセキュリティへ集約 |
+| テストケース | R1解消。4種類の安全設定のmutation失敗と正しい処理の成功を独立再確認 |
+| mdの記入漏れ | R2・R3・R4解消。計画・索引・規約の整合を確認 |
+| docsの記入漏れ | R5・R6解消。必要権限・cron・運用手順の整合を確認 |
+| 規約違反 | R7は指定どおり規約変更で解消。共有チェッカーは未変更 |
+| セキュリティ | 新規指摘R8。既存依存関係のaudit指摘は今回追加したものではなく別課題として区別 |
+
+| ID・分野・重要度 | 修正箇所 | 問題・根拠 | 修正内容と意図 | テストケース |
+| --- | --- | --- | --- | --- |
+| R8・セキュリティ・P2 | .github/workflows/ci.ymlのjob permissions | 同一リポジトリのPR検証jobにもpackages writeが付与される。公開stepの条件はjob全体のtoken権限を制限しない。通常のfork PRまで書込可能という指摘ではない | 検証jobをread-onlyにし、検証した同一イメージをartifactで引き継ぐmaster限定の公開jobだけにpackages writeを付ける | PRの検証jobがpackages writeを持たないこと、公開jobがmasterかつ検証成功時だけ実行されること、検証したイメージを公開すること |
+
+ユーザーがR8の修正を承諾したためPhase 4を挿入し、最終Phaseを5へ変更した。修正後は7分野で再レビューする。最終push・本番設定は引き続き未実施。
+セキュリティ補足：auditの5パッケージは比較基点と同じバージョン。Linux本番に該当しないWindows向けの問題や、画像最適化の入力経路の成立を確認できていない問題を含むため、現在の本番がリモートコード実行可能とは断定しない。依存更新は別途承諾を得て実施する。
+
+根拠：[GitHubのtoken最小権限](https://docs.github.com/en/actions/tutorials/authenticate-with-github_token)。
+
+## Phase 4：R8修正結果
+
+- 検証jobを`verify`へ変更し`contents: read`のみ付与。公開を`publish`jobへ分離し、masterかつPR以外の場合に、verify成功を条件として実行する。
+- masterのE2E成功後だけDockerイメージをsaveし、同じworkflow runのartifactを公開jobでloadする。検証時のイメージIDをjob出力で渡し、load後のID一致を必須とする。公開jobで再ビルドしない。
+- artifact用Actionsは公式のreleaseをcommit SHAで固定。保持1日・圧縮あり。Actionsのartifact保存はアカウントの無料枠内で運用し、枠外課金の可能性を運用docsへ記載した。
+- 検証：旧構成でPR jobの書込権限を検出し失敗、新構成で権限・master条件・成功依存・同一run artifact・ID検証の静的確認に成功。actionlint 1.7.12で構文・式検証成功。
+- workflow内のsave/load shellブロックをLinuxコンテナで実行し、タグを一旦外してloadしてもイメージIDが一致することを確認した。
+- 全体検証：本番イメージE2E 3件、Linuxデプロイテスト11件、CONTENTS 15ディレクトリ・指摘0件、git diff --check成功。
+- 実際のGitHub上のartifact転送・GHCR公開はpushとmasterマージ後の確認事項として残る。
