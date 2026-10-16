@@ -1,4 +1,4 @@
-# Issue #3: Portfolio HUD redesign
+# Issue #3: ポートフォリオHUD刷新
 
 ## Phase 0 — 調査・計画
 
@@ -43,26 +43,26 @@
 
 ## Review and repair history
 
-| 記録 | 結果 | Issue comment | 関連commit |
+| 記録 | 結果 | Issueコメント | 関連コミット |
 | --- | --- | --- | --- |
-| Review round 1 — findings | 8件を確認。すべてユーザー承認済み。 | [レビュー結果](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6217564914) | — |
-| Repair round 1 — implementation and verification | ナビ・テスト・CI、依存・文書の修正完了。 | [修正計画と結果](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6217567477) | 39458b9, 01327bb |
-| Review round 2 — documentation status | 計画書に残った古い承認待ち表記を修正。 | [指摘と対応](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6217569927) | 56da43e, 9d3a43f |
-| Final re-review | 9d3a43fを7分野で確認し、追加指摘なし。最終了承待ち。 | [最終レビュー](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6217571535) | 0652aa7 |
+| 第1回レビュー — 指摘 | 8件を確認。すべてユーザー承認済み。 | [レビュー結果](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6217564914) | — |
+| 第1回修正 — 実装と検証 | ナビ・テスト・CI、依存・文書の修正完了。 | [修正計画と結果](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6217567477) | 39458b9, 01327bb |
+| 第2回レビュー — 文書状態 | 計画書に残った古い承認待ち表記を修正。 | [指摘と対応](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6217569927) | 56da43e, 9d3a43f |
+| 最終再レビュー | 9d3a43fを7分野で確認し、追加指摘なし。最終了承待ち。 | [最終レビュー](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6217571535) | 0652aa7 |
 
 **Issue運用**：Phase Nのレビュー結果、承認された修正計画、修正結果、再レビュー結果は、それぞれ新しいIssueコメントとして時系列に記録する。初期計画にはこの一覧とコメントへのリンクだけを残す。Phase Nはユーザーの最終了承まで未完了とする。
 
-## Phase checklist
+## Phaseチェックリスト
 
 - [x] Phase 0：調査・計画をローカルとIssueコメントに記録し、commitする。
 - [x] Phase 1：HUD画面・掲載情報を実装し、単体／結合／E2E、ビルドとCONTENTS検査を通してcommitする。
 - [x] Phase 2：キャラクター演出・動きの軽減対応を実装し、単体／結合／E2E、ビルドとCONTENTS検査を通してcommitする。
 - [ ] Phase N：全体検証・7分野レビュー・ユーザー最終了承を完了する。
 
-## Execution log
+## 実行記録
 
-| Phase | Result | Commit SHA | Issue plan updated |
+| Phase | 結果 | コミットSHA | Issue計画更新 |
 | --- | --- | --- | --- |
-| 0 | Complete | d6bb27e45ac75c014b1924ba86fe4e1351f7cc16 | Yes ([initial plan](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6216410535)) |
-| 1 | Complete; 8 unit/integration cases, 3 Chromium E2E cases, production build, and CONTENTS checker passed | 8d1e81c | Yes |
-| 2 | Complete; 10 unit/integration cases, 4 Chromium E2E cases, production build, and CONTENTS checker passed | ee9c092 | Yes |
+| 0 | 完了 | d6bb27e45ac75c014b1924ba86fe4e1351f7cc16 | 済 ([初期計画](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6216410535)) |
+| 1 | 完了。単体／結合テスト8件、Chromium E2E 3件、本番ビルド、CONTENTS検査が成功 | 8d1e81c | 済 |
+| 2 | 完了。単体／結合テスト10件、Chromium E2E 4件、本番ビルド、CONTENTS検査が成功 | ee9c092 | 済 |
