@@ -48,9 +48,9 @@
 | 第1回レビュー — 指摘 | 8件を確認。すべてユーザー承認済み。 | [レビュー結果](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6217564914) | — |
 | 第1回修正 — 実装と検証 | ナビ・テスト・CI、依存・文書の修正完了。 | [修正計画と結果](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6217567477) | 39458b9, 01327bb |
 | 第2回レビュー — 文書状態 | 計画書に残った古い承認待ち表記を修正。 | [指摘と対応](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6217569927) | 56da43e, 9d3a43f |
-| 最終再レビュー | 9d3a43fを7分野で確認し、追加指摘なし。最終了承待ち。 | [最終レビュー](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6217571535) | 0652aa7 |
+| 最終再レビュー | 9d3a43fを7分野で確認し、追加指摘なし。その後、ユーザー最終了承済み。Phase N完了。 | [最終レビュー](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6217571535) | 0652aa7 |
 
-**Issue運用**：Phase Nのレビュー結果、承認された修正計画、修正結果、再レビュー結果は、それぞれ新しいIssueコメントとして時系列に記録する。初期計画にはこの一覧とコメントへのリンクだけを残す。Phase Nはユーザーの最終了承まで未完了とする。
+**Issue運用**：Phase Nのレビュー結果、承認された修正計画、修正結果、再レビュー結果は、それぞれ新しいIssueコメントとして時系列に記録する。初期計画にはこの一覧とコメントへのリンクだけを残す。Phase Nはユーザーの最終了承後に完了とする。
 
 ## Phaseチェックリスト
 

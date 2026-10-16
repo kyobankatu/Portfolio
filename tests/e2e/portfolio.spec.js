@@ -28,17 +28,20 @@ test('production home shows the portfolio content and requested links', async ({
 
 test('language toggle and keyboard navigation work at desktop and mobile widths', async ({ page }) => {
     await page.goto('/')
+    await expect(page.locator('html')).toHaveAttribute('lang', 'ja')
     await page.keyboard.press('Tab')
     await expect(page.locator(':focus')).toHaveAttribute('href', '#overview')
     await page.keyboard.press('Enter')
     await expect(page).toHaveURL(/#overview$/)
 
     await page.getByRole('button', { name: 'Switch language to English' }).click()
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en')
     await expect(page.getByRole('heading', { level: 1, name: 'Katumon.' })).toBeVisible()
     await expect(page.getByText('Computer vision with event cameras', { exact: true })).toBeVisible()
     await expect(page.getByText('A Genshin Impact combat simulator for modeling damage and calculating DPS.', { exact: true })).toBeVisible()
     await expect(page.getByRole('link', { name: /Swallow LLM/ })).toHaveAttribute('href', 'https://swallow-llm.github.io/index.en.html')
     await page.getByRole('button', { name: '日本語に切り替え' }).click()
+    await expect(page.locator('html')).toHaveAttribute('lang', 'ja')
     await expect(page.getByRole('heading', { level: 1, name: 'かつもん.' })).toBeVisible()
 
     for (const width of [390, 1440]) {

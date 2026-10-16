@@ -24,6 +24,10 @@ export default function Home({ translations = { ja, en } }) {
     const selectSection = (sectionId) => setActiveSection((current) => resolveActiveSection(sectionId, current))
 
     useEffect(() => {
+        document.documentElement.lang = lang
+    }, [lang])
+
+    useEffect(() => {
         const syncSectionFromHash = () => {
             const sectionId = window.location.hash.slice(1)
             if (sectionId === '') {
