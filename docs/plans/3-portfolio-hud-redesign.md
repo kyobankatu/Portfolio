@@ -53,6 +53,6 @@
 | Phase | Result | Commit SHA | Issue plan updated |
 | --- | --- | --- | --- |
 | 0 | Complete | `d6bb27e45ac75c014b1924ba86fe4e1351f7cc16` | Yes ([Issue comment](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6216410535)) |
-| 1 | Complete; 8 unit/integration cases, 3 Chromium E2E cases, production build, and CONTENTS checker passed | Pending SHA | Yes, pending final commit SHA |
+| 1 | Complete; 8 unit/integration cases, 3 Chromium E2E cases, production build, and CONTENTS checker passed | `8d1e81c` | Yes |
 | 2 | Pending | Pending | Pending |
 | N | Pending | Pending | Pending |
