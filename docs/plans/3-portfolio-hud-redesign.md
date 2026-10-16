@@ -50,7 +50,7 @@
 | 意図 | audit指摘を減らしつつproduction build・テストを維持する。開発規約の内容を保ち、翻訳対象と固定HUD表記を区別する。 |
 | 編集ファイル | `package.json`・`package-lock.json`（Next.js、sharp、PostCSS、Vitest系依存）、`CLAUDE.md`（既存規約を維持してCommands／Architecture／Stylingを更新）、ルート`CONTENTS.md`（lockfile生成元リンク）。 |
 | テストケース | **単体・結合・E2E**: 依存更新後も全ケースが通る。**Security**: `npm audit`と`npm audit --omit=dev`で残存指摘を確認し、残る場合は実行経路と理由を記録する。**Docs**: CONTENTS checkerが全対象ディレクトリで成功し、開発規約・locale記述が現行実装と一致する。 |
-| 完了条件 | Node 22互換、audit結果の記録、単体／結合／E2E、本番build、CONTENTS検査が成功する。 |
+| 完了条件 | Node 22互換、全依存audit 0件、単体／結合12件、Chromium E2E 6件、デプロイテスト10件成功（cp-1専用lockテスト1件skip）、本番build、17ディレクトリCONTENTS検査が成功する。 |
 
 ## Phase N — 最終検証・分野別レビュー
 
@@ -82,7 +82,7 @@
 - [x] Phase 1：HUD画面・掲載情報を実装し、単体／結合／E2E、ビルドとCONTENTS検査を通してcommitする。
 - [x] Phase 2：キャラクター演出・動きの軽減対応を実装し、単体／結合／E2E、ビルドとCONTENTS検査を通してcommitする。
 - [x] Phase 3：hash同期・翻訳／キーボード検証・CIゲートを追加し、全テストとCONTENTS検査を通してcommitする。
-- [ ] Phase 4：承認済み依存・文書修正を行い、audit・全テスト・CONTENTS検査を通してcommitする。
+- [x] Phase 4：承認済み依存・文書修正を行い、audit・全テスト・CONTENTS検査を通してcommitする。
 - [ ] Phase N：全体検証・修正後の7分野レビュー・ユーザー最終了承を完了する。
 
 ## Execution log
@@ -93,5 +93,5 @@
 | 1 | Complete; 8 unit/integration cases, 3 Chromium E2E cases, production build, and CONTENTS checker passed | `8d1e81c` | Yes |
 | 2 | Complete; 10 unit/integration cases, 4 Chromium E2E cases, production build, and CONTENTS checker passed | `ee9c092` | Yes |
 | 3 | Complete; 12 unit/integration cases, 6 Chromium E2E cases, build, deployment tests, and CONTENTS checker passed; CI verify now runs `test:unit` | `39458b9` | Yes |
-| 4 | Pending | Pending | Pending |
+| 4 | Complete; Next.js 15.5.28, Vitest 5.0.5, sharp 0.35.5 and PostCSS 8.5.30; both npm audits report zero vulnerabilities; 12 unit/integration tests, 6 Chromium E2E tests, build, 10 deployment tests (1 cp-1-only skip), and 17-directory CONTENTS check passed | `01327bb` | Yes |
 | N | Pending re-review after correction phases | Pending | Pending |
