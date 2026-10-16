@@ -14,7 +14,7 @@ Short map of the source and project files at this level. Editability describes w
 | [docs/](./docs/CONTENTS.md) | Plans and deployment documentation | 通常編集可 |
 | [locales/](./locales/CONTENTS.md) | Japanese and English page content | 通常編集可 |
 | [next.config.js](./next.config.js) | Next.js build configuration | 通常編集可 |
-| [package-lock.json](./package-lock.json) | Locked npm dependency versions; generated from package.json | 生成元を編集 |
+| [package-lock.json](./package-lock.json) | Locked npm dependency versions; generated from [package.json](./package.json) | 生成元を編集 |
 | [package.json](./package.json) | Dependencies and development commands | 通常編集可 |
 | [playwright.config.js](./playwright.config.js) | Chromium E2E runner configuration | 通常編集可 |
 | [portfolio.yaml](./portfolio.yaml) | Kubernetes Deployment, Service, and Ingress | 通常編集可 |

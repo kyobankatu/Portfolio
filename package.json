@@ -11,10 +11,11 @@
         "test:unit": "vitest run"
     },
     "dependencies": {
-        "next": "^15.3.0",
+        "next": "^15.5.28",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
-        "react-icons": "^5.6.0"
+        "react-icons": "^5.6.0",
+        "sharp": "^0.35.5"
     },
     "devDependencies": {
         "@playwright/test": "1.64.1",
@@ -22,6 +23,9 @@
         "@testing-library/react": "^16.3.0",
         "@testing-library/user-event": "^14.6.1",
         "jsdom": "^27.0.0",
-        "vitest": "^3.2.4"
+        "vitest": "^5.0.5"
+    },
+    "overrides": {
+        "postcss": "8.5.30"
     }
 }
