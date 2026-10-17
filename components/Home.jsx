@@ -83,7 +83,7 @@ export default function Home({ translations = { ja, en } }) {
                             type="button"
                             className={styles.langToggle}
                             onClick={() => setLang(lang === 'ja' ? 'en' : 'ja')}
-                            aria-label={lang === 'ja' ? 'Switch language to English' : 'Switch language to Japanese'}
+                            aria-label={t.languageToggleLabel}
                         >
                             {lang === 'ja' ? 'EN' : 'JA'}
                         </button>

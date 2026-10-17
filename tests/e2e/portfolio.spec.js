@@ -36,12 +36,13 @@ test('production home shows the portfolio content and requested links', async ({
 test('language toggle and keyboard navigation work at desktop and mobile widths', async ({ page }) => {
     await page.goto('/')
     await expect(page.locator('html')).toHaveAttribute('lang', 'ja')
+    await expect(page.getByRole('button', { name: '英語に切り替え' })).toBeVisible()
     await page.keyboard.press('Tab')
     await expect(page.locator(':focus')).toHaveAttribute('href', '#overview')
     await page.keyboard.press('Enter')
     await expect(page).toHaveURL(/#overview$/)
 
-    await page.getByRole('button', { name: 'Switch language to English' }).click()
+    await page.getByRole('button', { name: '英語に切り替え' }).click()
     await expect(page.locator('html')).toHaveAttribute('lang', 'en')
     await expect(page.getByRole('heading', { level: 1, name: 'Katumon.' })).toBeVisible()
     await expect(page.getByText('Computer vision with event cameras', { exact: true })).toBeVisible()
@@ -51,6 +52,7 @@ test('language toggle and keyboard navigation work at desktop and mobile widths'
     await page.getByRole('button', { name: 'Switch language to Japanese' }).click()
     await expect(page.locator('html')).toHaveAttribute('lang', 'ja')
     await expect(page.getByRole('heading', { level: 1, name: 'かつもん.' })).toBeVisible()
+    await expect(page.getByRole('button', { name: '英語に切り替え' })).toBeVisible()
 
     for (const width of [390, 1440]) {
         await page.setViewportSize({ width, height: 900 })

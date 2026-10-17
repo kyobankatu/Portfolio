@@ -14,8 +14,9 @@ describe('portfolio screen', () => {
         render(<Home />)
         expect(screen.getByText(ja.research.eventCamera)).toBeInTheDocument()
         expect(screen.getByText(ja.projects.DPSCalculator)).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: '英語に切り替え' })).toBeInTheDocument()
 
-        fireEvent.click(screen.getByRole('button', { name: 'Switch language to English' }))
+        fireEvent.click(screen.getByRole('button', { name: '英語に切り替え' }))
 
         expect(screen.getByText(en.research.eventCamera)).toBeInTheDocument()
         expect(screen.getByText(en.projects.DPSCalculator)).toBeInTheDocument()
@@ -27,7 +28,7 @@ describe('portfolio screen', () => {
 
         fireEvent.click(screen.getByRole('button', { name: 'Switch language to Japanese' }))
 
-        expect(screen.getByRole('button', { name: 'Switch language to English' })).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: '英語に切り替え' })).toBeInTheDocument()
     })
 
     it('keeps the screen usable when loaded with an unknown hash', () => {
