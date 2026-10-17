@@ -24,10 +24,10 @@
 
 | 項目 | 記入内容 |
 | --- | --- |
-| 目的 | 初期オフのPhysics Tossボタンとリセットを追加し、オンにするとセクションを掴んで投げられる最小の物理動作を実装する。 |
+| 目的 | 初期オフのPhysics Tossボタンとリセットを追加し、オンにするとセクションを掴んで投げられる最小の物理動作を実装する。対象は掴むまで静止させ、操作した対象から物理演算を始める。 |
 | 意図 | まずモードの開始・停止・復元と物理エンジンのライフサイクルを固め、通常閲覧への影響を分離する。 |
-| 編集ファイル | `components/Home.jsx`（Physics Toss／Reset操作とモード状態）、`components/Home.module.css`（操作部と有効時の視覚状態）、`components/physicsTossController.js`（Matter.jsエンジン、DOM同期、境界・クリーンアップ）、`package.json`・`package-lock.json`（必要な依存）、`components/CONTENTS.md`・`tests/unit/CONTENTS.md`・`tests/integration/CONTENTS.md`・`tests/e2e/CONTENTS.md`（索引）、`tests/unit/physicsTossController.test.js`、`tests/integration/Home.test.jsx`、`tests/e2e/portfolio.spec.js`。 |
-| テストケース | **単体**: 正常系—物理世界を生成し、重力・壁・床を設定し、リセットで初期位置へ復元する。異常系—無効な寸法や破棄済みcontrollerへの操作で例外・RAFリークを起こさない。**結合**: 初期オフでは通常レイアウト、オンでエンジン開始、オフで停止・復元、Resetで個別に復元する。**E2E**: 本番画面で初期オフを確認し、PCでセクションをドラッグして投げ、重力で落下・床で停止する。リンクは通常どおり操作でき、Resetと解除で配置が戻る。 |
+| 編集ファイル | `components/Home.jsx`（Physics Toss／Reset操作とモード状態）、`components/Home.module.css`（操作部と有効時の視覚状態）、`components/physicsTossController.js`（Matter.jsエンジン、DOM同期、境界・クリーンアップ）、`locales/ja.json`・`locales/en.json`（操作ラベル）、`package.json`・`package-lock.json`（物理依存）、`components/CONTENTS.md`・`tests/unit/CONTENTS.md`・`tests/integration/CONTENTS.md`・`tests/e2e/CONTENTS.md`（索引）、`tests/unit/physicsTossController.test.js`、`tests/integration/Home.test.jsx`、`tests/e2e/portfolio.spec.js`。 |
+| テストケース | **単体**: 正常系—対象は掴むまで静止し、投げると重力で移動し、床に留まり、リセットで初期位置へ復元する。異常系—無効な寸法や破棄済みcontrollerへの操作で例外・RAFリークを起こさず、対象内リンクからドラッグを開始しない。**結合**: 初期オフでは通常レイアウト、オンで操作可能、オフで停止・復元、Resetで個別に復元する。**E2E**: 本番画面で初期オフを確認し、PCでセクションをドラッグして投げて移動を確認する。リンク・ナビゲーションは通常どおり操作でき、Resetは有効化時の配置、解除は通常配置に戻す。床境界は単体で検証し、対象同士の衝突はPhase 2でE2Eを含めて検証する。 |
 | 完了条件 | Physics Tossの開始・停止・リセットが機能し、通常時にアニメーションや物理エンジンが走らない。単体／結合／E2E、build、CONTENTS検査が成功しcommitする。 |
 
 ## Phase 2 — 文章ブロックとサイドバーの衝突
@@ -63,7 +63,7 @@
 ## Phaseチェックリスト
 
 - [x] Phase 0：調査・計画をIssueとローカルに記録し、CONTENTS検査を通してcommitする。
-- [ ] Phase 1：Physics Tossの起動・停止・セクション物理を実装し、単体／結合／E2E、build、CONTENTS検査を通してcommitする。
+- [x] Phase 1：Physics Tossの起動・停止・セクション物理を実装し、単体／結合／E2E、build、CONTENTS検査を通してcommitする。
 - [ ] Phase 2：文章ブロック・サイドバーの物理と衝突を実装し、テスト・build・CONTENTS検査を通してcommitする。
 - [ ] Phase 3：キーボード・reduced-motion・モバイル対応を実装し、テスト・build・CONTENTS検査を通してcommitする。
 - [ ] Phase N：最終検証・7分野レビュー・ユーザー最終了承を完了する。

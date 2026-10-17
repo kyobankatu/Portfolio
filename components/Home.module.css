@@ -218,6 +218,38 @@
     color: var(--mint);
 }
 
+.physicsButton {
+    min-height: 34px;
+    padding: 0 10px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--text);
+    font: 700 0.62rem ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+}
+
+.physicsButton:hover,
+.physicsButton[aria-pressed="true"] {
+    border-color: var(--mint);
+    color: var(--mint);
+}
+
+.physicsButton:disabled {
+    cursor: wait;
+    opacity: 0.55;
+}
+
+.portfolioShell[data-physics-enabled="true"] [data-physics-section] {
+    position: relative;
+    cursor: grab;
+    will-change: translate;
+}
+
+.portfolioShell[data-physics-enabled="true"] [data-physics-section]:active {
+    cursor: grabbing;
+}
+
 .hero {
     min-height: 360px;
     padding: 56px 0 44px;
@@ -706,6 +738,7 @@
 .primaryButton:focus-visible,
 .secondaryButton:focus-visible,
 .langToggle:focus-visible,
+.physicsButton:focus-visible,
 .brand:focus-visible,
 .navigation a:focus-visible,
 .projectLinks a:focus-visible,
@@ -838,6 +871,8 @@
 
     .topbar {
         min-height: 58px;
+        flex-wrap: wrap;
+        padding: 9px 0;
     }
 
     .breadcrumb {
@@ -846,7 +881,9 @@
     }
 
     .topbarActions {
-        gap: 12px;
+        flex: 1;
+        justify-content: flex-end;
+        gap: 7px;
     }
 
     .statusLabel {
@@ -857,6 +894,12 @@
     .langToggle {
         min-width: 36px;
         height: 32px;
+    }
+
+    .physicsButton {
+        min-height: 32px;
+        padding: 0 7px;
+        font-size: 0.55rem;
     }
 
     .hero h1 {

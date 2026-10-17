@@ -49,6 +49,26 @@ describe('portfolio screen', () => {
         expect(screen.getByRole('status')).toHaveTextContent('イベントカメラとLLMを研究しています。')
     })
 
+    it('keeps Physics Toss off until requested and restores sections when disabled', () => {
+        render(<Home />)
+        const profile = document.querySelector('#profile')
+        const enableButton = screen.getByRole('button', { name: 'Physics Tossを有効にする' })
+
+        expect(enableButton).toHaveAttribute('aria-pressed', 'false')
+        expect(profile.style.translate).toBe('')
+        expect(screen.queryByRole('button', { name: '配置をリセット' })).not.toBeInTheDocument()
+
+        fireEvent.click(enableButton)
+
+        expect(screen.getByRole('button', { name: 'Physics Tossを無効にする' })).toHaveAttribute('aria-pressed', 'true')
+        expect(screen.getByRole('button', { name: '配置をリセット' })).toBeInTheDocument()
+
+        fireEvent.click(screen.getByRole('button', { name: 'Physics Tossを無効にする' }))
+
+        expect(screen.getByRole('button', { name: 'Physics Tossを有効にする' })).toHaveAttribute('aria-pressed', 'false')
+        expect(profile.style.translate).toBe('')
+    })
+
     it('keeps the navigation target and selected section in sync', () => {
         render(<Home />)
 

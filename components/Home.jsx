@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { FaEnvelope, FaGithub, FaLinkedin } from 'react-icons/fa'
 import styles from './Home.module.css'
 import { getProjectCards, navigationSections, resolveActiveSection, skillGroups } from './portfolioContent.js'
@@ -10,6 +10,9 @@ import ja from '../locales/ja.json'
 export default function Home({ translations = { ja, en } }) {
     const [lang, setLang] = useState('ja')
     const [activeSection, setActiveSection] = useState('profile')
+    const [physicsEnabled, setPhysicsEnabled] = useState(false)
+    const [physicsReady, setPhysicsReady] = useState(false)
+    const physicsController = useRef(null)
     const t = lang === 'ja' ? translations.ja : translations.en
     const projects = getProjectCards(t)
     const selectSection = (sectionId) => setActiveSection((current) => resolveActiveSection(sectionId, current))
@@ -17,6 +20,35 @@ export default function Home({ translations = { ja, en } }) {
     useEffect(() => {
         document.documentElement.lang = lang
     }, [lang])
+
+    useEffect(() => {
+        if (!physicsEnabled) return undefined
+
+        let cancelled = false
+        let controller = null
+        import('./physicsTossController.js').then(({ createPhysicsTossController }) => {
+            if (cancelled) return
+            const targets = [...document.querySelectorAll('[data-physics-section]')]
+            controller = createPhysicsTossController({
+                targets,
+                bounds: {
+                    width: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth, window.innerWidth),
+                    height: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight, window.innerHeight),
+                },
+            })
+            physicsController.current = controller
+            controller.start()
+            setPhysicsReady(true)
+        }).catch(() => {
+            if (!cancelled) setPhysicsEnabled(false)
+        })
+
+        return () => {
+            cancelled = true
+            controller?.destroy()
+            if (physicsController.current === controller) physicsController.current = null
+        }
+    }, [physicsEnabled])
 
     useEffect(() => {
         const syncSectionFromHash = () => {
@@ -38,7 +70,7 @@ export default function Home({ translations = { ja, en } }) {
         : 'https://swallow-llm.github.io/index.en.html'
 
     return (
-        <div className={styles.portfolioShell}>
+        <div className={styles.portfolioShell} data-physics-enabled={physicsReady}>
             <aside className={styles.sidebar} aria-label={t.sidebarLabel}>
                 <a className={styles.brand} href="#overview" onClick={() => selectSection('profile')}>
                     <span className={styles.avatarFrame}><img src="/avatar-placeholder.png" alt="" /></span>
@@ -81,6 +113,27 @@ export default function Home({ translations = { ja, en } }) {
                         <span className={styles.statusLabel}><span className={styles.statusDot} /> {t.readyStatus}</span>
                         <button
                             type="button"
+                            className={styles.physicsButton}
+                            aria-pressed={physicsEnabled}
+                            onClick={() => {
+                                if (physicsEnabled) setPhysicsReady(false)
+                                setPhysicsEnabled((enabled) => !enabled)
+                            }}
+                        >
+                            {physicsEnabled ? t.physicsDisable : t.physicsEnable}
+                        </button>
+                        {physicsEnabled && (
+                            <button
+                                type="button"
+                                className={styles.physicsButton}
+                                disabled={!physicsReady}
+                                onClick={() => physicsController.current?.reset()}
+                            >
+                                {t.physicsReset}
+                            </button>
+                        )}
+                        <button
+                            type="button"
                             className={styles.langToggle}
                             onClick={() => setLang(lang === 'ja' ? 'en' : 'ja')}
                             aria-label={t.languageToggleLabel}
@@ -90,7 +143,7 @@ export default function Home({ translations = { ja, en } }) {
                     </div>
                 </header>
 
-                <section id="overview" className={styles.hero} aria-labelledby="hero-title">
+                <section id="overview" data-physics-section className={styles.hero} aria-labelledby="hero-title">
                     <div className={styles.heroCopy}>
                         <p className={styles.eyebrow}>{t.heroEyebrow}</p>
                         <h1 id="hero-title">{t.name}<span className={styles.nameMark}>.</span></h1>
@@ -117,7 +170,7 @@ export default function Home({ translations = { ja, en } }) {
                     </div>
                 </section>
 
-                <section id="profile" className={styles.contentSection} aria-labelledby="profile-heading">
+                <section id="profile" data-physics-section className={styles.contentSection} aria-labelledby="profile-heading">
                     <div className={styles.sectionHeading}>
                         <div className={styles.headingTitle}><span>01</span><h2 id="profile-heading">Profile</h2></div>
                         <p>{t.sectionNotes.profile}</p>
@@ -129,7 +182,7 @@ export default function Home({ translations = { ja, en } }) {
                     </div>
                 </section>
 
-                <section id="research" className={styles.contentSection} aria-labelledby="research-heading">
+                <section id="research" data-physics-section className={styles.contentSection} aria-labelledby="research-heading">
                     <div className={styles.sectionHeading}>
                         <div className={styles.headingTitle}><span>02</span><h2 id="research-heading">Research</h2></div>
                         <p>{t.sectionNotes.research}</p>
@@ -144,7 +197,7 @@ export default function Home({ translations = { ja, en } }) {
                     </div>
                 </section>
 
-                <section id="missions" className={styles.contentSection} aria-labelledby="missions-heading">
+                <section id="missions" data-physics-section className={styles.contentSection} aria-labelledby="missions-heading">
                     <div className={styles.sectionHeading}>
                         <div className={styles.headingTitle}><span>03</span><h2 id="missions-heading">Missions</h2></div>
                         <p>{t.sectionNotes.missions}</p>
@@ -168,7 +221,7 @@ export default function Home({ translations = { ja, en } }) {
                     </div>
                 </section>
 
-                <section id="equipment" className={styles.contentSection} aria-labelledby="equipment-heading">
+                <section id="equipment" data-physics-section className={styles.contentSection} aria-labelledby="equipment-heading">
                     <div className={styles.sectionHeading}>
                         <div className={styles.headingTitle}><span>04</span><h2 id="equipment-heading">Equipment</h2></div>
                         <p>{t.sectionNotes.equipment}</p>
@@ -183,7 +236,7 @@ export default function Home({ translations = { ja, en } }) {
                     </div>
                 </section>
 
-                <section id="interests" className={styles.contentSection} aria-labelledby="interests-heading">
+                <section id="interests" data-physics-section className={styles.contentSection} aria-labelledby="interests-heading">
                     <div className={styles.sectionHeading}>
                         <div className={styles.headingTitle}><span>05</span><h2 id="interests-heading">Interests</h2></div>
                         <p>{t.sectionNotes.interests}</p>
@@ -191,7 +244,7 @@ export default function Home({ translations = { ja, en } }) {
                     <div className={styles.interestPanel}><span className={styles.interestIcon} aria-hidden="true">▧</span><p>{t.interestDescription}</p></div>
                 </section>
 
-                <section id="contact" className={styles.contentSection} aria-labelledby="contact-heading">
+                <section id="contact" data-physics-section className={styles.contentSection} aria-labelledby="contact-heading">
                     <div className={styles.sectionHeading}>
                         <div className={styles.headingTitle}><span>06</span><h2 id="contact-heading">Contact</h2></div>
                         <p>{t.sectionNotes.contact}</p>

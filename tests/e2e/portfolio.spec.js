@@ -106,6 +106,41 @@ test('character introduces the selected section and honors reduced motion', asyn
     await expect(introduction).toContainText('イベントカメラ')
 })
 
+test('Physics Toss is opt-in, moves sections with gravity, and restores the layout', async ({ page }) => {
+    await page.goto('/')
+    const profile = page.locator('#profile')
+    const initialBox = await profile.boundingBox()
+    const enableButton = page.getByRole('button', { name: 'Physics Tossを有効にする' })
+
+    await expect(enableButton).toHaveAttribute('aria-pressed', 'false')
+    expect(await profile.evaluate((element) => element.style.translate)).toBe('')
+
+    await enableButton.click()
+    await expect(page.getByRole('button', { name: 'Physics Tossを無効にする' })).toHaveAttribute('aria-pressed', 'true')
+    const resetButton = page.getByRole('button', { name: '配置をリセット' })
+    await expect(resetButton).toBeEnabled()
+
+    const startBox = await profile.boundingBox()
+    await page.mouse.move(startBox.x + 45, startBox.y + 30)
+    await page.mouse.down()
+    await page.mouse.move(startBox.x + 145, startBox.y + 150, { steps: 6 })
+    await page.mouse.up()
+
+    await expect.poll(async () => (await profile.boundingBox()).y).toBeGreaterThan(startBox.y + 40)
+
+    await resetButton.click()
+    await expect.poll(async () => (await profile.boundingBox()).y).toBe(startBox.y)
+
+    await page.getByRole('navigation').getByRole('link', { name: /研究テーマ/ }).click()
+    await expect(page).toHaveURL(/#research$/)
+    await expect(page.getByRole('status')).toContainText('イベントカメラ')
+
+    await page.getByRole('button', { name: 'Physics Tossを無効にする' }).click()
+    await expect(page.getByRole('button', { name: 'Physics Tossを有効にする' })).toHaveAttribute('aria-pressed', 'false')
+    expect(await profile.evaluate((element) => element.style.translate)).toBe('')
+    await expect.poll(async () => (await profile.boundingBox()).y).toBe(initialBox.y)
+})
+
 test('keyboard navigation and browser history keep the section state synchronized', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     await page.goto('/')
