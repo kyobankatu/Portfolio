@@ -48,6 +48,23 @@ test('language toggle and keyboard navigation work at desktop and mobile widths'
         await page.setViewportSize({ width, height: 900 })
         await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
         await expect(page.getByRole('link', { name: '作品を見る' })).toBeVisible()
+
+        if (width === 390) {
+            const documentWidth = await page.evaluate(() => document.documentElement.scrollWidth)
+            expect(documentWidth).toBeLessThanOrEqual(width)
+
+            for (const locator of [
+                page.getByRole('navigation'),
+                page.getByRole('link', { name: '作品を見る' }),
+            ]) {
+                const box = await locator.boundingBox()
+                expect(box).not.toBeNull()
+                expect(box.x).toBeGreaterThanOrEqual(0)
+                expect(box.x + box.width).toBeLessThanOrEqual(width)
+                expect(box.y).toBeGreaterThanOrEqual(0)
+                expect(box.y + box.height).toBeLessThanOrEqual(900)
+            }
+        }
     }
 })
 
