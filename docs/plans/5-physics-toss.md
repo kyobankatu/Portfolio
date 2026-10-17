@@ -101,6 +101,7 @@ Markdownレビューではローカル計画とIssue全文コメント、CONTENT
 ## Phase N 最終再レビュー結果
 
 - 結果: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6233412762)。比較対象は`origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`..`5860c5e85af6cbdac7f26646ba1e1b1a287f8ec0`。
-- Backend、テストケース、規約、セキュリティに追加指摘なし。Frontendに1件あり: Physics Toss中、Tabでフォーカスした物理対象の`:focus-visible`輪郭がなく、Spaceで掴む対象を視認できない。修正は利用者承諾待ち。
-- MDの最新review結果・コメント参照と、Docsの`5860c5e`追加テスト記録漏れは本追記で対応済み。ローカル計画書全文はIssueの計画コメントにも同期する。
-- Phase NはFrontend指摘の承認済み修正・再レビューと、利用者の最終了承後に完了とする。
+- 利用者はフォーカス枠の修正を承諾。Physics Toss有効時に物理section/objectへamberの2px `:focus-visible`枠を追加し、`Tab`でobject、`Shift+Tab`でsectionに移動して両方の枠を確認する本番E2Eを追加した。修正commit `c32d268`（`fix: show focus indicators for physics targets`）、section分岐のE2E追加commit `016cf8a`（`test: cover section focus outline`）。`tests/e2e/CONTENTS.md`も更新。
+- 検証結果: Vitest 37件、production Chromium E2E 16件、Next.js build成功、CONTENTS検査17ディレクトリ・指摘0件、`npm audit`／`npm audit --omit=dev`は各0 vulnerabilities。
+- 修正後レビュー: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6233579721)。比較対象は`origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`..`016cf8a`。Backendで1件—Physics Toss有効時にボタン上のSpaceをcontrollerが捕捉し、モード切替／Resetボタンの標準操作を妨げる。規約違反で1件—`CLAUDE.md`の明示波括弧ルールに対して`physicsTossController.js`のifガードが波括弧を省略。Frontend、テストケース、セキュリティには指摘なし。MD／Docsの更新指摘は本追記で反映する。
+- 上記2件のコード修正は利用者承諾待ち。Phase Nは承認済み修正・再レビューと利用者の最終了承後に完了とする。
