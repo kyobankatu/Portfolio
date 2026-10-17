@@ -479,9 +479,11 @@ describe('Physics Toss controller', () => {
         window.dispatchEvent(new MouseEvent('pointermove', { clientX: 180, clientY: 40 }))
 
         const zIndexDuringDrag = target.style.zIndex
+        const translateDuringDrag = target.style.translate
         controller.destroy()
         Object.defineProperty(window, 'scrollY', { configurable: true, value: 0 })
         expect(zIndexDuringDrag).toBe('10')
+        expect(translateDuringDrag).toBe('20px 0px')
     })
 
     it('keeps a dragged target inside the top edge', () => {

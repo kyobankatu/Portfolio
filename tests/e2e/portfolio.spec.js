@@ -220,8 +220,8 @@ test('Physics Toss prevents page scrolling on repeated Space keydown', async ({ 
 test('Physics Toss preserves native Space scrolling on nested links', async ({ page }) => {
     await page.goto('/')
     await page.getByRole('button', { name: 'Physics Tossを有効にする' }).click()
-    const link = page.getByRole('link', { name: /GitHub/ }).first()
-    await link.scrollIntoViewIfNeeded()
+    const link = page.locator('#missions').getByRole('link', { name: /GitHub/ }).first()
+    await link.evaluate((element) => element.scrollIntoView({ block: 'center' }))
     await link.focus()
     await page.evaluate(() => {
         window.__physicsSpacePrevented = null
@@ -235,6 +235,7 @@ test('Physics Toss preserves native Space scrolling on nested links', async ({ p
     await page.keyboard.press('Space')
 
     expect(await page.evaluate(() => window.__physicsSpacePrevented)).toBe(false)
+    expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0)
     await expect(page).toHaveURL('/')
 })
 
@@ -329,6 +330,10 @@ test('Physics Toss resynchronizes sticky sidebar objects after page scrolling', 
     await page.mouse.move(box.x + box.width / 2 + 20, box.y + box.height / 2)
 
     await expect(footer).toHaveCSS('z-index', '10')
+    await expect.poll(async () => (await footer.boundingBox()).x).toBeCloseTo(box.x + 20, 0)
+    const movedBox = await footer.boundingBox()
+    expect(movedBox.y).toBeGreaterThanOrEqual(0)
+    expect(movedBox.y + movedBox.height).toBeLessThanOrEqual(900)
     await page.mouse.up()
 })
 
