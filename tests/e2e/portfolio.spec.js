@@ -167,6 +167,30 @@ test('Physics Toss shows a visible focus indicator on keyboard-operated targets'
     })).toBe('2px solid')
 })
 
+test('Physics Toss keeps native Space activation for nested buttons', async ({ page }) => {
+    await page.goto('/')
+    const section = page.locator('#profile')
+    await section.evaluate((element) => {
+        const button = document.createElement('button')
+        button.id = 'nested-space-button'
+        button.type = 'button'
+        button.dataset.physicsObject = ''
+        button.textContent = 'Nested control'
+        button.addEventListener('click', () => {
+            button.dataset.activated = 'true'
+        })
+        element.append(button)
+    })
+
+    await page.getByRole('button', { name: 'Physics Tossを有効にする' }).click()
+    const button = page.locator('#nested-space-button')
+    await expect(page.getByRole('button', { name: '配置をリセット' })).toBeEnabled()
+    await button.focus()
+    await page.keyboard.press('Space')
+
+    await expect(button).toHaveAttribute('data-activated', 'true')
+})
+
 test('Physics Toss preserves a moved project card and its normal link click', async ({ page }) => {
     await page.goto('/')
     await page.getByRole('button', { name: 'Physics Tossを有効にする' }).click()

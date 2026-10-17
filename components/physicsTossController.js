@@ -433,10 +433,10 @@ export function createPhysicsTossController({
             return
         }
         if (event.code === 'Space' || event.key === ' ') {
+            event.preventDefault()
             if (event.repeat) {
                 return
             }
-            event.preventDefault()
             if (keyboardEntry) {
                 if (getOwnerSection(keyboardEntry) === sectionEntry) {
                     releaseKeyboardEntry()

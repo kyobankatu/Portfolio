@@ -566,6 +566,28 @@ describe('Physics Toss controller', () => {
         controller.destroy()
     })
 
+    it('prevents repeated Space keydowns from scrolling a physics target', () => {
+        const section = createTarget()
+        const controller = createPhysicsTossController({
+            targets: [section],
+            bounds: { width: 800, height: 600 },
+        })
+        const event = new KeyboardEvent('keydown', {
+            key: ' ',
+            code: 'Space',
+            repeat: true,
+            bubbles: true,
+            cancelable: true,
+        })
+
+        controller.start()
+        section.dispatchEvent(event)
+
+        expect(event.defaultPrevented).toBe(true)
+        expect(section.style.zIndex).toBe('')
+        controller.destroy()
+    })
+
     it('carries pointer speed into the released target', () => {
         const target = createTarget()
         const scheduler = createFrameScheduler()
