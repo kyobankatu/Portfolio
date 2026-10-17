@@ -22,12 +22,16 @@ export default function Home({ translations = { ja, en } }) {
     }, [lang])
 
     useEffect(() => {
-        if (!physicsEnabled) return undefined
+        if (!physicsEnabled) {
+            return undefined
+        }
 
         let cancelled = false
         let controller = null
         import('./physicsTossController.js').then(({ createPhysicsTossController }) => {
-            if (cancelled) return
+            if (cancelled) {
+                return
+            }
             const targets = [...document.querySelectorAll('[data-physics-section]')]
             const getBounds = () => ({
                 width: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth, window.innerWidth),
@@ -43,18 +47,24 @@ export default function Home({ translations = { ja, en } }) {
             controller.start()
             setPhysicsReady(true)
         }).catch(() => {
-            if (!cancelled) setPhysicsEnabled(false)
+            if (!cancelled) {
+                setPhysicsEnabled(false)
+            }
         })
 
         return () => {
             cancelled = true
             controller?.destroy()
-            if (physicsController.current === controller) physicsController.current = null
+            if (physicsController.current === controller) {
+                physicsController.current = null
+            }
         }
     }, [physicsEnabled])
 
     useEffect(() => {
-        if (physicsReady) physicsController.current?.refreshLayout()
+        if (physicsReady) {
+            physicsController.current?.refreshLayout()
+        }
     }, [lang, physicsReady])
 
     useEffect(() => {
@@ -125,7 +135,9 @@ export default function Home({ translations = { ja, en } }) {
                             className={styles.physicsButton}
                             aria-pressed={physicsEnabled}
                             onClick={() => {
-                                if (physicsEnabled) setPhysicsReady(false)
+                                if (physicsEnabled) {
+                                    setPhysicsReady(false)
+                                }
                                 setPhysicsEnabled((enabled) => !enabled)
                             }}
                         >

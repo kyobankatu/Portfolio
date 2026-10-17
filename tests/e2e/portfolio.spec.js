@@ -148,7 +148,9 @@ test('Physics Toss shows a visible focus indicator on keyboard-operated targets'
 
     const heading = page.locator('#hero-title')
     for (let index = 0; index < 30; index += 1) {
-        if (await heading.evaluate((element) => element === document.activeElement)) break
+        if (await heading.evaluate((element) => element === document.activeElement)) {
+            break
+        }
         await page.keyboard.press('Tab')
     }
 
