@@ -453,6 +453,65 @@ describe('Physics Toss controller', () => {
         controller.destroy()
     })
 
+    it('resynchronizes sticky targets with their viewport position after scrolling', () => {
+        const rect = { x: 100, y: 100, width: 120, height: 80 }
+        const target = createTarget(rect)
+        const scheduler = createFrameScheduler()
+        const controller = createPhysicsTossController({
+            targets: [target],
+            bounds: { width: 800, height: 1200 },
+            requestFrame: scheduler.requestFrame,
+            cancelFrame: scheduler.cancelFrame,
+        })
+
+        controller.start()
+        rect.y = 0
+        Object.defineProperty(window, 'scrollY', { configurable: true, value: 200 })
+        window.dispatchEvent(new Event('scroll'))
+        scheduler.advance(16)
+        target.dispatchEvent(new MouseEvent('pointerdown', {
+            bubbles: true,
+            cancelable: true,
+            button: 0,
+            clientX: 160,
+            clientY: 40,
+        }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 180, clientY: 40 }))
+
+        const zIndexDuringDrag = target.style.zIndex
+        controller.destroy()
+        Object.defineProperty(window, 'scrollY', { configurable: true, value: 0 })
+        expect(zIndexDuringDrag).toBe('10')
+    })
+
+    it('keeps a dragged target inside the top edge', () => {
+        const section = createTarget({ x: 0, y: 0, width: 600, height: 600 })
+        const object = document.createElement('article')
+        object.dataset.physicsObject = ''
+        object.getBoundingClientRect = () => ({ x: 100, y: 100, left: 100, top: 100, right: 220, bottom: 180, width: 120, height: 80 })
+        section.append(object)
+        const controller = createPhysicsTossController({
+            targets: [section],
+            bounds: { width: 800, height: 600 },
+        })
+
+        controller.start()
+        object.dispatchEvent(new MouseEvent('pointerdown', {
+            bubbles: true,
+            cancelable: true,
+            button: 0,
+            clientX: 160,
+            clientY: 140,
+        }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 160, clientY: -100 }))
+        window.dispatchEvent(new MouseEvent('pointerup', { clientX: 160, clientY: -100 }))
+
+        const verticalOffset = Number.parseFloat(object.style.translate.split(' ')[1])
+        expect(verticalOffset).toBeGreaterThanOrEqual(-100.001)
+        expect(verticalOffset).toBeLessThanOrEqual(0)
+        controller.destroy()
+    })
+
     it('keeps targets in place until tossed, then restores their original layout on reset', () => {
         const target = createTarget()
         const scheduler = createFrameScheduler()

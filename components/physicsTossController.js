@@ -103,6 +103,7 @@ export function createPhysicsTossController({
     let worldBounds = { ...bounds }
     let boundaryBodies = []
     let frameId = null
+    let boundsFrameId = null
     let previousTime = null
     let pendingDrag = null
     let activeEntry = null
@@ -253,6 +254,16 @@ export function createPhysicsTossController({
         if (engine && !prefersReducedMotion && frameId === null) {
             frameId = requestFrame(animate)
         }
+    }
+
+    function scheduleBoundsUpdate() {
+        if (!engine || boundsFrameId !== null) {
+            return
+        }
+        boundsFrameId = requestFrame(() => {
+            boundsFrameId = null
+            updateBounds()
+        })
     }
 
     function updateBounds() {
@@ -539,7 +550,11 @@ export function createPhysicsTossController({
         if (frameId !== null) {
             cancelFrame(frameId)
         }
+        if (boundsFrameId !== null) {
+            cancelFrame(boundsFrameId)
+        }
         frameId = null
+        boundsFrameId = null
         previousTime = null
         if (motionQuery?.removeEventListener) {
             motionQuery.removeEventListener('change', handleMotionPreference)
@@ -551,7 +566,7 @@ export function createPhysicsTossController({
         window.removeEventListener('pointerup', finishDrag)
         window.removeEventListener('pointercancel', handlePointerCancel)
         window.removeEventListener('resize', updateBounds)
-        window.removeEventListener('scroll', updateBounds)
+        window.removeEventListener('scroll', scheduleBoundsUpdate)
         sectionEntries.forEach((entry) => {
             entry.element.removeEventListener('pointerdown', handlePointerDown)
             entry.element.removeEventListener('keydown', handleKeyDown)
@@ -632,6 +647,7 @@ export function createPhysicsTossController({
             window.addEventListener('pointerup', finishDrag)
             window.addEventListener('pointercancel', handlePointerCancel)
             window.addEventListener('resize', updateBounds)
+            window.addEventListener('scroll', scheduleBoundsUpdate, { passive: true })
             scheduleAnimation()
         },
         stop() {

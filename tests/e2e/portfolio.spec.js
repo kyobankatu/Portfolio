@@ -193,6 +193,51 @@ test('Physics Toss keeps native Space activation for nested buttons', async ({ p
     await expect(button).toHaveAttribute('data-activated', 'true')
 })
 
+test('Physics Toss prevents page scrolling on repeated Space keydown', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Physics Tossを有効にする' }).click()
+    const heading = page.getByRole('heading', { name: 'Profile', exact: true })
+    await heading.focus()
+    await page.evaluate(() => {
+        window.__physicsSpaceRepeated = false
+        document.addEventListener('keydown', (event) => {
+            if (event.code === 'Space' && event.repeat) {
+                window.__physicsSpaceRepeated = true
+            }
+        })
+    })
+    const scrollBefore = await page.evaluate(() => window.scrollY)
+
+    await page.keyboard.down('Space')
+    await page.keyboard.down('Space')
+    await page.waitForTimeout(100)
+    await page.keyboard.up('Space')
+
+    expect(await page.evaluate(() => window.__physicsSpaceRepeated)).toBe(true)
+    expect(await page.evaluate(() => window.scrollY)).toBe(scrollBefore)
+})
+
+test('Physics Toss preserves native Space scrolling on nested links', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Physics Tossを有効にする' }).click()
+    const link = page.getByRole('link', { name: /GitHub/ }).first()
+    await link.scrollIntoViewIfNeeded()
+    await link.focus()
+    await page.evaluate(() => {
+        window.__physicsSpacePrevented = null
+        document.addEventListener('keydown', (event) => {
+            if (event.code === 'Space') {
+                window.__physicsSpacePrevented = event.defaultPrevented
+            }
+        })
+    })
+
+    await page.keyboard.press('Space')
+
+    expect(await page.evaluate(() => window.__physicsSpacePrevented)).toBe(false)
+    await expect(page).toHaveURL('/')
+})
+
 test('Physics Toss preserves a moved project card and its normal link click', async ({ page }) => {
     await page.goto('/')
     await page.getByRole('button', { name: 'Physics Tossを有効にする' }).click()
@@ -266,6 +311,25 @@ test('Physics Toss lets a profile card collide with the sidebar', async ({ page 
 
     await expect.poll(async () => sidebar.evaluate((element) => element.style.translate)).not.toBe('')
     expect((await card.boundingBox()).x).toBeGreaterThanOrEqual(-1)
+})
+
+test('Physics Toss resynchronizes sticky sidebar objects after page scrolling', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Physics Tossを有効にする' }).click()
+    const sidebar = page.locator('aside[data-physics-section]')
+    const footer = sidebar.locator('[data-physics-object]').last()
+
+    await page.evaluate(() => window.scrollTo(0, 300))
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(300)
+    const box = await footer.boundingBox()
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(box.x + box.width / 2 + 20, box.y + box.height / 2)
+
+    await expect(footer).toHaveCSS('z-index', '10')
+    await page.mouse.up()
 })
 
 test('Physics Toss gravity moves a released target after a horizontal drag', async ({ page }) => {
