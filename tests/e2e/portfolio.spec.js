@@ -157,6 +157,14 @@ test('Physics Toss shows a visible focus indicator on keyboard-operated targets'
         const style = getComputedStyle(element)
         return `${style.outlineWidth} ${style.outlineStyle}`
     })).toBe('2px solid')
+
+    const section = page.locator('#overview')
+    await page.keyboard.press('Shift+Tab')
+    await expect(section).toBeFocused()
+    await expect.poll(() => section.evaluate((element) => {
+        const style = getComputedStyle(element)
+        return `${style.outlineWidth} ${style.outlineStyle}`
+    })).toBe('2px solid')
 })
 
 test('Physics Toss preserves a moved project card and its normal link click', async ({ page }) => {
