@@ -439,8 +439,11 @@ export function createPhysicsTossController({
             entry.element.style.translate = entry.initialTranslate
             entry.element.style.zIndex = entry.initialZIndex
             Matter.Body.setStatic(entry.body, false)
-            syncEntryToElement(entry)
             Matter.Body.setPosition(entry.body, entry.initialPosition)
+            Matter.Body.setVelocity(entry.body, { x: 0, y: 0 })
+            Matter.Body.setAngle(entry.body, entry.initialAngle)
+            Matter.Body.setAngularVelocity(entry.body, 0)
+            entry.renderOrigin = { ...entry.initialPosition }
             setCollisionEnabled(entry, false)
         })
         sectionEntries.forEach((entry) => {

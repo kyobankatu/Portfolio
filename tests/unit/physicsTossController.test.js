@@ -488,6 +488,31 @@ describe('Physics Toss controller', () => {
         controller.destroy()
     })
 
+    it('keeps a reset child aligned when it is dragged again', () => {
+        const section = createTarget({ x: 0, y: 0, width: 600, height: 500 })
+        const object = createPhysicsObject({ x: 100, y: 100, width: 80, height: 50 })
+        section.append(object)
+        const controller = createPhysicsTossController({
+            targets: [section],
+            bounds: { width: 800, height: 600 },
+        })
+
+        controller.start()
+        object.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, cancelable: true, button: 0, clientX: 140, clientY: 125 }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 190, clientY: 165 }))
+        window.dispatchEvent(new MouseEvent('pointerup', { clientX: 190, clientY: 165 }))
+        expect(object.style.translate).not.toBe('')
+
+        controller.reset()
+        expect(object.style.translate).toBe('')
+
+        object.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, cancelable: true, button: 0, clientX: 140, clientY: 125 }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 150, clientY: 125 }))
+
+        expect(object.style.translate).toBe('10px 0px')
+        controller.destroy()
+    })
+
     it('carries pointer speed into the released target', () => {
         const target = createTarget()
         const scheduler = createFrameScheduler()
