@@ -509,8 +509,7 @@ describe('Physics Toss controller', () => {
         window.dispatchEvent(new MouseEvent('pointerup', { clientX: 160, clientY: -100 }))
 
         const verticalOffset = Number.parseFloat(object.style.translate.split(' ')[1])
-        expect(verticalOffset).toBeGreaterThanOrEqual(-100.001)
-        expect(verticalOffset).toBeLessThanOrEqual(0)
+        expect(verticalOffset).toBeCloseTo(-100, 2)
         controller.destroy()
     })
 
