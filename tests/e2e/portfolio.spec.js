@@ -141,7 +141,7 @@ test('Physics Toss is opt-in, moves sections with gravity, and restores the layo
     await expect.poll(async () => (await profile.boundingBox()).y).toBe(initialBox.y)
 })
 
-test('Physics Toss can move a project card without moving its section or consuming its link click', async ({ page }) => {
+test('Physics Toss preserves a moved project card and its normal link click', async ({ page }) => {
     await page.goto('/')
     await page.getByRole('button', { name: 'Physics Tossを有効にする' }).click()
     const resetButton = page.getByRole('button', { name: '配置をリセット' })
@@ -153,20 +153,21 @@ test('Physics Toss can move a project card without moving its section or consumi
     })
     await card.scrollIntoViewIfNeeded()
     const initialBox = await card.boundingBox()
-    await page.mouse.move(initialBox.x + initialBox.width / 2, initialBox.y + 35)
+    const projectLink = card.getByRole('link', { name: /GitHub/ })
+    const linkBox = await projectLink.boundingBox()
+    const unexpectedPopup = page.waitForEvent('popup', { timeout: 300 }).catch(() => null)
+    await page.mouse.move(linkBox.x + linkBox.width / 2, linkBox.y + linkBox.height / 2)
     await page.mouse.down()
-    await page.mouse.move(initialBox.x + initialBox.width / 2 + 100, initialBox.y + 95, { steps: 5 })
+    await page.mouse.move(linkBox.x + linkBox.width / 2 + 100, linkBox.y + linkBox.height / 2 + 45, { steps: 5 })
     await page.mouse.up()
 
     await expect.poll(async () => (await card.boundingBox()).y).toBeGreaterThan(initialBox.y + 20)
     expect(await section.evaluate((element) => element.style.translate)).toBe('')
-
-    await resetButton.click()
-    await card.scrollIntoViewIfNeeded()
-    await expect.poll(async () => (await card.boundingBox()).y).toBe(initialBox.y)
+    expect(await unexpectedPopup).toBeNull()
+    await page.waitForTimeout(300)
 
     const popupPromise = page.waitForEvent('popup')
-    await card.getByRole('link', { name: /GitHub/ }).click()
+    await projectLink.click()
     const popup = await popupPromise
     expect(popup.url()).toContain('github.com/kyobankatu/')
     await popup.close()
@@ -215,6 +216,42 @@ test('Physics Toss lets a profile card collide with the sidebar', async ({ page 
     expect((await card.boundingBox()).x).toBeGreaterThanOrEqual(-1)
 })
 
+test('Physics Toss gravity moves a released target after a horizontal drag', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' })
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Physics Tossを有効にする' }).click()
+    const heading = page.getByRole('heading', { name: 'Profile', exact: true })
+    await heading.scrollIntoViewIfNeeded()
+    const initialBox = await heading.boundingBox()
+    await page.mouse.move(initialBox.x + initialBox.width / 2, initialBox.y + initialBox.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(initialBox.x + initialBox.width / 2 + 35, initialBox.y + initialBox.height / 2, { steps: 4 })
+    await page.mouse.up()
+
+    await expect.poll(async () => (await heading.boundingBox()).y, { timeout: 5000 }).toBeGreaterThan(initialBox.y + 2)
+})
+
+test('Physics Toss keeps a moved target aligned after a language reflow and reset', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Physics Tossを有効にする' }).click()
+    const card = page.locator('#missions article[data-physics-object]').first()
+    await card.scrollIntoViewIfNeeded()
+    const initialBox = await card.boundingBox()
+    await page.mouse.move(initialBox.x + 30, initialBox.y + 30)
+    await page.mouse.down()
+    await page.mouse.move(initialBox.x + 75, initialBox.y + 30, { steps: 4 })
+    await page.mouse.up()
+    const movedTranslate = await card.evaluate((element) => element.style.translate)
+    expect(movedTranslate).not.toBe('')
+
+    await page.getByRole('button', { name: '英語に切り替え' }).click()
+    await expect(card).toContainText('ArtifactSimulator')
+    expect(await card.evaluate((element) => element.style.translate)).toBe(movedTranslate)
+
+    await page.getByRole('button', { name: 'Reset layout' }).click()
+    expect(await card.evaluate((element) => element.style.translate)).toBe('')
+})
+
 test('Physics Toss supports Space and arrow-key interaction', async ({ page }) => {
     await page.goto('/')
     await page.getByRole('button', { name: 'Physics Tossを有効にする' }).click()
@@ -259,8 +296,15 @@ test('Physics Toss honors reduced motion while keeping direct manipulation avail
     expect(await heading.evaluate((element) => element.style.translate)).toBe(positionAfterKeyboard)
 })
 
-test('Physics Toss supports touch-pointer dragging at mobile width', async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 })
+test('Physics Toss supports real touch dragging while vertical swipes scroll the page', async ({ browser }) => {
+    const context = await browser.newContext({
+        viewport: { width: 390, height: 844 },
+        isMobile: true,
+        hasTouch: true,
+        reducedMotion: 'reduce',
+    })
+    const page = await context.newPage()
+    const cdp = await context.newCDPSession(page)
     await page.goto('/')
     await page.getByRole('button', { name: '英語に切り替え' }).click()
     await page.getByRole('button', { name: 'Enable Physics Toss' }).click()
@@ -268,26 +312,31 @@ test('Physics Toss supports touch-pointer dragging at mobile width', async ({ pa
     const heading = page.getByRole('heading', { name: 'Profile', exact: true })
     await heading.scrollIntoViewIfNeeded()
     const box = await heading.boundingBox()
-    await heading.evaluate((element, rect) => {
-        const dispatch = (target, type, x, y) => target.dispatchEvent(new PointerEvent(type, {
-            bubbles: true,
-            cancelable: true,
-            pointerId: 9,
-            pointerType: 'touch',
-            isPrimary: true,
-            button: 0,
-            clientX: x,
-            clientY: y,
-        }))
-        const startX = rect.x + rect.width / 2
-        const startY = rect.y + rect.height / 2
-        dispatch(element, 'pointerdown', startX, startY)
-        dispatch(window, 'pointermove', startX + 45, startY + 35)
-        dispatch(window, 'pointerup', startX + 45, startY + 35)
-    }, box)
+    const startX = box.x + box.width / 2
+    const startY = box.y + box.height / 2
+    const dispatchTouch = (type, x, y) => cdp.send('Input.dispatchTouchEvent', {
+        type,
+        touchPoints: type === 'touchEnd' ? [] : [{ id: 1, x, y, radiusX: 4, radiusY: 4, force: 1 }],
+    })
 
-    await expect.poll(async () => (await heading.boundingBox()).y).toBeGreaterThan(box.y + 15)
+    const scrollBefore = await page.evaluate(() => window.scrollY)
+    await dispatchTouch('touchStart', startX, startY)
+    await dispatchTouch('touchMove', startX, startY - 70)
+    await dispatchTouch('touchEnd', startX, startY - 70)
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(scrollBefore)
+    expect(await heading.evaluate((element) => element.style.translate)).toBe('')
+
+    await heading.scrollIntoViewIfNeeded()
+    const dragBox = await heading.boundingBox()
+    const dragStartX = dragBox.x + dragBox.width / 2
+    const dragStartY = dragBox.y + dragBox.height / 2
+    await dispatchTouch('touchStart', dragStartX, dragStartY)
+    await dispatchTouch('touchMove', dragStartX + 55, dragStartY)
+    await dispatchTouch('touchEnd', dragStartX + 55, dragStartY)
+
+    await expect.poll(async () => (await heading.boundingBox()).x).toBeGreaterThan(dragBox.x + 20)
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390)
+    await context.close()
 })
 
 test('keyboard navigation and browser history keep the section state synchronized', async ({ page }) => {

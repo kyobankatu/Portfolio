@@ -34,7 +34,8 @@ function getElementCenter(element) {
 
 function createEntry(element, kind, sectionEntry = null) {
     const rect = getElementCenter(element)
-    const body = Matter.Bodies.rectangle(rect.x, rect.y, rect.width, rect.height, {
+    const size = { width: Math.max(1, rect.width), height: Math.max(1, rect.height) }
+    const body = Matter.Bodies.rectangle(rect.x, rect.y, size.width, size.height, {
         restitution: 0.2,
         friction: 0.7,
         frictionAir: 0.015,
@@ -49,6 +50,7 @@ function createEntry(element, kind, sectionEntry = null) {
         body,
         initialPosition: { x: body.position.x, y: body.position.y },
         renderOrigin: { x: body.position.x, y: body.position.y },
+        size,
         initialAngle: body.angle,
         initialTranslate: element.style.translate,
         initialZIndex: element.style.zIndex,
@@ -101,7 +103,7 @@ export function createPhysicsTossController({
     let pendingDrag = null
     let activeEntry = null
     let keyboardEntry = null
-    let suppressNextClick = false
+    let suppressedClick = null
     let prefersReducedMotion = false
     let motionQuery = null
     let destroyed = false
@@ -114,11 +116,46 @@ export function createPhysicsTossController({
 
     function syncEntryToElement(entry) {
         const center = getElementCenter(entry.element)
-        entry.renderOrigin = { x: center.x, y: center.y }
-        Matter.Body.setPosition(entry.body, entry.renderOrigin)
+        const offset = {
+            x: entry.body.position.x - entry.renderOrigin.x,
+            y: entry.body.position.y - entry.renderOrigin.y,
+        }
+        entry.renderOrigin = { x: center.x - offset.x, y: center.y - offset.y }
+        Matter.Body.setPosition(entry.body, center)
         Matter.Body.setVelocity(entry.body, { x: 0, y: 0 })
         Matter.Body.setAngle(entry.body, 0)
         Matter.Body.setAngularVelocity(entry.body, 0)
+    }
+
+    function refreshLayout() {
+        if (!engine) return
+        const currentOffsets = new Map(entries.map((entry) => [entry, {
+            x: entry.body.position.x - entry.renderOrigin.x,
+            y: entry.body.position.y - entry.renderOrigin.y,
+        }]))
+        const currentTranslations = new Map(entries.map((entry) => [entry, entry.element.style.translate]))
+        entries.forEach((entry) => { entry.element.style.translate = entry.initialTranslate })
+        const measurements = new Map(entries.map((entry) => [entry, getElementCenter(entry.element)]))
+        entries.forEach((entry) => { entry.element.style.translate = currentTranslations.get(entry) })
+        const renderedMeasurements = new Map(entries.map((entry) => [entry, getElementCenter(entry.element)]))
+
+        entries.forEach((entry) => {
+            const measurement = measurements.get(entry)
+            const width = Math.max(1, measurement.width)
+            const height = Math.max(1, measurement.height)
+            if (width !== entry.size.width || height !== entry.size.height) {
+                Matter.Body.scale(entry.body, width / entry.size.width, height / entry.size.height)
+                entry.size = { width, height }
+            }
+            const position = { x: measurement.x, y: measurement.y }
+            const offset = currentOffsets.get(entry)
+            const renderedPosition = renderedMeasurements.get(entry)
+            entry.renderOrigin = { x: renderedPosition.x - offset.x, y: renderedPosition.y - offset.y }
+            entry.initialPosition = { ...position }
+            Matter.Body.setPosition(entry.body, renderedPosition)
+        })
+        entries.forEach(constrainEntry)
+        entries.forEach(render)
     }
 
     function clampPosition(entry, x, y) {
@@ -206,15 +243,13 @@ export function createPhysicsTossController({
         if (!engine) return
         const nextBounds = getBounds()
         if (!nextBounds || !Number.isFinite(nextBounds.width) || !Number.isFinite(nextBounds.height) || nextBounds.width <= 0 || nextBounds.height <= 0) return
-        if (nextBounds.width === worldBounds.width && nextBounds.height === worldBounds.height) return
-        worldBounds = { width: nextBounds.width, height: nextBounds.height }
-        boundaryBodies.forEach((body) => Matter.Composite.remove(engine.world, body))
-        boundaryBodies = makeBoundaries(worldBounds.width, worldBounds.height)
-        Matter.Composite.add(engine.world, boundaryBodies)
-        entries.forEach((entry) => {
-            constrainEntry(entry)
-            render(entry)
-        })
+        if (nextBounds.width !== worldBounds.width || nextBounds.height !== worldBounds.height) {
+            worldBounds = { width: nextBounds.width, height: nextBounds.height }
+            boundaryBodies.forEach((body) => Matter.Composite.remove(engine.world, body))
+            boundaryBodies = makeBoundaries(worldBounds.width, worldBounds.height)
+            Matter.Composite.add(engine.world, boundaryBodies)
+        }
+        refreshLayout()
     }
 
     function handleMotionPreference(event) {
@@ -277,22 +312,29 @@ export function createPhysicsTossController({
             startX: event.clientX,
             startY: event.clientY,
             timeStamp: event.timeStamp,
+            pointerType: event.pointerType,
             interactive,
         }
-        if (!pendingDrag.interactive) event.preventDefault()
+        if (!pendingDrag.interactive && event.pointerType !== 'touch') event.preventDefault()
     }
 
     function handlePointerMove(event) {
         const point = getDocumentPoint(event)
         if (!activeEntry && pendingDrag) {
-            const distance = Math.hypot(event.clientX - pendingDrag.startX, event.clientY - pendingDrag.startY)
+            const deltaX = event.clientX - pendingDrag.startX
+            const deltaY = event.clientY - pendingDrag.startY
+            const distance = Math.hypot(deltaX, deltaY)
             if (distance < DRAG_THRESHOLD) return
+            if (pendingDrag.pointerType === 'touch' && Math.abs(deltaY) > Math.abs(deltaX)) {
+                pendingDrag = null
+                return
+            }
             const pending = pendingDrag
             pendingDrag = null
             if (pending.entry.kind === 'object') activateObjectMode(pending.sectionEntry)
             else activateSectionMode(pending.sectionEntry)
             beginDrag(pending.entry, pending.point, pending.timeStamp)
-            if (pending.interactive) suppressNextClick = true
+            if (pending.interactive) suppressedClick = { element: pending.entry.element, timeStamp: event.timeStamp }
         }
         if (!activeEntry) return
         moveDraggedEntry(event, point)
@@ -373,8 +415,11 @@ export function createPhysicsTossController({
     }
 
     function handleClick(event) {
-        if (!suppressNextClick) return
-        suppressNextClick = false
+        if (!suppressedClick) return
+        const suppression = suppressedClick
+        suppressedClick = null
+        if (event.timeStamp - suppression.timeStamp > 250) return
+        if (!(event.target instanceof Element) || !suppression.element.contains(event.target)) return
         event.preventDefault()
         event.stopImmediatePropagation()
     }
@@ -464,7 +509,7 @@ export function createPhysicsTossController({
             entries.forEach((entry) => {
                 if (!entry.enabled) entry.body.collisionFilter.mask = 0
                 Matter.Sleeping.set(entry.body, true)
-                entry.element.style.touchAction = 'none'
+                entry.element.style.touchAction = 'pan-y'
                 entry.element.tabIndex = 0
                 if (instructionsId) {
                     const descriptions = (entry.initialDescription ?? '').split(/\s+/).filter(Boolean)
@@ -481,7 +526,6 @@ export function createPhysicsTossController({
             window.addEventListener('pointerup', finishDrag)
             window.addEventListener('pointercancel', handlePointerCancel)
             window.addEventListener('resize', updateBounds)
-            window.addEventListener('scroll', updateBounds, { passive: true })
             scheduleAnimation()
         },
         stop() {
@@ -489,6 +533,9 @@ export function createPhysicsTossController({
         },
         reset() {
             if (engine) reset()
+        },
+        refreshLayout() {
+            refreshLayout()
         },
         destroy() {
             stop()

@@ -111,6 +111,21 @@ describe('portfolio screen', () => {
         expect(heading).not.toHaveAttribute('aria-describedby')
     })
 
+    it('shows localized interaction hints only while Physics Toss is enabled', async () => {
+        render(<Home />)
+        const instructions = screen.getByText(ja.physicsInstructions)
+        expect(instructions.className).toContain('visuallyHidden')
+
+        fireEvent.click(screen.getByRole('button', { name: ja.physicsEnable }))
+        expect(instructions.className).toContain('physicsHint')
+        expect(instructions).toHaveTextContent('縦スワイプ')
+
+        fireEvent.click(screen.getByRole('button', { name: ja.languageToggleLabel }))
+        const englishInstructions = screen.getByText(en.physicsInstructions)
+        expect(englishInstructions.className).toContain('physicsHint')
+        expect(englishInstructions).toHaveTextContent('swipe vertically')
+    })
+
     it('keeps the navigation target and selected section in sync', () => {
         render(<Home />)
 

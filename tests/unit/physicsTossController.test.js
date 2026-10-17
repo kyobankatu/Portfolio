@@ -38,6 +38,31 @@ function createTarget(rect = { x: 100, y: 100, width: 120, height: 80 }) {
     return target
 }
 
+function createTransformAwareTarget(rect) {
+    const target = document.createElement('section')
+    target.getBoundingClientRect = () => {
+        const [translateX, translateY] = target.style.translate.split(' ')
+        const x = rect.x + (Number.parseFloat(translateX) || 0)
+        const y = rect.y + (Number.parseFloat(translateY) || 0)
+        return { x, y, left: x, top: y, right: x + rect.width, bottom: y + rect.height, width: rect.width, height: rect.height }
+    }
+    document.body.append(target)
+    return target
+}
+
+function createPhysicsObject(rect) {
+    const object = document.createElement('article')
+    object.dataset.physicsObject = ''
+    object.getBoundingClientRect = () => {
+        const [translateX, translateY] = object.style.translate.split(' ')
+        const [parentTranslateX, parentTranslateY] = object.parentElement?.style.translate.split(' ') ?? []
+        const x = rect.x + (Number.parseFloat(translateX) || 0) + (Number.parseFloat(parentTranslateX) || 0)
+        const y = rect.y + (Number.parseFloat(translateY) || 0) + (Number.parseFloat(parentTranslateY) || 0)
+        return { x, y, left: x, top: y, right: x + rect.width, bottom: y + rect.height, width: rect.width, height: rect.height }
+    }
+    return object
+}
+
 afterEach(() => {
     document.body.replaceChildren()
     vi.restoreAllMocks()
@@ -108,6 +133,117 @@ describe('Physics Toss controller', () => {
 
         expect(section.style.translate).not.toBe('')
         expect(object.style.translate).toBe('')
+        controller.destroy()
+    })
+
+    it('preserves a moved sibling when switching to another child object', () => {
+        const section = createTarget({ x: 0, y: 0, width: 600, height: 500 })
+        const first = createPhysicsObject({ x: 100, y: 100, width: 80, height: 50 })
+        const second = createPhysicsObject({ x: 240, y: 100, width: 80, height: 50 })
+        section.append(first, second)
+        const scheduler = createFrameScheduler()
+        const controller = createPhysicsTossController({
+            targets: [section],
+            bounds: { width: 800, height: 600 },
+            requestFrame: scheduler.requestFrame,
+            cancelFrame: scheduler.cancelFrame,
+        })
+
+        controller.start()
+        first.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, cancelable: true, button: 0, clientX: 140, clientY: 125 }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 170, clientY: 145 }))
+        window.dispatchEvent(new MouseEvent('pointerup', { clientX: 170, clientY: 145 }))
+        const firstOffset = first.style.translate
+        expect(firstOffset).not.toBe('')
+        second.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, cancelable: true, button: 0, clientX: 280, clientY: 125 }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 300, clientY: 135 }))
+        scheduler.advance(16)
+
+        expect(first.style.translate).toBe(firstOffset)
+        controller.destroy()
+    })
+
+    it('preserves a moved section when switching to one of its child objects', () => {
+        const section = createTransformAwareTarget({ x: 0, y: 0, width: 600, height: 500 })
+        const object = createPhysicsObject({ x: 100, y: 100, width: 80, height: 50 })
+        section.append(object)
+        const scheduler = createFrameScheduler()
+        const controller = createPhysicsTossController({
+            targets: [section],
+            bounds: { width: 800, height: 600 },
+            matchMedia: () => ({ matches: true }),
+            requestFrame: scheduler.requestFrame,
+            cancelFrame: scheduler.cancelFrame,
+        })
+
+        controller.start()
+        section.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, cancelable: true, button: 0, clientX: 30, clientY: 30 }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 60, clientY: 50 }))
+        window.dispatchEvent(new MouseEvent('pointerup', { clientX: 60, clientY: 50 }))
+        const sectionOffset = section.style.translate
+        expect(sectionOffset).not.toBe('')
+
+        object.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, cancelable: true, button: 0, clientX: 170, clientY: 145 }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 190, clientY: 155 }))
+        window.dispatchEvent(new MouseEvent('pointerup', { clientX: 190, clientY: 155 }))
+
+        expect(section.style.translate).toBe(sectionOffset)
+        expect(object.style.translate).not.toBe('')
+        controller.destroy()
+    })
+
+    it('reflows physics bodies and reset positions after layout changes', () => {
+        const rect = { x: 100, y: 100, width: 120, height: 80 }
+        const target = createTarget(rect)
+        target.getBoundingClientRect = () => ({ ...rect, left: rect.x, top: rect.y, right: rect.x + rect.width, bottom: rect.y + rect.height })
+        const scheduler = createFrameScheduler()
+        const controller = createPhysicsTossController({
+            targets: [target],
+            bounds: { width: 800, height: 600 },
+            getBounds: () => ({ width: 700, height: 600 }),
+            matchMedia: () => ({ matches: true }),
+            requestFrame: scheduler.requestFrame,
+            cancelFrame: scheduler.cancelFrame,
+        })
+
+        controller.start()
+        target.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, cancelable: true, button: 0, clientX: 160, clientY: 140 }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 190, clientY: 140 }))
+        window.dispatchEvent(new MouseEvent('pointerup', { clientX: 190, clientY: 140 }))
+        rect.x = 300
+        rect.y = 120
+        rect.width = 180
+        rect.height = 100
+        window.dispatchEvent(new Event('resize'))
+        controller.reset()
+        target.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, cancelable: true, button: 0, clientX: 390, clientY: 170 }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 900, clientY: 170 }))
+        window.dispatchEvent(new MouseEvent('pointerup', { clientX: 900, clientY: 170 }))
+
+        expect(Number.parseFloat(target.style.translate.split(' ')[0])).toBeLessThanOrEqual(220.001)
+        controller.destroy()
+    })
+
+    it('lets a released target fall under gravity and settle on the floor', () => {
+        const target = createTarget({ x: 100, y: 480, width: 120, height: 80 })
+        const scheduler = createFrameScheduler()
+        const controller = createPhysicsTossController({
+            targets: [target],
+            bounds: { width: 800, height: 600 },
+            requestFrame: scheduler.requestFrame,
+            cancelFrame: scheduler.cancelFrame,
+        })
+
+        controller.start()
+        target.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, cancelable: true, button: 0, clientX: 160, clientY: 520 }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 168, clientY: 520 }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 168, clientY: 520 }))
+        window.dispatchEvent(new MouseEvent('pointerup', { clientX: 168, clientY: 520 }))
+        for (let frame = 1; frame <= 600; frame += 1) scheduler.advance(frame * 16)
+
+        const verticalOffset = Number.parseFloat(target.style.translate.split(' ')[1])
+        expect(verticalOffset).toBeGreaterThan(0)
+        expect(verticalOffset).toBeLessThanOrEqual(40.001)
         controller.destroy()
     })
 
@@ -200,6 +336,7 @@ describe('Physics Toss controller', () => {
 
         controller.start()
         expect(target.tabIndex).toBe(0)
+        expect(target.style.touchAction).toBe('pan-y')
         expect(target.getAttribute('aria-describedby')).toBe('existing-description physics-instructions')
         target.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', code: 'Space', bubbles: true, cancelable: true }))
         target.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }))

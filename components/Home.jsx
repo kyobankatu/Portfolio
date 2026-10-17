@@ -54,6 +54,10 @@ export default function Home({ translations = { ja, en } }) {
     }, [physicsEnabled])
 
     useEffect(() => {
+        if (physicsReady) physicsController.current?.refreshLayout()
+    }, [lang, physicsReady])
+
+    useEffect(() => {
         const syncSectionFromHash = () => {
             const sectionId = window.location.hash.slice(1)
             if (sectionId === '') {
@@ -111,7 +115,7 @@ export default function Home({ translations = { ja, en } }) {
             </aside>
 
             <main className={styles.mainContent}>
-                <p className={styles.visuallyHidden} id="physics-instructions">{t.physicsInstructions}</p>
+                <p className={physicsEnabled ? styles.physicsHint : styles.visuallyHidden} id="physics-instructions">{t.physicsInstructions}</p>
                 <header className={styles.topbar}>
                     <span className={styles.breadcrumb}>PORTFOLIO <span>/</span> PERSONAL ARCADE</span>
                     <div className={styles.topbarActions}>

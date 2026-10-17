@@ -176,6 +176,16 @@
     margin: 0 auto;
 }
 
+.physicsHint {
+    margin: 9px 0 0;
+    padding: 9px 12px;
+    border-left: 2px solid var(--mint);
+    background: var(--panel);
+    color: var(--muted);
+    font-size: 0.74rem;
+    line-height: 1.5;
+}
+
 .topbar {
     min-height: 70px;
     display: flex;
@@ -922,6 +932,11 @@
         min-height: 32px;
         padding: 0 7px;
         font-size: 0.55rem;
+    }
+
+    .physicsHint {
+        margin-top: 7px;
+        font-size: 0.68rem;
     }
 
     .hero h1 {

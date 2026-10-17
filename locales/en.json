@@ -10,7 +10,7 @@
     "physicsEnable": "Enable Physics Toss",
     "physicsDisable": "Disable Physics Toss",
     "physicsReset": "Reset layout",
-    "physicsInstructions": "In Physics Toss, focus a target and press Space to pick it up, use the arrow keys to move it, and press Space again to release it. Drag with a pointer or touch to toss it.",
+    "physicsInstructions": "Drag freely with a mouse. On touch, drag sideways to move items and swipe vertically to scroll the page. Use Space to pick up a focused item, the arrow keys to move it, and Space again to release it.",
     "readyStatus": "READY",
     "heroEyebrow": "PLAYER PROFILE / PORTFOLIO",
     "viewMissions": "View projects",

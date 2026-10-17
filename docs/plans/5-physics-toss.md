@@ -47,8 +47,8 @@
 | 目的 | Physics Tossをポインター以外からも操作できるようにし、動きを減らす設定と画面サイズ変化に対応する。 |
 | 意図 | 遊びの操作性を保ちながら、アクセシビリティと実画面での安定性を最終段階に仕上げる。 |
 | 編集ファイル | `components/Home.jsx`（Space／矢印キー、状態のARIA通知）、`components/Home.module.css`（focus、reduced-motion、touch affordance）、`components/physicsTossController.js`（キーボード移動、慣性停止、resize／scroll境界更新）、`locales/ja.json`・`locales/en.json`（操作説明と状態ラベル）、`components/CONTENTS.md`・`locales/CONTENTS.md`、`tests/unit/physicsTossController.test.js`、`tests/integration/Home.test.jsx`、`tests/e2e/portfolio.spec.js`、関連する`tests/**/CONTENTS.md`、必要なら`CLAUDE.md`（新しい操作規約）。 |
-| テストケース | **単体**: 正常系—キー入力で掴む・移動・離すと状態が変わる。動きを減らす設定では投げた後の慣性・連続自動更新を停止する。異常系—無効キー、フォーカス外、解除後の入力は状態を壊さない。**結合**: Space／矢印操作、reduced-motion時の直接移動、ARIA状態、resize後の境界が同期し、リンク・ナビのキーボード操作を妨げない。**E2E**: PCと390px幅のChromiumでキー操作とタッチ相当のドラッグ、重力・衝突・床・Reset、通常リンクを確認する。`prefers-reduced-motion: reduce`では慣性が止まり、直接操作とResetは可能。通常オフでは常時アニメーションがない。 |
-| 完了条件 | PC・モバイルで操作でき、動きを減らす設定に対応し、E2E・単体／結合テスト・build・CONTENTS検査が成功してcommitする。**結果**: Vitest 31件（統合テスト8件を含む。統合テスト単独実行も成功）、Playwright production Chromium 13件、Next.js build、CONTENTS検査（17 directories / 0 findings）、`npm audit`／`npm audit --omit=dev`（各0 vulnerabilities）が成功。 |
+| テストケース | **単体**: 正常系—キー入力で掴む・移動・離すと状態が変わり、リリース後に重力で落ちて床で止まる。動きを減らす設定では投げた後の慣性・連続自動更新を停止する。異常系—無効キー、フォーカス外、解除後の入力は状態を壊さない。**結合**: Space／矢印操作、reduced-motion時の直接移動、ARIA状態、resize・言語変更後の物理body再flowとReset基準が同期し、リンク・ナビのキーボード操作を妨げない。**E2E**: PCとタッチ対応390px Chromiumでキー操作、実タッチの横ドラッグと縦スクロール、リリース後の重力、衝突、境界、Reset、移動後の通常リンクを確認する。`prefers-reduced-motion: reduce`では慣性が止まり、直接操作とResetは可能。通常オフでは常時アニメーションがない。 |
+| 完了条件 | PC・モバイルで操作でき、動きを減らす設定に対応し、E2E・単体／結合テスト・build・CONTENTS検査が成功してcommitする。**最終結果**: Vitest 36件（統合テスト9件を含む）、Playwright production Chromium 15件、Next.js build、CONTENTS検査（17 directories / 0 findings）、`npm audit`／`npm audit --omit=dev`（各0 vulnerabilities）が成功。 |
 
 ## Phase N — 最終検証・分野別レビュー
 
@@ -58,7 +58,7 @@
 | 編集ファイル | 最終レビューで修正が承認された場合に限り、該当する実装・テスト・ドキュメントと各階層の`CONTENTS.md`を編集する。計画・レビュー結果は本ファイルとIssue後続コメントに記録する。 |
 | テストケース | `npm run test:unit`、production build、`npm run test:e2e`、`npm audit`、`npm audit --omit=dev`、CONTENTS skillのchecker。E2Eで通常／Physics Toss、section／block／sidebar、衝突、床、Reset、キーボード、リンク、reduced-motion、PC／モバイルを再確認する。未実施項目は理由・代替・未検証範囲を記録する。 |
 | レビュー分野 | frontend／backend／テストケース／md記入漏れ／docs記入漏れ／規約違反／セキュリティを別々のサブエージェントが読み取り専用でレビューする。 |
-| 完了条件 | 全検証と7分野レビュー、必要な承認済み修正ラウンドが完了し、ユーザーが最終成果を了承する。詳細はIssue後続コメントで記録する。 |
+| 完了条件 | 全検証と7分野レビュー、必要な承認済み修正ラウンドが完了し、ユーザーが最終成果を了承する。修正が必要な場合は、コード変更前に指摘・修正対象・意図を一覧表でユーザーへ示し、明示承諾を得る。詳細はIssue後続コメントで記録する。 |
 
 ## Phaseチェックリスト
 
@@ -71,3 +71,20 @@
 ## Issue運用
 
 Phase Nのレビュー結果、承認された修正計画、修正結果、再レビュー結果は後続Issueコメントとして時系列に記録する。Phase Nはユーザーの最終了承後に完了とする。
+
+## Phase N 初回レビュー結果と承認済み修正
+
+7分野の読み取り専用レビューを実施した。セキュリティと規約違反には指摘なし。利用者は次の修正をすべて承諾し、対応を完了した。修正後の7分野再レビューは後続コメントに記録する。
+
+| 分野 | 指摘 | 修正候補 |
+| --- | --- | --- |
+| Backend | section/objectモード切替で移動済み要素の表示位置が戻る可能性がある（`components/physicsTossController.js`）。 | 表示オフセットを保つ再同期を実装し、section→object／object→objectの単体テストを追加。 |
+| Backend | 画面サイズや言語変更で要素の寸法・位置が再flowしても物理bodyとReset基準が初期値のままになる。 | resize／言語変更後にbody形状・位置・Reset基準を再計測。単体テストと本番E2Eで検証。 |
+| Frontend | Physics Toss中に全対象へ`touch-action: none`を設定し、モバイルで縦スクロールしづらくなる。 | `touch-action: pan-y`と方向判定で縦スワイプをスクロールに、横ドラッグを移動に割り当て、本番タッチE2Eで検証。 |
+| Tests | 重力テストがドラッグ移動のみを確認し、リリース後の重力・床停止を証明していない。 | ゼロ速度で離した後の落下と床停止を単体で、通常設定での落下を本番E2Eで検証。 |
+| Tests | モバイルE2Eは390px幅で合成PointerEventを送るだけで、タッチ入力経路を通らない。 | `isMobile`／`hasTouch` Chromium contextとCDP touch inputで縦スクロール・横ドラッグを検証。 |
+| Tests | カードを移動した後にResetしてからリンクを開いている。 | 移動状態でドラッグ由来のクリックを抑止し、次の通常クリックでリンクが開くことをE2Eで検証。 |
+| Docs | `CLAUDE.md`の構成説明に遅延ロードされるphysics controller／Matter.jsが記載されていない。 | クライアント側でオプトイン時だけ初期化する構成を追記。 |
+| Docs | 操作説明は視覚的に隠されていて、画面上のボタンだけでは操作方法が分からない。 | 有効化時にタッチ・マウス・Space／矢印の可視操作ヒントを日英で表示し、統合テストを追加。 |
+
+Markdownレビューではローカル計画とIssue全文コメント、CONTENTS記載の整合を確認し、コード変更前の承諾ゲートを追記した。初回レビュー結果と修正内容はIssue後続コメントに記録し、修正後の7分野レビュー結果を追加する。
