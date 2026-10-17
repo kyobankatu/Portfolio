@@ -61,8 +61,12 @@ function createEntry(element, kind, sectionEntry = null) {
 }
 
 export function resolvePhysicsTarget(section, target) {
-    if (!(section instanceof HTMLElement)) throw new TypeError('Physics Toss section must be an HTML element.')
-    if (!(target instanceof Element)) return section
+    if (!(section instanceof HTMLElement)) {
+        throw new TypeError('Physics Toss section must be an HTML element.')
+    }
+    if (!(target instanceof Element)) {
+        return section
+    }
     const object = target.closest('[data-physics-object]')
     return object && section.contains(object) ? object : section
 }
@@ -128,7 +132,9 @@ export function createPhysicsTossController({
     }
 
     function refreshLayout() {
-        if (!engine) return
+        if (!engine) {
+            return
+        }
         const currentOffsets = new Map(entries.map((entry) => [entry, {
             x: entry.body.position.x - entry.renderOrigin.x,
             y: entry.body.position.y - entry.renderOrigin.y,
@@ -190,7 +196,9 @@ export function createPhysicsTossController({
     }
 
     function render(entry) {
-        if (!entry.enabled || !entry.element.isConnected) return
+        if (!entry.enabled || !entry.element.isConnected) {
+            return
+        }
         const deltaX = entry.body.position.x - entry.renderOrigin.x
         const deltaY = entry.body.position.y - entry.renderOrigin.y
         if (Math.abs(deltaX) < 0.001 && Math.abs(deltaY) < 0.001) {
@@ -201,11 +209,15 @@ export function createPhysicsTossController({
     }
 
     function constrainEntry(entry) {
-        if (!entry.enabled || entry.body.isStatic) return
+        if (!entry.enabled || entry.body.isStatic) {
+            return
+        }
         const currentX = entry.body.position.x
         const currentY = entry.body.position.y
         const { x, y } = clampPosition(entry, currentX, currentY)
-        if (x === currentX && y === currentY) return
+        if (x === currentX && y === currentY) {
+            return
+        }
         Matter.Body.setPosition(entry.body, { x, y })
         Matter.Body.setVelocity(entry.body, {
             x: x === currentX ? entry.body.velocity.x : 0,
@@ -226,7 +238,9 @@ export function createPhysicsTossController({
     }
 
     function animate(timestamp) {
-        if (!engine) return
+        if (!engine) {
+            return
+        }
         const delta = previousTime === null ? BASE_DELTA : Math.min(Math.max(timestamp - previousTime, 1), BASE_DELTA)
         previousTime = timestamp
         Matter.Engine.update(engine, delta)
@@ -236,13 +250,19 @@ export function createPhysicsTossController({
     }
 
     function scheduleAnimation() {
-        if (engine && !prefersReducedMotion && frameId === null) frameId = requestFrame(animate)
+        if (engine && !prefersReducedMotion && frameId === null) {
+            frameId = requestFrame(animate)
+        }
     }
 
     function updateBounds() {
-        if (!engine) return
+        if (!engine) {
+            return
+        }
         const nextBounds = getBounds()
-        if (!nextBounds || !Number.isFinite(nextBounds.width) || !Number.isFinite(nextBounds.height) || nextBounds.width <= 0 || nextBounds.height <= 0) return
+        if (!nextBounds || !Number.isFinite(nextBounds.width) || !Number.isFinite(nextBounds.height) || nextBounds.width <= 0 || nextBounds.height <= 0) {
+            return
+        }
         if (nextBounds.width !== worldBounds.width || nextBounds.height !== worldBounds.height) {
             worldBounds = { width: nextBounds.width, height: nextBounds.height }
             boundaryBodies.forEach((body) => Matter.Composite.remove(engine.world, body))
@@ -255,11 +275,15 @@ export function createPhysicsTossController({
     function handleMotionPreference(event) {
         prefersReducedMotion = event.matches
         if (prefersReducedMotion) {
-            if (frameId !== null) cancelFrame(frameId)
+            if (frameId !== null) {
+                cancelFrame(frameId)
+            }
             frameId = null
             previousTime = null
             entries.forEach((entry) => {
-                if (entry.body.isStatic) return
+                if (entry.body.isStatic) {
+                    return
+                }
                 Matter.Body.setVelocity(entry.body, { x: 0, y: 0 })
                 Matter.Body.setAngularVelocity(entry.body, 0)
                 Matter.Sleeping.set(entry.body, true)
@@ -284,7 +308,9 @@ export function createPhysicsTossController({
 
     function moveDraggedEntry(event, point) {
         const entry = activeEntry
-        if (!entry) return
+        if (!entry) {
+            return
+        }
         const position = clampPosition(entry, point.x - entry.drag.offsetX, point.y - entry.drag.offsetY)
         const elapsed = Math.max(event.timeStamp - entry.drag.lastTime, 1)
         entry.drag.velocity = {
@@ -293,18 +319,27 @@ export function createPhysicsTossController({
         }
         Matter.Body.setPosition(entry.body, position)
         entry.drag.lastTime = event.timeStamp
-        if (prefersReducedMotion) updateDirectManipulation()
-        else render(entry)
+        if (prefersReducedMotion) {
+            updateDirectManipulation()
+        } else {
+            render(entry)
+        }
     }
 
     function handlePointerDown(event) {
-        if (event.button !== 0 || activeEntry || pendingDrag) return
+        if (event.button !== 0 || activeEntry || pendingDrag) {
+            return
+        }
         const sectionEntry = entriesByElement.get(event.currentTarget)
-        if (!sectionEntry || !engine) return
+        if (!sectionEntry || !engine) {
+            return
+        }
         const element = resolvePhysicsTarget(sectionEntry.element, event.target)
         const entry = entriesByElement.get(element) || sectionEntry
         const interactive = event.target instanceof Element && Boolean(event.target.closest('a, button, input, select, textarea, [contenteditable="true"]'))
-        if (interactive && entry === sectionEntry) return
+        if (interactive && entry === sectionEntry) {
+            return
+        }
         pendingDrag = {
             entry,
             sectionEntry,
@@ -315,7 +350,9 @@ export function createPhysicsTossController({
             pointerType: event.pointerType,
             interactive,
         }
-        if (!pendingDrag.interactive && event.pointerType !== 'touch') event.preventDefault()
+        if (!pendingDrag.interactive && event.pointerType !== 'touch') {
+            event.preventDefault()
+        }
     }
 
     function handlePointerMove(event) {
@@ -324,19 +361,28 @@ export function createPhysicsTossController({
             const deltaX = event.clientX - pendingDrag.startX
             const deltaY = event.clientY - pendingDrag.startY
             const distance = Math.hypot(deltaX, deltaY)
-            if (distance < DRAG_THRESHOLD) return
+            if (distance < DRAG_THRESHOLD) {
+                return
+            }
             if (pendingDrag.pointerType === 'touch' && Math.abs(deltaY) > Math.abs(deltaX)) {
                 pendingDrag = null
                 return
             }
             const pending = pendingDrag
             pendingDrag = null
-            if (pending.entry.kind === 'object') activateObjectMode(pending.sectionEntry)
-            else activateSectionMode(pending.sectionEntry)
+            if (pending.entry.kind === 'object') {
+                activateObjectMode(pending.sectionEntry)
+            } else {
+                activateSectionMode(pending.sectionEntry)
+            }
             beginDrag(pending.entry, pending.point, pending.timeStamp)
-            if (pending.interactive) suppressedClick = { element: pending.entry.element, timeStamp: event.timeStamp }
+            if (pending.interactive) {
+                suppressedClick = { element: pending.entry.element, timeStamp: event.timeStamp }
+            }
         }
-        if (!activeEntry) return
+        if (!activeEntry) {
+            return
+        }
         moveDraggedEntry(event, point)
         event.preventDefault()
     }
@@ -346,7 +392,9 @@ export function createPhysicsTossController({
             pendingDrag = null
             return
         }
-        if (!activeEntry) return
+        if (!activeEntry) {
+            return
+        }
         const entry = activeEntry
         activeEntry = null
         const shouldSleep = cancelled || prefersReducedMotion
@@ -364,7 +412,9 @@ export function createPhysicsTossController({
     }
 
     function releaseKeyboardEntry() {
-        if (!keyboardEntry) return
+        if (!keyboardEntry) {
+            return
+        }
         const entry = keyboardEntry
         keyboardEntry = null
         Matter.Body.setStatic(entry.body, false)
@@ -376,33 +426,51 @@ export function createPhysicsTossController({
 
     function handleKeyDown(event) {
         const sectionEntry = entriesByElement.get(event.currentTarget)
-        if (!sectionEntry || !engine) return
+        if (!sectionEntry || !engine) {
+            return
+        }
+        if (event.target instanceof Element && event.target.closest('button, input, select, textarea, [contenteditable="true"], [role="button"]')) {
+            return
+        }
         if (event.code === 'Space' || event.key === ' ') {
-            if (event.repeat) return
-            event.preventDefault()
-            if (keyboardEntry) {
-                if (getOwnerSection(keyboardEntry) === sectionEntry) releaseKeyboardEntry()
+            if (event.repeat) {
                 return
             }
-            if (activeEntry || pendingDrag) return
+            event.preventDefault()
+            if (keyboardEntry) {
+                if (getOwnerSection(keyboardEntry) === sectionEntry) {
+                    releaseKeyboardEntry()
+                }
+                return
+            }
+            if (activeEntry || pendingDrag) {
+                return
+            }
             const element = resolvePhysicsTarget(sectionEntry.element, event.target)
             const entry = entriesByElement.get(element) || sectionEntry
-            if (entry.kind === 'object') activateObjectMode(sectionEntry)
-            else activateSectionMode(sectionEntry)
+            if (entry.kind === 'object') {
+                activateObjectMode(sectionEntry)
+            } else {
+                activateSectionMode(sectionEntry)
+            }
             Matter.Sleeping.set(entry.body, false)
             Matter.Body.setStatic(entry.body, true)
             keyboardEntry = entry
             entry.element.style.zIndex = '10'
             return
         }
-        if (!keyboardEntry || getOwnerSection(keyboardEntry) !== sectionEntry) return
+        if (!keyboardEntry || getOwnerSection(keyboardEntry) !== sectionEntry) {
+            return
+        }
         const movement = {
             ArrowLeft: { x: -16, y: 0 },
             ArrowRight: { x: 16, y: 0 },
             ArrowUp: { x: 0, y: -16 },
             ArrowDown: { x: 0, y: 16 },
         }[event.key]
-        if (!movement) return
+        if (!movement) {
+            return
+        }
         event.preventDefault()
         const { x, y } = clampPosition(
             keyboardEntry,
@@ -410,16 +478,25 @@ export function createPhysicsTossController({
             keyboardEntry.body.position.y + movement.y,
         )
         Matter.Body.setPosition(keyboardEntry.body, { x, y })
-        if (prefersReducedMotion) updateDirectManipulation()
-        else render(keyboardEntry)
+        if (prefersReducedMotion) {
+            updateDirectManipulation()
+        } else {
+            render(keyboardEntry)
+        }
     }
 
     function handleClick(event) {
-        if (!suppressedClick) return
+        if (!suppressedClick) {
+            return
+        }
         const suppression = suppressedClick
         suppressedClick = null
-        if (event.timeStamp - suppression.timeStamp > 250) return
-        if (!(event.target instanceof Element) || !suppression.element.contains(event.target)) return
+        if (event.timeStamp - suppression.timeStamp > 250) {
+            return
+        }
+        if (!(event.target instanceof Element) || !suppression.element.contains(event.target)) {
+            return
+        }
         event.preventDefault()
         event.stopImmediatePropagation()
     }
@@ -456,12 +533,19 @@ export function createPhysicsTossController({
     }
 
     function stop() {
-        if (engine) reset()
-        if (frameId !== null) cancelFrame(frameId)
+        if (engine) {
+            reset()
+        }
+        if (frameId !== null) {
+            cancelFrame(frameId)
+        }
         frameId = null
         previousTime = null
-        if (motionQuery?.removeEventListener) motionQuery.removeEventListener('change', handleMotionPreference)
-        else motionQuery?.removeListener?.(handleMotionPreference)
+        if (motionQuery?.removeEventListener) {
+            motionQuery.removeEventListener('change', handleMotionPreference)
+        } else {
+            motionQuery?.removeListener?.(handleMotionPreference)
+        }
         document.removeEventListener('click', handleClick, true)
         window.removeEventListener('pointermove', handlePointerMove)
         window.removeEventListener('pointerup', finishDrag)
@@ -476,14 +560,22 @@ export function createPhysicsTossController({
             entry.element.style.translate = entry.initialTranslate
             entry.element.style.zIndex = entry.initialZIndex
             entry.element.style.touchAction = entry.initialTouchAction
-            if (entry.initialTabIndex === null) entry.element.removeAttribute('tabindex')
-            else entry.element.setAttribute('tabindex', entry.initialTabIndex)
-            if (entry.initialDescription === null) entry.element.removeAttribute('aria-describedby')
-            else entry.element.setAttribute('aria-describedby', entry.initialDescription)
+            if (entry.initialTabIndex === null) {
+                entry.element.removeAttribute('tabindex')
+            } else {
+                entry.element.setAttribute('tabindex', entry.initialTabIndex)
+            }
+            if (entry.initialDescription === null) {
+                entry.element.removeAttribute('aria-describedby')
+            } else {
+                entry.element.setAttribute('aria-describedby', entry.initialDescription)
+            }
             entry.drag = null
         })
         boundaryBodies = []
-        if (engine) Matter.Engine.clear(engine)
+        if (engine) {
+            Matter.Engine.clear(engine)
+        }
         engine = null
     }
 
@@ -493,8 +585,12 @@ export function createPhysicsTossController({
 
     return {
         start() {
-            if (destroyed) throw new Error('Physics Toss controller has been destroyed.')
-            if (engine) return
+            if (destroyed) {
+                throw new Error('Physics Toss controller has been destroyed.')
+            }
+            if (engine) {
+                return
+            }
             const world = Matter.Engine.create({ enableSleeping: true })
             world.gravity.y = 1
             world.gravity.scale = 0.001
@@ -503,20 +599,27 @@ export function createPhysicsTossController({
             boundaryBodies = makeBoundaries(worldBounds.width, worldBounds.height)
             motionQuery = matchMedia('(prefers-reduced-motion: reduce)')
             prefersReducedMotion = Boolean(motionQuery.matches)
-            if (motionQuery.addEventListener) motionQuery.addEventListener('change', handleMotionPreference)
-            else motionQuery.addListener?.(handleMotionPreference)
+            if (motionQuery.addEventListener) {
+                motionQuery.addEventListener('change', handleMotionPreference)
+            } else {
+                motionQuery.addListener?.(handleMotionPreference)
+            }
             Matter.Composite.add(engine.world, [
                 ...entries.map((entry) => entry.body),
                 ...boundaryBodies,
             ])
             entries.forEach((entry) => {
-                if (!entry.enabled) entry.body.collisionFilter.mask = 0
+                if (!entry.enabled) {
+                    entry.body.collisionFilter.mask = 0
+                }
                 Matter.Sleeping.set(entry.body, true)
                 entry.element.style.touchAction = 'pan-y'
                 entry.element.tabIndex = 0
                 if (instructionsId) {
                     const descriptions = (entry.initialDescription ?? '').split(/\s+/).filter(Boolean)
-                    if (!descriptions.includes(instructionsId)) descriptions.push(instructionsId)
+                    if (!descriptions.includes(instructionsId)) {
+                        descriptions.push(instructionsId)
+                    }
                     entry.element.setAttribute('aria-describedby', descriptions.join(' '))
                 }
             })
@@ -535,7 +638,9 @@ export function createPhysicsTossController({
             stop()
         },
         reset() {
-            if (engine) reset()
+            if (engine) {
+                reset()
+            }
         },
         refreshLayout() {
             refreshLayout()

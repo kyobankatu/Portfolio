@@ -517,6 +517,30 @@ describe('Physics Toss controller', () => {
         controller.destroy()
     })
 
+    it('leaves Space activation on nested buttons to the browser', () => {
+        const section = createTarget()
+        const button = document.createElement('button')
+        button.dataset.physicsObject = ''
+        section.append(button)
+        const controller = createPhysicsTossController({
+            targets: [section],
+            bounds: { width: 800, height: 600 },
+        })
+        const event = new KeyboardEvent('keydown', {
+            key: ' ',
+            code: 'Space',
+            bubbles: true,
+            cancelable: true,
+        })
+
+        controller.start()
+        button.dispatchEvent(event)
+
+        expect(event.defaultPrevented).toBe(false)
+        expect(button.style.zIndex).toBe('')
+        controller.destroy()
+    })
+
     it('carries pointer speed into the released target', () => {
         const target = createTarget()
         const scheduler = createFrameScheduler()
