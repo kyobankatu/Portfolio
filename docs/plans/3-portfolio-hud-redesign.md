@@ -68,4 +68,5 @@
 | 0 | 完了 | d6bb27e45ac75c014b1924ba86fe4e1351f7cc16 | 済 ([初期計画](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6216410535)) |
 | 1 | 完了。単体／結合テスト8件、Chromium E2E 3件、本番ビルド、CONTENTS検査が成功 | 8d1e81c | 済 |
 | 2 | 完了。単体／結合テスト10件、Chromium E2E 4件、本番ビルド、CONTENTS検査が成功 | ee9c092 | 済 |
-| N | 完了。7分野の最終レビューで指摘なし。全検証成功、ユーザー最終了承済み | 0652aa7、0b11038 | 済 |
+| N（初回） | 完了。初回の7分野最終レビューで指摘なし。全検証成功、ユーザー最終了承済み | 0652aa7、0b11038 | 済 |
+| R3（進行中） | モバイル表示E2E追加、計画書の日本語見出し化、Phase N再開状態を反映。7分野再レビュー完了。結果記録・ユーザー最終了承待ち | d6fe078、b881f81、72c84b6 | [R3計画](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6227690604)、[Phase N状態](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6227755695)、[実行記録の区別](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6227778354) |
