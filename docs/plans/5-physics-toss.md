@@ -113,7 +113,7 @@ Markdownレビューではローカル計画とIssue全文コメント、CONTENT
 - 指摘: backendはPhysics Toss有効中のページスクロール後、sticky sidebarの物理body位置が表示位置とずれ、画面上の対象位置で衝突しない可能性（`components/physicsTossController.js`）。テストケースはrepeat Spaceによる実ページスクロール抑止と、nested link上のSpaceのブラウザー標準操作をproduction Chromium E2Eで直接検証していない。上端境界の単体テストも追加候補。md記入漏れは計画書全文をIssueコメントへ同期する手順の明記不足で、本版で追記した。docs記入漏れは古い修正承諾状態とテスト件数の記録で、本版で現況と最新実測値へ更新した。
 - 利用者は修正前一覧をすべて承諾した。承認済み修正と再検証結果は後続節に記録する。Phase Nは未完了。
 - 最新検証: `npm run test:unit` 40件成功、production Chromium E2E 17件成功、`npm run build`成功、`npm audit`と`npm audit --omit=dev`は各0 vulnerabilities、CONTENTS検査17ディレクトリ・指摘0件、`git diff --check`成功。
-- 7分野の再レビュー記録: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6234539412)。Issueの計画コメントには本計画書全文を同期する。Phase Nは7分野レビュー記録と利用者の最終了承後に完了とする。ブランチは未push。
+- 7分野の再レビュー記録: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6234539412)。[Issue計画コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6231979057)にはこの時点の本計画書全文を同期済み。Phase Nは7分野レビュー記録と利用者の最終了承後に完了とする。ブランチは未push。
 
 ## Phase N 追加指摘の承認済み修正と再検証
 
