@@ -62,7 +62,7 @@
 
 ## Phaseチェックリスト
 
-- [ ] Phase 0：調査・計画をIssueとローカルに記録し、CONTENTS検査を通してcommitする。
+- [x] Phase 0：調査・計画をIssueとローカルに記録し、CONTENTS検査を通してcommitする。
 - [ ] Phase 1：Physics Tossの起動・停止・セクション物理を実装し、単体／結合／E2E、build、CONTENTS検査を通してcommitする。
 - [ ] Phase 2：文章ブロック・サイドバーの物理と衝突を実装し、テスト・build・CONTENTS検査を通してcommitする。
 - [ ] Phase 3：キーボード・reduced-motion・モバイル対応を実装し、テスト・build・CONTENTS検査を通してcommitする。
@@ -71,4 +71,3 @@
 ## Issue運用
 
 Phase Nのレビュー結果、承認された修正計画、修正結果、再レビュー結果は後続Issueコメントとして時系列に記録する。Phase Nはユーザーの最終了承後に完了とする。
-
