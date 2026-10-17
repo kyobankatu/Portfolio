@@ -62,10 +62,10 @@
 
 ## Phaseチェックリスト
 
-- [x] Phase 0：調査・計画をIssueとローカルに記録し、CONTENTS検査を通してcommitする。
-- [x] Phase 1：Physics Tossの起動・停止・セクション物理を実装し、単体／結合／E2E、build、CONTENTS検査を通してcommitする。
-- [x] Phase 2：文章ブロック・サイドバーの物理と衝突を実装し、テスト・build・CONTENTS検査を通してcommitする。
-- [x] Phase 3：キーボード・reduced-motion・モバイル対応を実装し、テスト・build・CONTENTS検査を通してcommitする。
+- [x] Phase 0：調査・計画をIssueとローカルに記録し、CONTENTS検査を通してcommitする（`fcc3adb`）。
+- [x] Phase 1：Physics Tossの起動・停止・セクション物理を実装し、単体／結合／E2E、build、CONTENTS検査を通してcommitする（`8f45662`）。
+- [x] Phase 2：文章ブロック・サイドバーの物理と衝突を実装し、テスト・build・CONTENTS検査を通してcommitする（`11f043d`）。
+- [x] Phase 3：キーボード・reduced-motion・モバイル対応を実装し、テスト・build・CONTENTS検査を通してcommitする（`c013430`）。
 - [ ] Phase N：最終検証・7分野レビュー・ユーザー最終了承を完了する。
 
 ## Issue運用
@@ -88,3 +88,11 @@ Phase Nのレビュー結果、承認された修正計画、修正結果、再�
 | Docs | 操作説明は視覚的に隠されていて、画面上のボタンだけでは操作方法が分からない。 | 有効化時にタッチ・マウス・Space／矢印の可視操作ヒントを日英で表示し、統合テストを追加。 |
 
 Markdownレビューではローカル計画とIssue全文コメント、CONTENTS記載の整合を確認し、コード変更前の承諾ゲートを追記した。初回レビュー結果と修正内容はIssue後続コメントに記録し、修正後の7分野レビュー結果を追加する。
+
+## Phase N 初回レビュー修正記録
+
+- 初回レビュー: [Issueコメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6232882657)。比較対象は`origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`..`c0134309af3378fc046e48c7fb07f6df8738cd62`。利用者が修正候補を承諾し、対応済み。
+- 初回修正結果: [Issueコメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6232978108)、commit `dd97991`（`fix: address physics toss review findings`）。
+- 修正後レビュー: 比較対象は`origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`..`dd979916fe9629aa1f73aa1fc451fb679a04716d`。BackendでReset後の子要素再操作時の位置ずれ、MarkdownでPhase commit SHAとレビュー履歴リンク・対象HEAD・修正commit SHAの記録漏れが見つかった。Frontend、テスト、Docs、規約、セキュリティには追加指摘なし。
+- 利用者がこの追加修正を承諾。子要素のReset時に位置・速度・角度・描画基準を初期化し、Reset後の再ドラッグを検証する単体テストを追加。修正はcommit `76bccd1`（`fix: reset physics object render origins`）。
+- この修正後の検証: Vitest 37件、production Chromium E2E 15件、Next.js build、CONTENTS検査（17 directories / 0 findings）、`npm audit`と`npm audit --omit=dev`（各0 vulnerabilities）が成功。修正後の7分野レビューとその結果コメントは、完了後にこの記録とIssue後続コメントへ追記する。
