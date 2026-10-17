@@ -4,19 +4,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Mandatory Rules
 
-- Do NOT modify any files unless explicitly instructed.
-- Do NOT refactor existing code unless clearly requested.
+- Do not modify files unless explicitly instructed.
+- Do not refactor existing code unless clearly requested.
 - Prefer minimal, localized changes over large improvements.
 - Stability and existing behavior are more important than code cleanliness.
 
 ## Change Proposal Requirement
 
-Before making any code changes:
-- Explain what will be changed
-- Explain why it is necessary
-- Describe potential risks or side effects
-
-Wait for explicit approval before proceeding.
+Before making code changes:
+- Explain what will change and why it is necessary.
+- Describe potential risks or side effects.
+- Wait for explicit approval before proceeding.
 
 ## Security Rules
 
@@ -32,50 +30,56 @@ Wait for explicit approval before proceeding.
 
 ## Notation
 
-- Indent must be 4
-- Don't insert extra spaces
-- Don't omit "{}"
-- Use comparison operators (`>`, `>=`, `<`, `<=`) in the direction that makes the condition easiest to read.
-- Avoid using goto
-- Consider readability
+- Use four spaces for indentation.
+- Avoid extra spaces and keep braces explicit where the language supports them.
+- Choose comparison operators (`>`, `>=`, `<`, `<=`) in the direction that makes the condition easiest to read.
+- Avoid `goto`.
+- Prefer readable code.
 
 ## Model Usage Policy
 
-- Use the Default (recommended) model for all tasks.
-- The Default model is currently Sonnet.
-- Do NOT switch to Opus unless explicitly instructed by the user.
+- Use the Default (recommended) model for all tasks. The Default model is currently Sonnet.
+- Do not switch to Opus unless explicitly instructed by the user.
 - Prefer lower-cost models unless higher capability is required.
 
 ## Commands
 
 ```bash
-npm run dev      # Start dev server with HMR
-npm run build    # Production build → .next/
-npm run start    # Serve production build locally
+npm install
+npm run dev       # Start Next.js with HMR
+npm run test:unit # Run unit and React integration tests
+npm run build     # Build the production app
+npm run start     # Serve the production build locally
+npm run test:e2e  # Run Chromium E2E against the production build
 ```
 
-Playwright browser tests live in `tests/e2e`; deployment controller tests use Python's unittest in `tests/deploy`.
-See [deployment.md](docs/deployment.md#ローカル検証) for production Docker E2E setup.
+Deployment controller tests use Python's unittest:
 
 ```bash
-npm run test:e2e
 python -B -m unittest discover -s tests/deploy -v
 ```
 
+For local production Docker E2E setup, see [deployment.md](docs/deployment.md#ローカル検証).
+
 ## Architecture
 
-Next.js 15 (App Router) + React 19 portfolio. The home page is statically generated at build time.
+Next.js 15 App Router and React 19. The home page is statically generated at build time.
 
-- **`app/layout.js`** — root layout; sets `<html lang="ja">` and imports `globals.css`
-- **`app/page.js`** — home route; renders `<Home />`
-- **`app/globals.css`** — global styles: dark navy gradient background (`#0b1220`), animated pseudo-element orbs on `body::before`/`body::after`, light-mode overrides via `prefers-color-scheme`
-- **`components/Home.jsx`** — `'use client'` component containing the entire page: hero, profile card, skill badges, CTA buttons, placeholder Projects/Contact sections, and JS-driven orb animation
-- **`components/Home.module.css`** — scoped styles for `Home.jsx`
-- **`public/avatar-placeholder.png`** — avatar image served as `/avatar-placeholder.png`
+- `app/layout.js` sets page metadata, Japanese document language, and imports global styles.
+- `app/page.js` renders the client-side `Home` portfolio screen.
+- `app/globals.css` defines the dark canvas, browser defaults, focus indication, and reduced-motion baseline.
+- `components/Home.jsx` renders the responsive HUD, language switch, section navigation, research, projects, skills, interests, and contacts.
+- `components/Home.module.css` contains responsive HUD styles and character motion.
+- `components/portfolioContent.js` defines project and skill data, localized content projection, and section selection validation.
+- `locales/ja.json` and `locales/en.json` contain translated prose, project descriptions, and character introductions. Fixed HUD labels and technical category names may remain English; accessibility labels that describe controls should be localized.
+- `tests/unit` tests content projection and invalid data; `tests/integration` tests rendered page behavior; `tests/e2e` checks the production build in Chromium.
+- `.github/workflows/ci.yml` runs unit/integration tests and build verification before publishing.
+- `public/avatar-placeholder.png` is served as `/avatar-placeholder.png`.
 
 ## Styling conventions
 
-- Dark theme by default; light mode via `@media (prefers-color-scheme: light)`
-- Gold accent color: `#bfa046` / `#d7b262`
-- Component styles use CSS Modules; global baseline is in `app/globals.css`
-- Orb animation runs two layers: CSS pseudo-elements on `body` (static) and a `useEffect`/`useState`/`setInterval` driven layer in `Home.jsx` (dynamic, spawns and removes orbs by ID)
+- Use the current dark HUD palette and responsive layout defined in `components/Home.module.css`.
+- Keep component-specific styles in CSS Modules; reserve `app/globals.css` for document-wide behavior.
+- Keep translated prose in both locale JSON files. Fixed HUD labels and technical category names may remain English; localize accessibility labels for controls.
+- Keep motion brief and non-blocking, and honor `prefers-reduced-motion`.
+- Update the nearest `CONTENTS.md` when adding or removing source files.

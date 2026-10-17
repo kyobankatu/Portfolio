@@ -1,7 +1,7 @@
 # tests/e2e
 
-本番用イメージへのブラウザE2E。
+Browser-level checks against a production build.
 
 | 名前 | 役割 | 編集方針 |
 | --- | --- | --- |
-| [portfolio.spec.js](./portfolio.spec.js) | トップ画面・言語切替・画像・404のE2E | 通常編集可 |
+| [portfolio.spec.js](./portfolio.spec.js) | Verifies portfolio content, links, keyboard use, responsive layout, and 404 behavior in Chromium | 通常編集可 |
