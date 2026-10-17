@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { createPhysicsTossController } from '../../components/physicsTossController.js'
+import { createPhysicsTossController, resolvePhysicsTarget } from '../../components/physicsTossController.js'
 
 function createFrameScheduler() {
     let nextId = 0
@@ -44,6 +44,141 @@ afterEach(() => {
 })
 
 describe('Physics Toss controller', () => {
+    it('selects a marked child over its section and falls back to the section whitespace', () => {
+        const section = createTarget()
+        const object = document.createElement('article')
+        object.dataset.physicsObject = ''
+        const text = document.createElement('span')
+        object.append(text)
+        section.append(object)
+
+        expect(resolvePhysicsTarget(section, text)).toBe(object)
+        expect(resolvePhysicsTarget(section, section)).toBe(section)
+    })
+
+    it('moves one child independently and moves the whole section from its whitespace', () => {
+        const section = createTarget({ x: 100, y: 100, width: 300, height: 200 })
+        const object = document.createElement('article')
+        object.dataset.physicsObject = ''
+        object.getBoundingClientRect = () => ({
+            x: 150,
+            y: 150,
+            left: 150,
+            top: 150,
+            right: 230,
+            bottom: 200,
+            width: 80,
+            height: 50,
+        })
+        section.append(object)
+        const scheduler = createFrameScheduler()
+        const controller = createPhysicsTossController({
+            targets: [section],
+            bounds: { width: 800, height: 600 },
+            requestFrame: scheduler.requestFrame,
+            cancelFrame: scheduler.cancelFrame,
+        })
+
+        controller.start()
+        object.dispatchEvent(new MouseEvent('pointerdown', {
+            bubbles: true,
+            cancelable: true,
+            button: 0,
+            clientX: 190,
+            clientY: 175,
+        }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 230, clientY: 215 }))
+        window.dispatchEvent(new MouseEvent('pointerup', { clientX: 230, clientY: 215 }))
+        scheduler.advance(16)
+
+        expect(object.style.translate).not.toBe('')
+        expect(section.style.translate).toBe('')
+
+        controller.reset()
+        section.dispatchEvent(new MouseEvent('pointerdown', {
+            bubbles: true,
+            cancelable: true,
+            button: 0,
+            clientX: 110,
+            clientY: 110,
+        }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 160, clientY: 140 }))
+        window.dispatchEvent(new MouseEvent('pointerup', { clientX: 160, clientY: 140 }))
+        scheduler.advance(32)
+
+        expect(section.style.translate).not.toBe('')
+        expect(object.style.translate).toBe('')
+        controller.destroy()
+    })
+
+    it('moves a resting sibling when a physics object collides with it', () => {
+        const section = createTarget({ x: 0, y: 0, width: 600, height: 600 })
+        const first = document.createElement('article')
+        const second = document.createElement('article')
+        first.dataset.physicsObject = ''
+        second.dataset.physicsObject = ''
+        first.getBoundingClientRect = () => ({ x: 100, y: 100, left: 100, top: 100, right: 180, bottom: 160, width: 80, height: 60 })
+        second.getBoundingClientRect = () => ({ x: 100, y: 220, left: 100, top: 220, right: 180, bottom: 280, width: 80, height: 60 })
+        section.append(first, second)
+        const scheduler = createFrameScheduler()
+        const controller = createPhysicsTossController({
+            targets: [section],
+            bounds: { width: 800, height: 600 },
+            requestFrame: scheduler.requestFrame,
+            cancelFrame: scheduler.cancelFrame,
+        })
+
+        controller.start()
+        first.dispatchEvent(new MouseEvent('pointerdown', {
+            bubbles: true,
+            cancelable: true,
+            button: 0,
+            clientX: 140,
+            clientY: 130,
+        }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 140, clientY: 270 }))
+        window.dispatchEvent(new MouseEvent('pointerup', { clientX: 140, clientY: 270 }))
+        for (let frame = 1; frame <= 60; frame += 1) {
+            scheduler.advance(frame * 16)
+        }
+
+        expect(first.style.translate).not.toBe('')
+        expect(second.style.translate).not.toBe('')
+        controller.destroy()
+    })
+
+    it('keeps a dragged object inside the left edge', () => {
+        const section = createTarget({ x: 0, y: 0, width: 600, height: 600 })
+        const object = document.createElement('article')
+        object.dataset.physicsObject = ''
+        object.getBoundingClientRect = () => ({ x: 100, y: 100, left: 100, top: 100, right: 220, bottom: 180, width: 120, height: 80 })
+        section.append(object)
+        const scheduler = createFrameScheduler()
+        const controller = createPhysicsTossController({
+            targets: [section],
+            bounds: { width: 800, height: 600 },
+            requestFrame: scheduler.requestFrame,
+            cancelFrame: scheduler.cancelFrame,
+        })
+
+        controller.start()
+        object.dispatchEvent(new MouseEvent('pointerdown', {
+            bubbles: true,
+            cancelable: true,
+            button: 0,
+            clientX: 160,
+            clientY: 140,
+        }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 0, clientY: 140 }))
+        window.dispatchEvent(new MouseEvent('pointerup', { clientX: 0, clientY: 140 }))
+        scheduler.advance(16)
+
+        const horizontalOffset = Number.parseFloat(object.style.translate.split(' ')[0])
+        expect(horizontalOffset).toBeGreaterThanOrEqual(-100.001)
+        expect(horizontalOffset).toBeLessThanOrEqual(0)
+        controller.destroy()
+    })
+
     it('rejects bounds that cannot contain a physics world', () => {
         expect(() => createPhysicsTossController({
             targets: [],
@@ -135,6 +270,41 @@ describe('Physics Toss controller', () => {
         expect(scheduler.pendingCount).toBe(0)
         expect(target.style.translate).toBe('')
         expect(() => controller.start()).toThrow(/destroyed/)
+    })
+
+    it('allows another drag after a pointer is cancelled', () => {
+        const target = createTarget()
+        const scheduler = createFrameScheduler()
+        const controller = createPhysicsTossController({
+            targets: [target],
+            bounds: { width: 800, height: 600 },
+            requestFrame: scheduler.requestFrame,
+            cancelFrame: scheduler.cancelFrame,
+        })
+
+        controller.start()
+        target.dispatchEvent(new MouseEvent('pointerdown', {
+            bubbles: true,
+            cancelable: true,
+            button: 0,
+            clientX: 160,
+            clientY: 140,
+        }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 220, clientY: 160 }))
+        window.dispatchEvent(new MouseEvent('pointercancel'))
+        target.dispatchEvent(new MouseEvent('pointerdown', {
+            bubbles: true,
+            cancelable: true,
+            button: 0,
+            clientX: 220,
+            clientY: 160,
+        }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 260, clientY: 200 }))
+        window.dispatchEvent(new MouseEvent('pointerup', { clientX: 260, clientY: 200 }))
+        scheduler.advance(16)
+
+        expect(target.style.translate).not.toBe('')
+        controller.destroy()
     })
 
     it('keeps a thrown target above the physics floor', () => {

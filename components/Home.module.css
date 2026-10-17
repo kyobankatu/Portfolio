@@ -246,7 +246,17 @@
     will-change: translate;
 }
 
+.portfolioShell[data-physics-enabled="true"] [data-physics-object] {
+    position: relative;
+    cursor: grab;
+    will-change: translate;
+}
+
 .portfolioShell[data-physics-enabled="true"] [data-physics-section]:active {
+    cursor: grabbing;
+}
+
+.portfolioShell[data-physics-enabled="true"] [data-physics-object]:active {
     cursor: grabbing;
 }
 

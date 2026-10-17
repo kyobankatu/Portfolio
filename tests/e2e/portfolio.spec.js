@@ -121,9 +121,9 @@ test('Physics Toss is opt-in, moves sections with gravity, and restores the layo
     await expect(resetButton).toBeEnabled()
 
     const startBox = await profile.boundingBox()
-    await page.mouse.move(startBox.x + 45, startBox.y + 30)
+    await page.mouse.move(startBox.x + startBox.width / 2, startBox.y + 8)
     await page.mouse.down()
-    await page.mouse.move(startBox.x + 145, startBox.y + 150, { steps: 6 })
+    await page.mouse.move(startBox.x + startBox.width / 2 + 100, startBox.y + 128, { steps: 6 })
     await page.mouse.up()
 
     await expect.poll(async () => (await profile.boundingBox()).y).toBeGreaterThan(startBox.y + 40)
@@ -139,6 +139,79 @@ test('Physics Toss is opt-in, moves sections with gravity, and restores the layo
     await expect(page.getByRole('button', { name: 'Physics Tossを有効にする' })).toHaveAttribute('aria-pressed', 'false')
     expect(await profile.evaluate((element) => element.style.translate)).toBe('')
     await expect.poll(async () => (await profile.boundingBox()).y).toBe(initialBox.y)
+})
+
+test('Physics Toss can move a project card without moving its section or consuming its link click', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Physics Tossを有効にする' }).click()
+    const resetButton = page.getByRole('button', { name: '配置をリセット' })
+    await expect(resetButton).toBeEnabled()
+
+    const section = page.locator('#missions')
+    const card = section.locator('article[data-physics-object]').filter({
+        has: page.getByRole('heading', { name: 'DPSCalculator' }),
+    })
+    await card.scrollIntoViewIfNeeded()
+    const initialBox = await card.boundingBox()
+    await page.mouse.move(initialBox.x + initialBox.width / 2, initialBox.y + 35)
+    await page.mouse.down()
+    await page.mouse.move(initialBox.x + initialBox.width / 2 + 100, initialBox.y + 95, { steps: 5 })
+    await page.mouse.up()
+
+    await expect.poll(async () => (await card.boundingBox()).y).toBeGreaterThan(initialBox.y + 20)
+    expect(await section.evaluate((element) => element.style.translate)).toBe('')
+
+    await resetButton.click()
+    await card.scrollIntoViewIfNeeded()
+    await expect.poll(async () => (await card.boundingBox()).y).toBe(initialBox.y)
+
+    const popupPromise = page.waitForEvent('popup')
+    await card.getByRole('link', { name: /GitHub/ }).click()
+    const popup = await popupPromise
+    expect(popup.url()).toContain('github.com/kyobankatu/')
+    await popup.close()
+})
+
+test('Physics Toss can move a heading without moving its section', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Physics Tossを有効にする' }).click()
+    const resetButton = page.getByRole('button', { name: '配置をリセット' })
+    await expect(resetButton).toBeEnabled()
+
+    const section = page.locator('#research')
+    const heading = section.getByRole('heading', { name: 'Research', exact: true })
+    await heading.scrollIntoViewIfNeeded()
+    const initialBox = await heading.boundingBox()
+    await page.mouse.move(initialBox.x + initialBox.width / 2, initialBox.y + initialBox.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(initialBox.x + initialBox.width / 2 + 80, initialBox.y + initialBox.height / 2 + 60, { steps: 5 })
+    await page.mouse.up()
+
+    await expect.poll(async () => (await heading.boundingBox()).y).toBeGreaterThan(initialBox.y + 20)
+    expect(await section.evaluate((element) => element.style.translate)).toBe('')
+
+    await resetButton.click()
+    await heading.scrollIntoViewIfNeeded()
+    await expect.poll(async () => (await heading.boundingBox()).y).toBe(initialBox.y)
+})
+
+test('Physics Toss lets a profile card collide with the sidebar', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Physics Tossを有効にする' }).click()
+    await expect(page.getByRole('button', { name: '配置をリセット' })).toBeEnabled()
+
+    const sidebar = page.locator('aside[data-physics-section]')
+    const card = page.locator('#profile article[data-physics-object]').first()
+    const sidebarBox = await sidebar.boundingBox()
+    const cardBox = await card.boundingBox()
+    await page.mouse.move(cardBox.x + cardBox.width / 2, cardBox.y + cardBox.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(cardBox.width / 2, sidebarBox.height / 2, { steps: 8 })
+    await page.mouse.up()
+
+    await expect.poll(async () => sidebar.evaluate((element) => element.style.translate)).not.toBe('')
+    expect((await card.boundingBox()).x).toBeGreaterThanOrEqual(-1)
 })
 
 test('keyboard navigation and browser history keep the section state synchronized', async ({ page }) => {

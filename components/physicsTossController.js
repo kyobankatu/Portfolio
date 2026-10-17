@@ -2,16 +2,14 @@ import Matter from 'matter-js'
 
 const BASE_DELTA = 1000 / 60
 const MAX_VELOCITY = 25
+const DRAG_THRESHOLD = 6
+const ALL_COLLISIONS = 0xFFFFFFFF
 
 function getDocumentPoint(event) {
     return {
         x: event.clientX + window.scrollX,
         y: event.clientY + window.scrollY,
     }
-}
-
-function isInteractiveTarget(target) {
-    return target instanceof Element && Boolean(target.closest('a, button, input, select, textarea, [contenteditable="true"]'))
 }
 
 function makeBoundaries(width, height) {
@@ -22,6 +20,49 @@ function makeBoundaries(width, height) {
         Matter.Bodies.rectangle(width + thickness / 2, height / 2, thickness, height * 2, { isStatic: true, label: 'right-wall' }),
         Matter.Bodies.rectangle(width / 2, height + thickness / 2, width * 2, thickness, { isStatic: true, label: 'floor' }),
     ]
+}
+
+function getElementCenter(element) {
+    const rect = element.getBoundingClientRect()
+    return {
+        x: rect.left + window.scrollX + rect.width / 2,
+        y: rect.top + window.scrollY + rect.height / 2,
+        width: rect.width,
+        height: rect.height,
+    }
+}
+
+function createEntry(element, kind, sectionEntry = null) {
+    const rect = getElementCenter(element)
+    const body = Matter.Bodies.rectangle(rect.x, rect.y, rect.width, rect.height, {
+        restitution: 0.2,
+        friction: 0.7,
+        frictionAir: 0.015,
+        inertia: Infinity,
+        label: element.id || element.dataset.physicsObject || `physics-${kind}`,
+    })
+
+    return {
+        element,
+        kind,
+        sectionEntry,
+        body,
+        initialPosition: { x: body.position.x, y: body.position.y },
+        renderOrigin: { x: body.position.x, y: body.position.y },
+        initialAngle: body.angle,
+        initialTranslate: element.style.translate,
+        initialZIndex: element.style.zIndex,
+        initialTouchAction: element.style.touchAction,
+        enabled: kind === 'section',
+        drag: null,
+    }
+}
+
+export function resolvePhysicsTarget(section, target) {
+    if (!(section instanceof HTMLElement)) throw new TypeError('Physics Toss section must be an HTML element.')
+    if (!(target instanceof Element)) return section
+    const object = target.closest('[data-physics-object]')
+    return object && section.contains(object) ? object : section
 }
 
 export function createPhysicsTossController({
@@ -37,39 +78,59 @@ export function createPhysicsTossController({
         throw new RangeError('Physics Toss bounds must have positive finite width and height.')
     }
 
-    const entries = targets.map((element) => {
-        const rect = element.getBoundingClientRect()
-        const x = rect.left + window.scrollX
-        const y = rect.top + window.scrollY
-        const body = Matter.Bodies.rectangle(x + rect.width / 2, y + rect.height / 2, rect.width, rect.height, {
-            restitution: 0.2,
-            friction: 0.7,
-            frictionAir: 0.015,
-            inertia: Infinity,
-            label: element.id || 'physics-target',
-        })
-
-        return {
-            element,
-            body,
-            initialPosition: { x: body.position.x, y: body.position.y },
-            initialAngle: body.angle,
-            initialTranslate: element.style.translate,
-            initialZIndex: element.style.zIndex,
-            initialTouchAction: element.style.touchAction,
-            drag: null,
-        }
-    })
+    const sectionEntries = targets.map((element) => createEntry(element, 'section'))
+    const objectEntries = sectionEntries.flatMap((sectionEntry) => (
+        [...sectionEntry.element.querySelectorAll('[data-physics-object]')]
+            .map((element) => createEntry(element, 'object', sectionEntry))
+    ))
+    const entries = [...sectionEntries, ...objectEntries]
+    const entriesByElement = new Map(entries.map((entry) => [entry.element, entry]))
 
     let engine = null
     let frameId = null
     let previousTime = null
+    let pendingDrag = null
+    let activeEntry = null
+    let suppressNextClick = false
     let destroyed = false
 
+    function setCollisionEnabled(entry, enabled) {
+        entry.enabled = enabled
+        entry.body.collisionFilter.mask = enabled ? ALL_COLLISIONS : 0
+        Matter.Sleeping.set(entry.body, true)
+    }
+
+    function syncEntryToElement(entry) {
+        const center = getElementCenter(entry.element)
+        entry.renderOrigin = { x: center.x, y: center.y }
+        Matter.Body.setPosition(entry.body, entry.renderOrigin)
+        Matter.Body.setVelocity(entry.body, { x: 0, y: 0 })
+        Matter.Body.setAngle(entry.body, 0)
+        Matter.Body.setAngularVelocity(entry.body, 0)
+    }
+
+    function activateSectionMode(sectionEntry) {
+        objectEntries
+            .filter((entry) => entry.sectionEntry === sectionEntry)
+            .forEach((entry) => setCollisionEnabled(entry, false))
+        syncEntryToElement(sectionEntry)
+        setCollisionEnabled(sectionEntry, true)
+    }
+
+    function activateObjectMode(sectionEntry) {
+        setCollisionEnabled(sectionEntry, false)
+        objectEntries
+            .filter((entry) => entry.sectionEntry === sectionEntry)
+            .forEach((entry) => {
+                syncEntryToElement(entry)
+                setCollisionEnabled(entry, true)
+            })
+    }
+
     function render(entry) {
-        if (!entry.element.isConnected) return
-        const deltaX = entry.body.position.x - entry.initialPosition.x
-        const deltaY = entry.body.position.y - entry.initialPosition.y
+        if (!entry.enabled || !entry.element.isConnected) return
+        const deltaX = entry.body.position.x - entry.renderOrigin.x
+        const deltaY = entry.body.position.y - entry.renderOrigin.y
         if (Math.abs(deltaX) < 0.001 && Math.abs(deltaY) < 0.001) {
             entry.element.style.translate = entry.initialTranslate
             return
@@ -77,40 +138,52 @@ export function createPhysicsTossController({
         entry.element.style.translate = `${deltaX}px ${deltaY}px`
     }
 
+    function constrainEntry(entry) {
+        if (!entry.enabled || entry.body.isStatic) return
+        const halfWidth = (entry.body.bounds.max.x - entry.body.bounds.min.x) / 2
+        const halfHeight = (entry.body.bounds.max.y - entry.body.bounds.min.y) / 2
+        const minX = halfWidth
+        const maxX = Math.max(minX, bounds.width - halfWidth)
+        const minY = halfHeight
+        const maxY = Math.max(minY, bounds.height - halfHeight)
+        const currentX = entry.body.position.x
+        const currentY = entry.body.position.y
+        const x = Math.max(minX, Math.min(maxX, currentX))
+        const y = Math.max(minY, Math.min(maxY, currentY))
+        if (x === currentX && y === currentY) return
+        Matter.Body.setPosition(entry.body, { x, y })
+        Matter.Body.setVelocity(entry.body, {
+            x: x === currentX ? entry.body.velocity.x : 0,
+            y: y === currentY ? entry.body.velocity.y : 0,
+        })
+    }
+
     function animate(timestamp) {
         if (!engine) return
-        const delta = previousTime === null ? BASE_DELTA : Math.min(Math.max(timestamp - previousTime, 1), 33)
+        const delta = previousTime === null ? BASE_DELTA : Math.min(Math.max(timestamp - previousTime, 1), BASE_DELTA)
         previousTime = timestamp
         Matter.Engine.update(engine, delta)
+        entries.forEach(constrainEntry)
         entries.forEach(render)
         frameId = requestFrame(animate)
     }
 
-    function getEntry(element) {
-        return entries.find((entry) => entry.element === element)
-    }
-
-    function handlePointerDown(event) {
-        if (event.button !== 0 || isInteractiveTarget(event.target)) return
-        const entry = getEntry(event.currentTarget)
-        if (!entry || !engine) return
-        const point = getDocumentPoint(event)
+    function beginDrag(entry, point, timeStamp) {
         Matter.Sleeping.set(entry.body, false)
         Matter.Body.setStatic(entry.body, true)
         entry.drag = {
             offsetX: point.x - entry.body.position.x,
             offsetY: point.y - entry.body.position.y,
-            lastTime: event.timeStamp,
+            lastTime: timeStamp,
             velocity: { x: 0, y: 0 },
         }
+        activeEntry = entry
         entry.element.style.zIndex = '10'
-        event.preventDefault()
     }
 
-    function handlePointerMove(event) {
-        const entry = entries.find((candidate) => candidate.drag)
+    function moveDraggedEntry(event, point) {
+        const entry = activeEntry
         if (!entry) return
-        const point = getDocumentPoint(event)
         const halfWidth = (entry.body.bounds.max.x - entry.body.bounds.min.x) / 2
         const halfHeight = (entry.body.bounds.max.y - entry.body.bounds.min.y) / 2
         const position = {
@@ -122,36 +195,94 @@ export function createPhysicsTossController({
             x: Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, (position.x - entry.body.position.x) * BASE_DELTA / elapsed)),
             y: Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, (position.y - entry.body.position.y) * BASE_DELTA / elapsed)),
         }
-        Matter.Body.setPosition(entry.body, {
-            x: position.x,
-            y: position.y,
-        })
+        Matter.Body.setPosition(entry.body, position)
         entry.drag.lastTime = event.timeStamp
     }
 
-    function handlePointerUp(event) {
-        const entry = entries.find((candidate) => candidate.drag)
-        if (!entry) return
-        const { velocity } = entry.drag
+    function handlePointerDown(event) {
+        if (event.button !== 0 || activeEntry || pendingDrag) return
+        const sectionEntry = entriesByElement.get(event.currentTarget)
+        if (!sectionEntry || !engine) return
+        const element = resolvePhysicsTarget(sectionEntry.element, event.target)
+        const entry = entriesByElement.get(element) || sectionEntry
+        const interactive = event.target instanceof Element && Boolean(event.target.closest('a, button, input, select, textarea, [contenteditable="true"]'))
+        if (interactive && entry === sectionEntry) return
+        pendingDrag = {
+            entry,
+            sectionEntry,
+            point: getDocumentPoint(event),
+            startX: event.clientX,
+            startY: event.clientY,
+            timeStamp: event.timeStamp,
+            interactive,
+        }
+        if (!pendingDrag.interactive) event.preventDefault()
+    }
+
+    function handlePointerMove(event) {
+        const point = getDocumentPoint(event)
+        if (!activeEntry && pendingDrag) {
+            const distance = Math.hypot(event.clientX - pendingDrag.startX, event.clientY - pendingDrag.startY)
+            if (distance < DRAG_THRESHOLD) return
+            const pending = pendingDrag
+            pendingDrag = null
+            if (pending.entry.kind === 'object') activateObjectMode(pending.sectionEntry)
+            else activateSectionMode(pending.sectionEntry)
+            beginDrag(pending.entry, pending.point, pending.timeStamp)
+            if (pending.interactive) suppressNextClick = true
+        }
+        if (!activeEntry) return
+        moveDraggedEntry(event, point)
+        event.preventDefault()
+    }
+
+    function finishDrag(event, cancelled = false) {
+        if (pendingDrag) {
+            pendingDrag = null
+            return
+        }
+        if (!activeEntry) return
+        const entry = activeEntry
+        activeEntry = null
+        const velocity = cancelled ? { x: 0, y: 0 } : entry.drag.velocity
         entry.drag = null
         Matter.Body.setStatic(entry.body, false)
         Matter.Body.setVelocity(entry.body, velocity)
         Matter.Sleeping.set(entry.body, false)
+        entry.element.style.zIndex = entry.initialZIndex
+    }
+
+    function handleClick(event) {
+        if (!suppressNextClick) return
+        suppressNextClick = false
+        event.preventDefault()
+        event.stopImmediatePropagation()
     }
 
     function reset() {
-        entries.forEach((entry) => {
-            entry.drag = null
+        pendingDrag = null
+        activeEntry = null
+        sectionEntries.forEach((entry) => {
+            entry.element.style.translate = entry.initialTranslate
+            entry.element.style.zIndex = entry.initialZIndex
             Matter.Body.setStatic(entry.body, false)
+            syncEntryToElement(entry)
             Matter.Body.setPosition(entry.body, entry.initialPosition)
+        })
+        objectEntries.forEach((entry) => {
+            entry.element.style.translate = entry.initialTranslate
+            entry.element.style.zIndex = entry.initialZIndex
+            Matter.Body.setStatic(entry.body, false)
+            syncEntryToElement(entry)
+            Matter.Body.setPosition(entry.body, entry.initialPosition)
+            setCollisionEnabled(entry, false)
+        })
+        sectionEntries.forEach((entry) => {
             Matter.Body.setVelocity(entry.body, { x: 0, y: 0 })
             Matter.Body.setAngle(entry.body, entry.initialAngle)
             Matter.Body.setAngularVelocity(entry.body, 0)
-            Matter.Sleeping.set(entry.body, true)
-            entry.element.style.translate = entry.initialTranslate
-            entry.element.style.zIndex = entry.initialZIndex
-            render(entry)
-            entry.element.style.translate = entry.initialTranslate
+            setCollisionEnabled(entry, true)
+            entry.renderOrigin = { ...entry.initialPosition }
         })
     }
 
@@ -160,11 +291,12 @@ export function createPhysicsTossController({
         if (frameId !== null) cancelFrame(frameId)
         frameId = null
         previousTime = null
+        document.removeEventListener('click', handleClick, true)
         window.removeEventListener('pointermove', handlePointerMove)
-        window.removeEventListener('pointerup', handlePointerUp)
-        window.removeEventListener('pointercancel', handlePointerUp)
+        window.removeEventListener('pointerup', finishDrag)
+        window.removeEventListener('pointercancel', handlePointerCancel)
+        sectionEntries.forEach((entry) => entry.element.removeEventListener('pointerdown', handlePointerDown))
         entries.forEach((entry) => {
-            entry.element.removeEventListener('pointerdown', handlePointerDown)
             entry.element.style.translate = entry.initialTranslate
             entry.element.style.zIndex = entry.initialZIndex
             entry.element.style.touchAction = entry.initialTouchAction
@@ -172,6 +304,10 @@ export function createPhysicsTossController({
         })
         if (engine) Matter.Engine.clear(engine)
         engine = null
+    }
+
+    function handlePointerCancel(event) {
+        finishDrag(event, true)
     }
 
     return {
@@ -187,13 +323,15 @@ export function createPhysicsTossController({
                 ...makeBoundaries(bounds.width, bounds.height),
             ])
             entries.forEach((entry) => {
+                if (!entry.enabled) entry.body.collisionFilter.mask = 0
                 Matter.Sleeping.set(entry.body, true)
                 entry.element.style.touchAction = 'none'
-                entry.element.addEventListener('pointerdown', handlePointerDown)
             })
+            sectionEntries.forEach((entry) => entry.element.addEventListener('pointerdown', handlePointerDown))
+            document.addEventListener('click', handleClick, true)
             window.addEventListener('pointermove', handlePointerMove)
-            window.addEventListener('pointerup', handlePointerUp)
-            window.addEventListener('pointercancel', handlePointerUp)
+            window.addEventListener('pointerup', finishDrag)
+            window.addEventListener('pointercancel', handlePointerCancel)
             frameId = requestFrame(animate)
         },
         stop() {

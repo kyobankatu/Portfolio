@@ -37,7 +37,7 @@
 | 目的 | 見出し・段落・カード・サイドバーの対象を個別の物理オブジェクトとして登録し、対象同士の当たり判定を実装する。セクション余白からはセクション全体を掴めるようにする。 |
 | 意図 | セクション単位から粒度を広げ、ユーザーが選んだヒット領域の優先順位を定義する。子要素を掴んだ時に親セクションを同時操作しないようにする。 |
 | 編集ファイル | `components/Home.jsx`（セクション・文章・カード・サイドバーの対象登録、入れ子のヒット判定）、`components/physicsTossController.js`（複数body登録、ドラッグ制約、衝突、DOM位置同期）、`components/Home.module.css`（hitbox・掴み状態）、`components/CONTENTS.md`、`tests/unit/physicsTossController.test.js`、`tests/integration/Home.test.jsx`、`tests/e2e/portfolio.spec.js`、関連する`tests/**/CONTENTS.md`。 |
-| テストケース | **単体**: 正常系—異なるサイズの対象が重力で落下し、対象同士・壁・床で重ならず衝突する。子要素からのhit testは子だけを選び、余白からは親sectionを選ぶ。異常系—対象が消えた場合やpointercancel時に掴み状態・listener・bodyを残さない。**結合**: 段落・project card・sidebar項目を個別に動かし、section操作と競合しない。リンク上のpointerdownはドラッグを開始せずリンク遷移を維持する。**E2E**: PCでsectionと複数種類の文章ブロックを投げ、サイドバーを含む対象同士が衝突する。境界内に留まり、カード内リンク・ナビゲーションが動作する。ドラッグ中のpointercancel後も次の操作が可能。 |
+| テストケース | **単体**: 正常系—異なるサイズの対象が重力で落下し、対象同士・壁・床で衝突する。子要素からのhit testは子だけを選び、余白からは親sectionを選ぶ。異常系—pointercancel後に掴み状態を残さず次の操作を受け付け、リンク上のクリックをドラッグに変えない。**結合**: 見出し・段落・カード・sidebar項目の登録とモード操作を確認し、親sectionを同時に動かさない。**E2E**: PCでsection、見出し、project cardを動かし、サイドバーとの衝突、境界、Resetを確認する。カード内リンクとナビゲーションのクリックが動作する。 |
 | 完了条件 | 合意した対象と粒度で画面全体の物理挙動が動作し、ナビ・リンクが維持される。衝突・入れ子hit test・キャンセルの各検証、build、CONTENTS検査が成功しcommitする。 |
 
 ## Phase 3 — キーボード・動きの軽減・モバイル対応
@@ -64,7 +64,7 @@
 
 - [x] Phase 0：調査・計画をIssueとローカルに記録し、CONTENTS検査を通してcommitする。
 - [x] Phase 1：Physics Tossの起動・停止・セクション物理を実装し、単体／結合／E2E、build、CONTENTS検査を通してcommitする。
-- [ ] Phase 2：文章ブロック・サイドバーの物理と衝突を実装し、テスト・build・CONTENTS検査を通してcommitする。
+- [x] Phase 2：文章ブロック・サイドバーの物理と衝突を実装し、テスト・build・CONTENTS検査を通してcommitする。
 - [ ] Phase 3：キーボード・reduced-motion・モバイル対応を実装し、テスト・build・CONTENTS検査を通してcommitする。
 - [ ] Phase N：最終検証・7分野レビュー・ユーザー最終了承を完了する。
 

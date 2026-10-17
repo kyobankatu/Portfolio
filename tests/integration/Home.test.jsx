@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 import Home from '../../components/Home.jsx'
 import ja from '../../locales/ja.json'
@@ -67,6 +67,27 @@ describe('portfolio screen', () => {
 
         expect(screen.getByRole('button', { name: 'Physics Tossを有効にする' })).toHaveAttribute('aria-pressed', 'false')
         expect(profile.style.translate).toBe('')
+    })
+
+    it('registers nested heading, card, and sidebar targets while preserving mode controls', async () => {
+        render(<Home />)
+        const profile = document.querySelector('#profile')
+        const heading = screen.getByRole('heading', { name: 'Profile', exact: true })
+        const card = profile.querySelector('article')
+        const navigationItem = screen.getByRole('navigation').querySelector('a')
+        const enableButton = screen.getByRole('button', { name: 'Physics Tossを有効にする' })
+
+        expect(profile).toHaveAttribute('data-physics-section')
+        expect(heading).toHaveAttribute('data-physics-object')
+        expect(card).toHaveAttribute('data-physics-object')
+        expect(navigationItem).toHaveAttribute('data-physics-object')
+        fireEvent.click(enableButton)
+        const resetButton = screen.getByRole('button', { name: '配置をリセット' })
+        await waitFor(() => expect(resetButton).toBeEnabled())
+        expect(document.querySelector('[data-physics-enabled="true"]')).toBeInTheDocument()
+        fireEvent.click(resetButton)
+        fireEvent.click(screen.getByRole('button', { name: 'Physics Tossを無効にする' }))
+        expect(document.querySelector('[data-physics-enabled="false"]')).toBeInTheDocument()
     })
 
     it('keeps the navigation target and selected section in sync', () => {
