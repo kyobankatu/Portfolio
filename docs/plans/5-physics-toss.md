@@ -48,7 +48,7 @@
 | 意図 | 遊びの操作性を保ちながら、アクセシビリティと実画面での安定性を最終段階に仕上げる。 |
 | 編集ファイル | `components/Home.jsx`（Space／矢印キー、状態のARIA通知）、`components/Home.module.css`（focus、reduced-motion、touch affordance）、`components/physicsTossController.js`（キーボード移動、慣性停止、resize／scroll境界更新）、`locales/ja.json`・`locales/en.json`（操作説明と状態ラベル）、`components/CONTENTS.md`・`locales/CONTENTS.md`、`tests/unit/physicsTossController.test.js`、`tests/integration/Home.test.jsx`、`tests/e2e/portfolio.spec.js`、関連する`tests/**/CONTENTS.md`、必要なら`CLAUDE.md`（新しい操作規約）。 |
 | テストケース | **単体**: 正常系—キー入力で掴む・移動・離すと状態が変わる。動きを減らす設定では投げた後の慣性・連続自動更新を停止する。異常系—無効キー、フォーカス外、解除後の入力は状態を壊さない。**結合**: Space／矢印操作、reduced-motion時の直接移動、ARIA状態、resize後の境界が同期し、リンク・ナビのキーボード操作を妨げない。**E2E**: PCと390px幅のChromiumでキー操作とタッチ相当のドラッグ、重力・衝突・床・Reset、通常リンクを確認する。`prefers-reduced-motion: reduce`では慣性が止まり、直接操作とResetは可能。通常オフでは常時アニメーションがない。 |
-| 完了条件 | PC・モバイルで操作でき、動きを減らす設定に対応し、E2E・単体／結合テスト・build・CONTENTS検査が成功してcommitする。 |
+| 完了条件 | PC・モバイルで操作でき、動きを減らす設定に対応し、E2E・単体／結合テスト・build・CONTENTS検査が成功してcommitする。**結果**: Vitest 31件（統合テスト8件を含む。統合テスト単独実行も成功）、Playwright production Chromium 13件、Next.js build、CONTENTS検査（17 directories / 0 findings）、`npm audit`／`npm audit --omit=dev`（各0 vulnerabilities）が成功。 |
 
 ## Phase N — 最終検証・分野別レビュー
 
@@ -65,7 +65,7 @@
 - [x] Phase 0：調査・計画をIssueとローカルに記録し、CONTENTS検査を通してcommitする。
 - [x] Phase 1：Physics Tossの起動・停止・セクション物理を実装し、単体／結合／E2E、build、CONTENTS検査を通してcommitする。
 - [x] Phase 2：文章ブロック・サイドバーの物理と衝突を実装し、テスト・build・CONTENTS検査を通してcommitする。
-- [ ] Phase 3：キーボード・reduced-motion・モバイル対応を実装し、テスト・build・CONTENTS検査を通してcommitする。
+- [x] Phase 3：キーボード・reduced-motion・モバイル対応を実装し、テスト・build・CONTENTS検査を通してcommitする。
 - [ ] Phase N：最終検証・7分野レビュー・ユーザー最終了承を完了する。
 
 ## Issue運用

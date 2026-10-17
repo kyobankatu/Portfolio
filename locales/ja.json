@@ -10,6 +10,7 @@
     "physicsEnable": "Physics Tossを有効にする",
     "physicsDisable": "Physics Tossを無効にする",
     "physicsReset": "配置をリセット",
+    "physicsInstructions": "Physics Toss中は、対象にフォーカスしてSpaceで掴み、矢印キーで移動し、もう一度Spaceで離します。マウスやタッチではドラッグして投げます。",
     "readyStatus": "READY",
     "heroEyebrow": "PLAYER PROFILE / PORTFOLIO",
     "viewMissions": "作品を見る",

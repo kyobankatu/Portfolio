@@ -186,6 +186,136 @@ describe('Physics Toss controller', () => {
         })).toThrow(RangeError)
     })
 
+    it('supports Space and arrow-key movement and restores its focus attributes', () => {
+        const target = createTarget()
+        target.setAttribute('aria-describedby', 'existing-description')
+        const scheduler = createFrameScheduler()
+        const controller = createPhysicsTossController({
+            targets: [target],
+            bounds: { width: 800, height: 600 },
+            instructionsId: 'physics-instructions',
+            requestFrame: scheduler.requestFrame,
+            cancelFrame: scheduler.cancelFrame,
+        })
+
+        controller.start()
+        expect(target.tabIndex).toBe(0)
+        expect(target.getAttribute('aria-describedby')).toBe('existing-description physics-instructions')
+        target.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', code: 'Space', bubbles: true, cancelable: true }))
+        target.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }))
+        expect(target.style.translate).toContain('16px')
+        target.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', code: 'Space', bubbles: true, cancelable: true }))
+        controller.stop()
+
+        expect(target.getAttribute('tabindex')).toBeNull()
+        expect(target.getAttribute('aria-describedby')).toBe('existing-description')
+        controller.destroy()
+    })
+
+    it('keeps direct manipulation but stops inertia when reduced motion is requested', () => {
+        const target = createTarget()
+        const scheduler = createFrameScheduler()
+        const mediaQuery = {
+            matches: true,
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+        }
+        const controller = createPhysicsTossController({
+            targets: [target],
+            bounds: { width: 800, height: 600 },
+            matchMedia: () => mediaQuery,
+            requestFrame: scheduler.requestFrame,
+            cancelFrame: scheduler.cancelFrame,
+        })
+
+        controller.start()
+        expect(scheduler.pendingCount).toBe(0)
+        target.dispatchEvent(new MouseEvent('pointerdown', {
+            bubbles: true,
+            cancelable: true,
+            button: 0,
+            clientX: 160,
+            clientY: 140,
+        }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 220, clientY: 180 }))
+        window.dispatchEvent(new MouseEvent('pointerup', { clientX: 220, clientY: 180 }))
+        const positionAfterRelease = target.style.translate
+        scheduler.advance(500)
+
+        expect(positionAfterRelease).not.toBe('')
+        expect(target.style.translate).toBe(positionAfterRelease)
+        expect(scheduler.pendingCount).toBe(0)
+        controller.destroy()
+    })
+
+    it('stops an active physics loop when the reduced-motion preference changes', () => {
+        const target = createTarget()
+        const scheduler = createFrameScheduler()
+        let preferenceChanged
+        const mediaQuery = {
+            matches: false,
+            addEventListener: vi.fn((type, listener) => { preferenceChanged = listener }),
+            removeEventListener: vi.fn(),
+        }
+        const controller = createPhysicsTossController({
+            targets: [target],
+            bounds: { width: 800, height: 600 },
+            matchMedia: () => mediaQuery,
+            requestFrame: scheduler.requestFrame,
+            cancelFrame: scheduler.cancelFrame,
+        })
+
+        controller.start()
+        target.dispatchEvent(new MouseEvent('pointerdown', {
+            bubbles: true,
+            cancelable: true,
+            button: 0,
+            clientX: 160,
+            clientY: 140,
+        }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 220, clientY: 180 }))
+        window.dispatchEvent(new MouseEvent('pointerup', { clientX: 220, clientY: 180 }))
+        mediaQuery.matches = true
+        preferenceChanged({ matches: true })
+        const positionAfterPreferenceChange = target.style.translate
+        scheduler.advance(500)
+
+        expect(scheduler.pendingCount).toBe(0)
+        expect(target.style.translate).toBe(positionAfterPreferenceChange)
+        controller.destroy()
+        expect(mediaQuery.removeEventListener).toHaveBeenCalledOnce()
+    })
+
+    it('rebuilds the screen boundaries after a resize', () => {
+        const target = createTarget()
+        const scheduler = createFrameScheduler()
+        let currentBounds = { width: 800, height: 600 }
+        const controller = createPhysicsTossController({
+            targets: [target],
+            bounds: currentBounds,
+            getBounds: () => currentBounds,
+            requestFrame: scheduler.requestFrame,
+            cancelFrame: scheduler.cancelFrame,
+        })
+
+        controller.start()
+        currentBounds = { width: 400, height: 300 }
+        window.dispatchEvent(new Event('resize'))
+        target.dispatchEvent(new MouseEvent('pointerdown', {
+            bubbles: true,
+            cancelable: true,
+            button: 0,
+            clientX: 160,
+            clientY: 140,
+        }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 600, clientY: 140 }))
+        window.dispatchEvent(new MouseEvent('pointerup', { clientX: 600, clientY: 140 }))
+
+        const horizontalOffset = Number.parseFloat(target.style.translate.split(' ')[0])
+        expect(horizontalOffset).toBeLessThanOrEqual(180)
+        controller.destroy()
+    })
+
     it('keeps targets in place until tossed, then restores their original layout on reset', () => {
         const target = createTarget()
         const scheduler = createFrameScheduler()

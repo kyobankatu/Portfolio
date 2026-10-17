@@ -90,6 +90,27 @@ describe('portfolio screen', () => {
         expect(document.querySelector('[data-physics-enabled="false"]')).toBeInTheDocument()
     })
 
+    it('connects localized instructions to keyboard targets only while Physics Toss is active', async () => {
+        render(<Home />)
+        const heading = screen.getByRole('heading', { name: 'Profile', exact: true })
+        const enableButton = screen.getByRole('button', { name: 'Physics Tossを有効にする' })
+
+        expect(heading).not.toHaveAttribute('tabindex')
+        fireEvent.click(enableButton)
+        await waitFor(() => expect(heading).toHaveAttribute('tabindex', '0'))
+        expect(heading).toHaveAttribute('aria-describedby', 'physics-instructions')
+        expect(document.getElementById('physics-instructions')).toHaveTextContent('Spaceで掴み')
+
+        fireEvent.keyDown(heading, { key: ' ', code: 'Space' })
+        fireEvent.keyDown(heading, { key: 'ArrowRight' })
+        expect(heading.style.translate).toContain('16px')
+        fireEvent.keyDown(heading, { key: ' ', code: 'Space' })
+        fireEvent.click(screen.getByRole('button', { name: 'Physics Tossを無効にする' }))
+
+        await waitFor(() => expect(heading).not.toHaveAttribute('tabindex'))
+        expect(heading).not.toHaveAttribute('aria-describedby')
+    })
+
     it('keeps the navigation target and selected section in sync', () => {
         render(<Home />)
 

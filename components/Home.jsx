@@ -29,12 +29,15 @@ export default function Home({ translations = { ja, en } }) {
         import('./physicsTossController.js').then(({ createPhysicsTossController }) => {
             if (cancelled) return
             const targets = [...document.querySelectorAll('[data-physics-section]')]
+            const getBounds = () => ({
+                width: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth, window.innerWidth),
+                height: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight, window.innerHeight),
+            })
             controller = createPhysicsTossController({
                 targets,
-                bounds: {
-                    width: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth, window.innerWidth),
-                    height: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight, window.innerHeight),
-                },
+                instructionsId: 'physics-instructions',
+                bounds: getBounds(),
+                getBounds,
             })
             physicsController.current = controller
             controller.start()
@@ -108,6 +111,7 @@ export default function Home({ translations = { ja, en } }) {
             </aside>
 
             <main className={styles.mainContent}>
+                <p className={styles.visuallyHidden} id="physics-instructions">{t.physicsInstructions}</p>
                 <header className={styles.topbar}>
                     <span className={styles.breadcrumb}>PORTFOLIO <span>/</span> PERSONAL ARCADE</span>
                     <div className={styles.topbarActions}>

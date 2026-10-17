@@ -196,6 +196,7 @@ test('Physics Toss can move a heading without moving its section', async ({ page
 })
 
 test('Physics Toss lets a profile card collide with the sidebar', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' })
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('/')
     await page.getByRole('button', { name: 'Physics Tossを有効にする' }).click()
@@ -212,6 +213,81 @@ test('Physics Toss lets a profile card collide with the sidebar', async ({ page 
 
     await expect.poll(async () => sidebar.evaluate((element) => element.style.translate)).not.toBe('')
     expect((await card.boundingBox()).x).toBeGreaterThanOrEqual(-1)
+})
+
+test('Physics Toss supports Space and arrow-key interaction', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Physics Tossを有効にする' }).click()
+    const resetButton = page.getByRole('button', { name: '配置をリセット' })
+    await expect(resetButton).toBeEnabled()
+    const heading = page.getByRole('heading', { name: 'Profile', exact: true })
+    await heading.focus()
+
+    await page.keyboard.press('Space')
+    await page.keyboard.press('ArrowRight')
+    expect(await heading.evaluate((element) => element.style.translate)).not.toBe('')
+    await page.keyboard.press('Space')
+    await resetButton.click()
+    await page.getByRole('button', { name: 'Physics Tossを無効にする' }).click()
+    await expect(heading).not.toHaveAttribute('tabindex')
+})
+
+test('Physics Toss honors reduced motion while keeping direct manipulation available', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Physics Tossを有効にする' }).click()
+    await expect(page.getByRole('button', { name: '配置をリセット' })).toBeEnabled()
+    const heading = page.getByRole('heading', { name: 'Research', exact: true })
+    await heading.scrollIntoViewIfNeeded()
+    const box = await heading.boundingBox()
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(box.x + box.width / 2 + 60, box.y + box.height / 2 + 45, { steps: 4 })
+    await page.mouse.up()
+    const positionAfterDrag = await heading.evaluate((element) => element.style.translate)
+    expect(positionAfterDrag).not.toBe('')
+    await page.waitForTimeout(250)
+    expect(await heading.evaluate((element) => element.style.translate)).toBe(positionAfterDrag)
+
+    await heading.focus()
+    await page.keyboard.press('Space')
+    await page.keyboard.press('ArrowRight')
+    await page.keyboard.press('Space')
+    const positionAfterKeyboard = await heading.evaluate((element) => element.style.translate)
+    expect(positionAfterKeyboard).not.toBe(positionAfterDrag)
+    await page.waitForTimeout(250)
+    expect(await heading.evaluate((element) => element.style.translate)).toBe(positionAfterKeyboard)
+})
+
+test('Physics Toss supports touch-pointer dragging at mobile width', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.goto('/')
+    await page.getByRole('button', { name: '英語に切り替え' }).click()
+    await page.getByRole('button', { name: 'Enable Physics Toss' }).click()
+    await expect(page.getByRole('button', { name: 'Reset layout' })).toBeEnabled()
+    const heading = page.getByRole('heading', { name: 'Profile', exact: true })
+    await heading.scrollIntoViewIfNeeded()
+    const box = await heading.boundingBox()
+    await heading.evaluate((element, rect) => {
+        const dispatch = (target, type, x, y) => target.dispatchEvent(new PointerEvent(type, {
+            bubbles: true,
+            cancelable: true,
+            pointerId: 9,
+            pointerType: 'touch',
+            isPrimary: true,
+            button: 0,
+            clientX: x,
+            clientY: y,
+        }))
+        const startX = rect.x + rect.width / 2
+        const startY = rect.y + rect.height / 2
+        dispatch(element, 'pointerdown', startX, startY)
+        dispatch(window, 'pointermove', startX + 45, startY + 35)
+        dispatch(window, 'pointerup', startX + 45, startY + 35)
+    }, box)
+
+    await expect.poll(async () => (await heading.boundingBox()).y).toBeGreaterThan(box.y + 15)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390)
 })
 
 test('keyboard navigation and browser history keep the section state synchronized', async ({ page }) => {
