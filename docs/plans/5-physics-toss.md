@@ -122,4 +122,7 @@ Markdownレビューではローカル計画とIssue全文コメント、CONTENT
 - 修正commit: `8f7b529`（`fix: resync physics bodies after scrolling`）。
 - テスト精度の追加commit: `77c507b`（`test: assert physics scroll interaction outcomes`）でsticky対象の実移動量・表示領域内、nested link上Spaceの実スクロールを確認し、`a76ba96`（`test: assert exact physics top boundary`）で上端の期待translateを`-100px`に厳密化した。
 - 再検証: Vitest 42件、production Chromium E2E 20件、Next.js build成功、`npm audit`／`npm audit --omit=dev`は各0 vulnerabilities、CONTENTS検査17ディレクトリ・指摘0件、`git diff --check`成功。
-- 最新HEADを対象に7分野レビューを再実施する。Phase Nはレビュー結果の記録とユーザー最終了承まで未完了。ブランチは未push。
+- 最新7分野レビュー対象: `origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`..`edd3fe037d75d430d858d68a590fcd6e1445575f`。Frontend 0件、Backend 0件、テストケース0件、MD 0件、Docs/CONTENTS 0件、セキュリティ0件。
+- 規約レビュー指摘1件: `tests/unit/physicsTossController.test.js`の`for`ループに波括弧がなく、`CLAUDE.md`の明示ブレース規約に反する。他の規約指摘なし。
+- 承認状態: 上記ループへ波括弧を追加する1行程度の規約修正は、コード変更前に利用者の承諾を得るまで未着手とする。Phase Nは未完了。
+- 最新の再検証記録と7分野レビュー結果: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6237413015)。[Issue計画コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6231979057)は本版全文へ同期する。ブランチは未push。
