@@ -141,6 +141,24 @@ test('Physics Toss is opt-in, moves sections with gravity, and restores the layo
     await expect.poll(async () => (await profile.boundingBox()).y).toBe(initialBox.y)
 })
 
+test('Physics Toss shows a visible focus indicator on keyboard-operated targets', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Physics Tossを有効にする' }).click()
+    await expect(page.getByRole('button', { name: '配置をリセット' })).toBeEnabled()
+
+    const heading = page.locator('#hero-title')
+    for (let index = 0; index < 30; index += 1) {
+        if (await heading.evaluate((element) => element === document.activeElement)) break
+        await page.keyboard.press('Tab')
+    }
+
+    await expect(heading).toBeFocused()
+    await expect.poll(() => heading.evaluate((element) => {
+        const style = getComputedStyle(element)
+        return `${style.outlineWidth} ${style.outlineStyle}`
+    })).toBe('2px solid')
+})
+
 test('Physics Toss preserves a moved project card and its normal link click', async ({ page }) => {
     await page.goto('/')
     await page.getByRole('button', { name: 'Physics Tossを有効にする' }).click()

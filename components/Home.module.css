@@ -780,6 +780,12 @@
     outline-offset: 3px;
 }
 
+.portfolioShell[data-physics-enabled="true"] [data-physics-section]:focus-visible,
+.portfolioShell[data-physics-enabled="true"] [data-physics-object]:focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: 3px;
+}
+
 @media (max-width: 1100px) {
     .portfolioShell {
         grid-template-columns: 230px minmax(0, 1fr);
