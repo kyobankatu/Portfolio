@@ -429,7 +429,7 @@ export function createPhysicsTossController({
         if (!sectionEntry || !engine) {
             return
         }
-        if (event.target instanceof Element && event.target.closest('button, input, select, textarea, [contenteditable="true"], [role="button"]')) {
+        if (event.target instanceof Element && event.target.closest('a[href], button, input, select, textarea, [contenteditable="true"], [role="button"]')) {
             return
         }
         if (event.code === 'Space' || event.key === ' ') {
