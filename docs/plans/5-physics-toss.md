@@ -106,11 +106,19 @@ Markdownレビューではローカル計画とIssue全文コメント、CONTENT
 - 当時の修正後レビュー: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6233579721)。比較対象は`origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`..`016cf8a`。Backendで1件—Physics Toss有効時にボタン上のSpaceをcontrollerが捕捉し、モード切替／Resetボタンの標準操作を妨げる。規約違反で1件—`CLAUDE.md`の明示波括弧ルールに対して`physicsTossController.js`のifガードが波括弧を省略。Frontend、テストケース、セキュリティには指摘なし。これらは次の承認済み修正ラウンドで対応した。
 - 利用者は修正前一覧の内容を承諾済み。修正commit `94293eb`（nested buttonでSpaceの標準操作を維持、controllerの波括弧）、`cb51c7f`（nested linkでSpaceの標準操作を維持）、`7b440bd`（繰り返しSpace入力によるページスクロールを防止）、`78b07bf`（Home.jsxとE2Eの残る明示波括弧）を反映した。
 
-## Phase N 最新再レビュー・検証結果
+## Phase N 追加指摘を受けた再レビュー結果（HEAD `78b07bf`）
 
 - 比較対象: `origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`..`78b07bf3e4fce247e6e77f9be2b5085666fb4b4c`。
 - 7分野レビュー: frontend 0件、backend 1件、テストケース1件（追加推奨。上端境界は任意の追加余地）、md記入漏れ1件、docs記入漏れ2件、規約違反0件、セキュリティ0件。レビューは個別のサブエージェントが実施した。
 - 指摘: backendはPhysics Toss有効中のページスクロール後、sticky sidebarの物理body位置が表示位置とずれ、画面上の対象位置で衝突しない可能性（`components/physicsTossController.js`）。テストケースはrepeat Spaceによる実ページスクロール抑止と、nested link上のSpaceのブラウザー標準操作をproduction Chromium E2Eで直接検証していない。上端境界の単体テストも追加候補。md記入漏れは計画書全文をIssueコメントへ同期する手順の明記不足で、本版で追記した。docs記入漏れは古い修正承諾状態とテスト件数の記録で、本版で現況と最新実測値へ更新した。
-- 次の修正候補（コード変更前に利用者の承諾が必要）: `components/physicsTossController.js`でスクロール時にsticky sidebarを含む物理body位置を再計測し、`tests/unit/physicsTossController.test.js`と`tests/e2e/portfolio.spec.js`でスクロール後のsidebar衝突を検証する。加えてproduction Chromium E2Eでrepeat Space時にページがスクロールしないこと、nested link上のSpaceがブラウザー標準動作を保つことを検証する。画面上端の境界も単体テストに追加する。これらのコード・テスト変更は承諾を得るまで未着手とする。Phase Nは未完了。
+- 利用者は修正前一覧をすべて承諾した。承認済み修正と再検証結果は後続節に記録する。Phase Nは未完了。
 - 最新検証: `npm run test:unit` 40件成功、production Chromium E2E 17件成功、`npm run build`成功、`npm audit`と`npm audit --omit=dev`は各0 vulnerabilities、CONTENTS検査17ディレクトリ・指摘0件、`git diff --check`成功。
 - 7分野の再レビュー記録: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6234539412)。Issueの計画コメントには本計画書全文を同期する。Phase Nは7分野レビュー記録と利用者の最終了承後に完了とする。ブランチは未push。
+
+## Phase N 追加指摘の承認済み修正と再検証
+
+- 利用者はsticky sidebarのスクロール再計測、スクロール後の回帰検査、repeat Space／nested link Spaceのproduction E2E、上端境界の単体テストをすべて承諾した。
+- `components/physicsTossController.js`でscrollイベント後の物理body再計測をrequestAnimationFrameで集約し、停止時は保留中の計測をcancelする。`tests/unit/physicsTossController.test.js`ではscroll後の対象位置と上端制約を、`tests/e2e/portfolio.spec.js`ではscroll後にsticky sidebar内の対象を掴めること、repeat Spaceのスクロール抑止、nested link上のSpaceの標準既定動作を本番Chromiumで確認する。関連する`tests/unit/CONTENTS.md`と`tests/e2e/CONTENTS.md`を更新した。
+- 修正commit: `8f7b529`（`fix: resync physics bodies after scrolling`）。
+- 再検証: Vitest 42件、production Chromium E2E 20件、Next.js build成功、`npm audit`／`npm audit --omit=dev`は各0 vulnerabilities、CONTENTS検査17ディレクトリ・指摘0件、`git diff --check`成功。
+- 最新HEADを対象に7分野レビューを再実施する。Phase Nはレビュー結果の記録とユーザー最終了承まで未完了。ブランチは未push。
