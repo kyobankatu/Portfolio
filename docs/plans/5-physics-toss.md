@@ -48,7 +48,7 @@
 | 意図 | 遊びの操作性を保ちながら、アクセシビリティと実画面での安定性を最終段階に仕上げる。 |
 | 編集ファイル | `components/Home.jsx`（Space／矢印キー、状態のARIA通知）、`components/Home.module.css`（focus、reduced-motion、touch affordance）、`components/physicsTossController.js`（キーボード移動、慣性停止、resize／scroll境界更新）、`locales/ja.json`・`locales/en.json`（操作説明と状態ラベル）、`components/CONTENTS.md`・`locales/CONTENTS.md`、`tests/unit/physicsTossController.test.js`、`tests/integration/Home.test.jsx`、`tests/e2e/portfolio.spec.js`、関連する`tests/**/CONTENTS.md`、必要なら`CLAUDE.md`（新しい操作規約）。 |
 | テストケース | **単体**: 正常系—キー入力で掴む・移動・離すと状態が変わり、リリース後に重力で落ちて床で止まる。動きを減らす設定では投げた後の慣性・連続自動更新を停止する。異常系—無効キー、フォーカス外、解除後の入力は状態を壊さない。**結合**: Space／矢印操作、reduced-motion時の直接移動、ARIA状態、resize・言語変更後の物理body再flowとReset基準が同期し、リンク・ナビのキーボード操作を妨げない。**E2E**: PCとタッチ対応390px Chromiumでキー操作、実タッチの横ドラッグと縦スクロール、リリース後の重力、衝突、境界、Reset、移動後の通常リンクを確認する。`prefers-reduced-motion: reduce`では慣性が止まり、直接操作とResetは可能。通常オフでは常時アニメーションがない。 |
-| 完了条件 | PC・モバイルで操作でき、動きを減らす設定に対応し、E2E・単体／結合テスト・build・CONTENTS検査が成功してcommitする。**最終結果**: Vitest 36件（統合テスト9件を含む）、Playwright production Chromium 15件、Next.js build、CONTENTS検査（17 directories / 0 findings）、`npm audit`／`npm audit --omit=dev`（各0 vulnerabilities）が成功。 |
+| 完了条件 | PC・モバイルで操作でき、動きを減らす設定に対応し、E2E・単体／結合テスト・build・CONTENTS検査が成功してcommitする。Phase 3 commit時の検証結果は当時の記録として保持し、Phase Nの再検証結果は後述の最新記録に記載する。 |
 
 ## Phase N — 最終検証・分野別レビュー
 
@@ -70,7 +70,7 @@
 
 ## Issue運用
 
-Phase Nのレビュー結果、承認された修正計画、修正結果、再レビュー結果は後続Issueコメントとして時系列に記録する。Phase Nはユーザーの最終了承後に完了とする。
+Issueの計画コメントには本計画書の全文を掲載する。ローカル計画を更新するたびに、同じコメント本文も計画書全文で置き換えて同期する。レビュー結果、承認された修正計画、修正結果、再レビュー結果は別の後続Issueコメントとして時系列に記録する。Phase Nはユーザーの最終了承後に完了とする。
 
 ## Phase N 初回レビュー結果と承認済み修正
 
@@ -103,5 +103,14 @@ Markdownレビューではローカル計画とIssue全文コメント、CONTENT
 - 結果: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6233412762)。比較対象は`origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`..`5860c5e85af6cbdac7f26646ba1e1b1a287f8ec0`。
 - 利用者はフォーカス枠の修正を承諾。Physics Toss有効時に物理section/objectへamberの2px `:focus-visible`枠を追加し、`Tab`でobject、`Shift+Tab`でsectionに移動して両方の枠を確認する本番E2Eを追加した。修正commit `c32d268`（`fix: show focus indicators for physics targets`）、section分岐のE2E追加commit `016cf8a`（`test: cover section focus outline`）。`tests/e2e/CONTENTS.md`も更新。
 - 検証結果: Vitest 37件、production Chromium E2E 16件、Next.js build成功、CONTENTS検査17ディレクトリ・指摘0件、`npm audit`／`npm audit --omit=dev`は各0 vulnerabilities。
-- 修正後レビュー: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6233579721)。比較対象は`origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`..`016cf8a`。Backendで1件—Physics Toss有効時にボタン上のSpaceをcontrollerが捕捉し、モード切替／Resetボタンの標準操作を妨げる。規約違反で1件—`CLAUDE.md`の明示波括弧ルールに対して`physicsTossController.js`のifガードが波括弧を省略。Frontend、テストケース、セキュリティには指摘なし。MD／Docsの更新指摘は本追記で反映する。
-- 上記2件のコード修正は利用者承諾待ち。Phase Nは承認済み修正・再レビューと利用者の最終了承後に完了とする。
+- 当時の修正後レビュー: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6233579721)。比較対象は`origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`..`016cf8a`。Backendで1件—Physics Toss有効時にボタン上のSpaceをcontrollerが捕捉し、モード切替／Resetボタンの標準操作を妨げる。規約違反で1件—`CLAUDE.md`の明示波括弧ルールに対して`physicsTossController.js`のifガードが波括弧を省略。Frontend、テストケース、セキュリティには指摘なし。これらは次の承認済み修正ラウンドで対応した。
+- 利用者は修正前一覧の内容を承諾済み。修正commit `94293eb`（nested buttonでSpaceの標準操作を維持、controllerの波括弧）、`cb51c7f`（nested linkでSpaceの標準操作を維持）、`7b440bd`（繰り返しSpace入力によるページスクロールを防止）、`78b07bf`（Home.jsxとE2Eの残る明示波括弧）を反映した。
+
+## Phase N 最新再レビュー・検証結果
+
+- 比較対象: `origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`..`78b07bf3e4fce247e6e77f9be2b5085666fb4b4c`。
+- 7分野レビュー: frontend 0件、backend 1件、テストケース1件（追加推奨。上端境界は任意の追加余地）、md記入漏れ1件、docs記入漏れ2件、規約違反0件、セキュリティ0件。レビューは個別のサブエージェントが実施した。
+- 指摘: backendはPhysics Toss有効中のページスクロール後、sticky sidebarの物理body位置が表示位置とずれ、画面上の対象位置で衝突しない可能性（`components/physicsTossController.js`）。テストケースはrepeat Spaceによる実ページスクロール抑止と、nested link上のSpaceのブラウザー標準操作をproduction Chromium E2Eで直接検証していない。上端境界の単体テストも追加候補。md記入漏れは計画書全文をIssueコメントへ同期する手順の明記不足で、本版で追記した。docs記入漏れは古い修正承諾状態とテスト件数の記録で、本版で現況と最新実測値へ更新した。
+- 次の修正候補（コード変更前に利用者の承諾が必要）: `components/physicsTossController.js`でスクロール時にsticky sidebarを含む物理body位置を再計測し、`tests/unit/physicsTossController.test.js`と`tests/e2e/portfolio.spec.js`でスクロール後のsidebar衝突を検証する。加えてproduction Chromium E2Eでrepeat Space時にページがスクロールしないこと、nested link上のSpaceがブラウザー標準動作を保つことを検証する。画面上端の境界も単体テストに追加する。これらのコード・テスト変更は承諾を得るまで未着手とする。Phase Nは未完了。
+- 最新検証: `npm run test:unit` 40件成功、production Chromium E2E 17件成功、`npm run build`成功、`npm audit`と`npm audit --omit=dev`は各0 vulnerabilities、CONTENTS検査17ディレクトリ・指摘0件、`git diff --check`成功。
+- 7分野の再レビュー記録: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6234539412)。Issueの計画コメントには本計画書全文を同期する。Phase Nは7分野レビュー記録と利用者の最終了承後に完了とする。ブランチは未push。
