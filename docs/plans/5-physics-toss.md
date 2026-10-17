@@ -95,4 +95,12 @@ Markdownレビューではローカル計画とIssue全文コメント、CONTENT
 - 初回修正結果: [Issueコメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6232978108)、commit `dd97991`（`fix: address physics toss review findings`）。
 - 修正後レビュー: 比較対象は`origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`..`dd979916fe9629aa1f73aa1fc451fb679a04716d`。BackendでReset後の子要素再操作時の位置ずれ、MarkdownでPhase commit SHAとレビュー履歴リンク・対象HEAD・修正commit SHAの記録漏れが見つかった。Frontend、テスト、Docs、規約、セキュリティには追加指摘なし。
 - 利用者がこの追加修正を承諾。子要素のReset時に位置・速度・角度・描画基準を初期化し、Reset後の再ドラッグを検証する単体テストを追加。修正はcommit `76bccd1`（`fix: reset physics object render origins`）。
-- この修正後の検証: Vitest 37件、production Chromium E2E 15件、Next.js build、CONTENTS検査（17 directories / 0 findings）、`npm audit`と`npm audit --omit=dev`（各0 vulnerabilities）が成功。修正後の7分野レビューとその結果コメントは、完了後にこの記録とIssue後続コメントへ追記する。
+- 修正後の検証: Vitest 37件、production Chromium E2E 15件、Next.js build、CONTENTS検査（17 directories / 0 findings）、`npm audit`と`npm audit --omit=dev`（各0 vulnerabilities）が成功。
+- 追加テスト: 要素を動かした後にレイアウトをreflowし、Resetして同じ要素を再ドラッグするケースを追加。期待移動量どおりのtranslateになることを確認し、commit `5860c5e`（`test: cover reset after physics reflow`）。
+
+## Phase N 最終再レビュー結果
+
+- 結果: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6233412762)。比較対象は`origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`..`5860c5e85af6cbdac7f26646ba1e1b1a287f8ec0`。
+- Backend、テストケース、規約、セキュリティに追加指摘なし。Frontendに1件あり: Physics Toss中、Tabでフォーカスした物理対象の`:focus-visible`輪郭がなく、Spaceで掴む対象を視認できない。修正は利用者承諾待ち。
+- MDの最新review結果・コメント参照と、Docsの`5860c5e`追加テスト記録漏れは本追記で対応済み。ローカル計画書全文はIssueの計画コメントにも同期する。
+- Phase NはFrontend指摘の承認済み修正・再レビューと、利用者の最終了承後に完了とする。
