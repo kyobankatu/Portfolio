@@ -488,9 +488,10 @@ describe('Physics Toss controller', () => {
         controller.destroy()
     })
 
-    it('keeps a reset child aligned when it is dragged again', () => {
+    it('keeps a reflowed child aligned when it is reset and dragged again', () => {
         const section = createTarget({ x: 0, y: 0, width: 600, height: 500 })
-        const object = createPhysicsObject({ x: 100, y: 100, width: 80, height: 50 })
+        const rect = { x: 100, y: 100, width: 80, height: 50 }
+        const object = createPhysicsObject(rect)
         section.append(object)
         const controller = createPhysicsTossController({
             targets: [section],
@@ -503,11 +504,14 @@ describe('Physics Toss controller', () => {
         window.dispatchEvent(new MouseEvent('pointerup', { clientX: 190, clientY: 165 }))
         expect(object.style.translate).not.toBe('')
 
+        rect.x = 120
+        rect.y = 120
+        controller.refreshLayout()
         controller.reset()
         expect(object.style.translate).toBe('')
 
-        object.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, cancelable: true, button: 0, clientX: 140, clientY: 125 }))
-        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 150, clientY: 125 }))
+        object.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, cancelable: true, button: 0, clientX: 160, clientY: 145 }))
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: 170, clientY: 145 }))
 
         expect(object.style.translate).toBe('10px 0px')
         controller.destroy()
