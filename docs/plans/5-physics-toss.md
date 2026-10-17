@@ -120,5 +120,6 @@ Markdownレビューではローカル計画とIssue全文コメント、CONTENT
 - 利用者はsticky sidebarのスクロール再計測、スクロール後の回帰検査、repeat Space／nested link Spaceのproduction E2E、上端境界の単体テストをすべて承諾した。
 - `components/physicsTossController.js`でscrollイベント後の物理body再計測をrequestAnimationFrameで集約し、停止時は保留中の計測をcancelする。`tests/unit/physicsTossController.test.js`ではscroll後の対象位置と上端制約を、`tests/e2e/portfolio.spec.js`ではscroll後にsticky sidebar内の対象を掴めること、repeat Spaceのスクロール抑止、nested link上のSpaceの標準既定動作を本番Chromiumで確認する。関連する`tests/unit/CONTENTS.md`と`tests/e2e/CONTENTS.md`を更新した。
 - 修正commit: `8f7b529`（`fix: resync physics bodies after scrolling`）。
+- テスト精度の追加commit: `77c507b`（`test: assert physics scroll interaction outcomes`）でsticky対象の実移動量・表示領域内、nested link上Spaceの実スクロールを確認し、`a76ba96`（`test: assert exact physics top boundary`）で上端の期待translateを`-100px`に厳密化した。
 - 再検証: Vitest 42件、production Chromium E2E 20件、Next.js build成功、`npm audit`／`npm audit --omit=dev`は各0 vulnerabilities、CONTENTS検査17ディレクトリ・指摘0件、`git diff --check`成功。
 - 最新HEADを対象に7分野レビューを再実施する。Phase Nはレビュー結果の記録とユーザー最終了承まで未完了。ブランチは未push。
