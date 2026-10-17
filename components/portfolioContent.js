@@ -52,6 +52,15 @@ export const projectDefinitions = [
     },
 ]
 
+export const navigationSections = [
+    { id: 'profile', number: '01' },
+    { id: 'research', number: '02' },
+    { id: 'missions', number: '03' },
+    { id: 'equipment', number: '04' },
+    { id: 'interests', number: '05' },
+    { id: 'contact', number: '06' },
+]
+
 export const skillGroups = [
     { category: 'Languages', skills: ['Java', 'Python', 'C', 'JavaScript', 'TypeScript'] },
     { category: 'Frontend', skills: ['Next.js', 'React', 'Vue.js', 'HTML', 'CSS'] },
@@ -59,18 +68,16 @@ export const skillGroups = [
     { category: 'Tools & Cloud', skills: ['Git', 'Docker', 'Kubernetes', 'Google Cloud'] },
 ]
 
-export const sectionIds = ['profile', 'research', 'missions', 'equipment', 'interests', 'contact']
-
 export function resolveActiveSection(sectionId, currentSection) {
     if (sectionId === 'overview') {
         return 'profile'
     }
 
-    if (sectionIds.includes(sectionId)) {
+    if (navigationSections.some((section) => section.id === sectionId)) {
         return sectionId
     }
 
-    return sectionIds.includes(currentSection) ? currentSection : 'profile'
+    return navigationSections.some((section) => section.id === currentSection) ? currentSection : 'profile'
 }
 
 export function getProjectCards(locale) {

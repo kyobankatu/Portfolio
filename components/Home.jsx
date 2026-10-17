@@ -3,18 +3,9 @@
 import { useEffect, useState } from 'react'
 import { FaEnvelope, FaGithub, FaLinkedin } from 'react-icons/fa'
 import styles from './Home.module.css'
-import { getProjectCards, resolveActiveSection, skillGroups } from './portfolioContent.js'
+import { getProjectCards, navigationSections, resolveActiveSection, skillGroups } from './portfolioContent.js'
 import en from '../locales/en.json'
 import ja from '../locales/ja.json'
-
-const navigation = [
-    { id: 'profile', number: '01' },
-    { id: 'research', number: '02' },
-    { id: 'missions', number: '03' },
-    { id: 'equipment', number: '04' },
-    { id: 'interests', number: '05' },
-    { id: 'contact', number: '06' },
-]
 
 export default function Home({ translations = { ja, en } }) {
     const [lang, setLang] = useState('ja')
@@ -63,7 +54,7 @@ export default function Home({ translations = { ja, en } }) {
                 </div>
 
                 <nav className={styles.navigation} aria-label={t.navigationLabel}>
-                    {navigation.map((item) => (
+                    {navigationSections.map((item) => (
                         <a
                             key={item.id}
                             href={`#${item.id}`}
@@ -92,7 +83,7 @@ export default function Home({ translations = { ja, en } }) {
                             type="button"
                             className={styles.langToggle}
                             onClick={() => setLang(lang === 'ja' ? 'en' : 'ja')}
-                            aria-label={lang === 'ja' ? 'Switch language to English' : '日本語に切り替え'}
+                            aria-label={lang === 'ja' ? 'Switch language to English' : 'Switch language to Japanese'}
                         >
                             {lang === 'ja' ? 'EN' : 'JA'}
                         </button>

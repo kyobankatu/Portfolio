@@ -22,7 +22,12 @@ describe('portfolio screen', () => {
         expect(screen.queryByText(ja.research.eventCamera)).not.toBeInTheDocument()
         expect(screen.queryByText(ja.projects.DPSCalculator)).not.toBeInTheDocument()
         expect(screen.getByRole('link', { name: /Swallow LLM/ }).getAttribute('href')).toContain('index.en.html')
+        expect(screen.getByRole('button', { name: 'Switch language to Japanese' })).toBeInTheDocument()
         expect(screen.queryByText('undefined')).not.toBeInTheDocument()
+
+        fireEvent.click(screen.getByRole('button', { name: 'Switch language to Japanese' }))
+
+        expect(screen.getByRole('button', { name: 'Switch language to English' })).toBeInTheDocument()
     })
 
     it('keeps the screen usable when loaded with an unknown hash', () => {

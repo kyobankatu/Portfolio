@@ -51,6 +51,7 @@
 | 最終再レビュー | 9d3a43fを7分野で確認し、追加指摘なし。その後、ユーザー最終了承済み。Phase N完了。 | [最終レビュー](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6217571535) | 0652aa7 |
 | Copilot指摘修正・再レビュー | 文書lang同期、計画状態の整合、Issue計画の改行復元を完了。7分野再レビュー済み。追加P3提案2件は承認済みR3修正ラウンドへ引き継ぎ。 | [修正計画](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6218203427)、[修正結果・再レビュー](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6218302247) | 22cd330 |
 | 承認済みP3提案の修正ラウンド | モバイルE2E強化・見出し日本語化を実装。7分野再レビュー完了・追加指摘なし。ユーザー最終了承待ち。 | [修正計画](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6227690604)、[Phase N状態](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6227755695)、[実行記録の区別](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6227778354)、[修正結果・最終レビュー](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6227802148) | d6fe078、b881f81、72c84b6 |
+| R4修正ラウンド（実施中） | code-reviewで承認された言語切替ラベル、連絡先・作品一覧の回帰テスト、セクション定義の一元化を対応する。 | [修正計画](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6228283992) | — |
 
 **Issue運用**：Phase Nのレビュー結果、承認された修正計画、修正結果、再レビュー結果は、それぞれ新しいIssueコメントとして時系列に記録する。初期計画にはこの一覧とコメントへのリンクだけを残す。Phase Nはユーザーの最終了承後に完了とする。
 
@@ -59,7 +60,7 @@
 - [x] Phase 0：調査・計画をローカルとIssueコメントに記録し、commitする。
 - [x] Phase 1：HUD画面・掲載情報を実装し、単体／結合／E2E、ビルドとCONTENTS検査を通してcommitする。
 - [x] Phase 2：キャラクター演出・動きの軽減対応を実装し、単体／結合／E2E、ビルドとCONTENTS検査を通してcommitする。
-- [ ] Phase N：R3修正後の全体検証・7分野レビュー・ユーザー最終了承を完了する。
+- [ ] Phase N：R4修正後の全体検証・7分野レビュー・ユーザー最終了承を完了する。
 
 ## 実行記録
 
@@ -70,3 +71,4 @@
 | 2 | 完了。単体／結合テスト10件、Chromium E2E 4件、本番ビルド、CONTENTS検査が成功 | ee9c092 | 済 |
 | N（初回） | 完了。初回の7分野最終レビューで指摘なし。全検証成功、ユーザー最終了承済み | 0652aa7、0b11038 | 済 |
 | R3（最終了承待ち） | モバイル表示E2E追加、計画書の日本語見出し化、Phase N再開状態を反映。7分野再レビュー完了・追加指摘なし。 | d6fe078、b881f81、72c84b6 | [R3計画](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6227690604)、[Phase N状態](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6227755695)、[実行記録の区別](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6227778354)、[修正結果・最終レビュー](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6227802148) |
+| R4（実施中） | 英語操作ラベル、連絡先と全作品一覧の回帰テスト、共有セクション定義を追加。全体検証後に7分野再レビューする。 | — | [修正計画](https://github.com/kyobankatu/Portfolio/issues/3#issuecomment-6228283992) |

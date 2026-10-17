@@ -15,6 +15,22 @@ describe('getProjectCards', () => {
         expect(getProjectCards(en).find((project) => project.key === 'DPSCalculator').description).not.toBe(calculator.description)
     })
 
+    it('preserves the complete project list in both locales with PainRecorder replaced by DPSCalculator', () => {
+        const expectedProjectKeys = [
+            'ArtifactSimulator',
+            'DPSCalculator',
+            'ClipboardSync',
+            'Portfolio',
+            'ArtifactSimulator-Backend',
+            'ZZZ-SearchApi',
+            'ZZZ-SearchOverlay',
+            'NeuralNetwork',
+        ]
+
+        expect(getProjectCards(ja).map((project) => project.key)).toEqual(expectedProjectKeys)
+        expect(getProjectCards(en).map((project) => project.key)).toEqual(expectedProjectKeys)
+    })
+
     it.each([undefined, '', '   '])('rejects a missing or empty project description (%s)', (description) => {
         const invalidLocale = { ...ja, projects: { ...ja.projects, ArtifactSimulator: description } }
 

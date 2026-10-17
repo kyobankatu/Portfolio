@@ -24,6 +24,13 @@ test('production home shows the portfolio content and requested links', async ({
     await expect(dpsCard.getByRole('link', { name: /公開ページ/ })).toHaveAttribute('href', /simulation_report\.html/)
     await expect(page.getByRole('link', { name: /Swallow LLM/ })).toHaveAttribute('href', 'https://swallow-llm.github.io/index.ja.html')
     await expect(page.getByRole('link', { name: /ota\.k\.5051/ })).toHaveCount(0)
+
+    const contactSection = page.getByRole('region', { name: 'Contact' })
+    const contacts = contactSection.getByRole('link')
+    await expect(contacts).toHaveCount(3)
+    await expect(contactSection.getByRole('link', { name: /Email/ })).toHaveAttribute('href', 'mailto:kento.ota@rio.scrc.iir.isct.ac.jp')
+    await expect(contactSection.getByRole('link', { name: /LinkedIn/ })).toHaveAttribute('href', 'https://www.linkedin.com/in/kento-ota-84bb6a382')
+    await expect(contactSection.getByRole('link', { name: /GitHub/ })).toHaveAttribute('href', 'https://github.com/kyobankatu')
 })
 
 test('language toggle and keyboard navigation work at desktop and mobile widths', async ({ page }) => {
@@ -39,8 +46,9 @@ test('language toggle and keyboard navigation work at desktop and mobile widths'
     await expect(page.getByRole('heading', { level: 1, name: 'Katumon.' })).toBeVisible()
     await expect(page.getByText('Computer vision with event cameras', { exact: true })).toBeVisible()
     await expect(page.getByText('A Genshin Impact combat simulator for modeling damage and calculating DPS.', { exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Switch language to Japanese' })).toBeVisible()
     await expect(page.getByRole('link', { name: /Swallow LLM/ })).toHaveAttribute('href', 'https://swallow-llm.github.io/index.en.html')
-    await page.getByRole('button', { name: '日本語に切り替え' }).click()
+    await page.getByRole('button', { name: 'Switch language to Japanese' }).click()
     await expect(page.locator('html')).toHaveAttribute('lang', 'ja')
     await expect(page.getByRole('heading', { level: 1, name: 'かつもん.' })).toBeVisible()
 
