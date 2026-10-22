@@ -66,7 +66,7 @@
 - [x] Phase 1：Physics Tossの起動・停止・セクション物理を実装し、単体／結合／E2E、build、CONTENTS検査を通してcommitする（`8f45662`）。
 - [x] Phase 2：文章ブロック・サイドバーの物理と衝突を実装し、テスト・build・CONTENTS検査を通してcommitする（`11f043d`）。
 - [x] Phase 3：キーボード・reduced-motion・モバイル対応を実装し、テスト・build・CONTENTS検査を通してcommitする（`c013430`）。
-- [ ] Phase N：最終検証・7分野レビュー・ユーザー最終了承を完了する。
+- [x] Phase N：最終検証・7分野レビュー・ユーザー最終了承を完了する（2026-10-23に利用者が最終承認）。
 
 ## Issue運用
 
@@ -124,5 +124,6 @@ Markdownレビューではローカル計画とIssue全文コメント、CONTENT
 - 再検証: Vitest 42件、production Chromium E2E 20件、Next.js build成功、`npm audit`／`npm audit --omit=dev`は各0 vulnerabilities、CONTENTS検査17ディレクトリ・指摘0件、`git diff --check`成功。
 - 最新7分野レビュー対象: `origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`..`edd3fe037d75d430d858d68a590fcd6e1445575f`。Frontend 0件、Backend 0件、テストケース0件、MD 0件、Docs/CONTENTS 0件、セキュリティ0件。
 - 規約レビュー指摘1件: `tests/unit/physicsTossController.test.js`の`for`ループに波括弧がなく、`CLAUDE.md`の明示ブレース規約に反する。他の規約指摘なし。利用者が修正を承諾し、明示波括弧を追加したcommitは`de9e431`（`style: add explicit braces to physics test loop`）。
-- 指摘修正後の検証: `npm run test:unit` 42件成功、`git diff --check`成功。`for`ループに波括弧があることを確認した。最新HEAD `44ed6e368fb84453e9b44df606028782ab78330a`の規約再レビューは0件で、対象差分の`if`／`for`／`while`／`else`／`catch`に明示ブレース漏れはない。Phase Nは利用者の最終了承まで未完了。
-- 規約修正の承認記録: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6343788758)。修正後のクリーンな規約レビュー結果: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6343798943)。[Issue計画コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6231979057)を本版全文へ同期する。ブランチは未push。
+- 指摘修正後の検証: `npm run test:unit` 42件成功、`git diff --check`成功。`for`ループに波括弧があることを確認した。最新HEAD `44ed6e368fb84453e9b44df606028782ab78330a`の規約再レビューは0件で、対象差分の`if`／`for`／`while`／`else`／`catch`に明示ブレース漏れはない。
+- 規約修正の承認記録: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6343788758)。修正後のクリーンな規約レビュー結果: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6343798943)。
+- Phase N完了: 利用者が2026-10-23に最終成果を承認した。最終レビュー・承認記録と公開手順は後続Issueコメントに記載する。Issue計画コメントには本計画書全文を同期する。
