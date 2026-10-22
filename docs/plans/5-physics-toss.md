@@ -124,5 +124,5 @@ Markdownレビューではローカル計画とIssue全文コメント、CONTENT
 - 再検証: Vitest 42件、production Chromium E2E 20件、Next.js build成功、`npm audit`／`npm audit --omit=dev`は各0 vulnerabilities、CONTENTS検査17ディレクトリ・指摘0件、`git diff --check`成功。
 - 最新7分野レビュー対象: `origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`..`edd3fe037d75d430d858d68a590fcd6e1445575f`。Frontend 0件、Backend 0件、テストケース0件、MD 0件、Docs/CONTENTS 0件、セキュリティ0件。
 - 規約レビュー指摘1件: `tests/unit/physicsTossController.test.js`の`for`ループに波括弧がなく、`CLAUDE.md`の明示ブレース規約に反する。他の規約指摘なし。利用者が修正を承諾し、明示波括弧を追加したcommitは`de9e431`（`style: add explicit braces to physics test loop`）。
-- 指摘修正後の検証: `npm run test:unit` 42件成功、`git diff --check`成功。`for`ループに波括弧があることを確認した。Phase Nは最終確認と利用者の最終了承まで未完了。
-- 最新の再検証記録と7分野レビュー結果: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6237413015)。[Issue計画コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6231979057)を本版全文へ同期する。ブランチは未push。
+- 指摘修正後の検証: `npm run test:unit` 42件成功、`git diff --check`成功。`for`ループに波括弧があることを確認した。最新HEAD `44ed6e368fb84453e9b44df606028782ab78330a`の規約再レビューは0件で、対象差分の`if`／`for`／`while`／`else`／`catch`に明示ブレース漏れはない。Phase Nは利用者の最終了承まで未完了。
+- 規約修正と再レビュー結果: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6343788758)。[Issue計画コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6231979057)を本版全文へ同期する。ブランチは未push。
