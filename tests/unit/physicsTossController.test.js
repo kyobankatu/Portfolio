@@ -239,7 +239,9 @@ describe('Physics Toss controller', () => {
         window.dispatchEvent(new MouseEvent('pointermove', { clientX: 168, clientY: 520 }))
         window.dispatchEvent(new MouseEvent('pointermove', { clientX: 168, clientY: 520 }))
         window.dispatchEvent(new MouseEvent('pointerup', { clientX: 168, clientY: 520 }))
-        for (let frame = 1; frame <= 600; frame += 1) scheduler.advance(frame * 16)
+        for (let frame = 1; frame <= 600; frame += 1) {
+            scheduler.advance(frame * 16)
+        }
 
         const verticalOffset = Number.parseFloat(target.style.translate.split(' ')[1])
         expect(verticalOffset).toBeGreaterThan(0)
