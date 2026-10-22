@@ -1,0 +1,131 @@
+# Issue #5: ポートフォリオにPhysics Toss演出を追加
+
+## 合意した操作仕様
+
+- 通常表示ではPhysics Tossを無効にし、ボタンを押した場合だけ有効にする。
+- セクションの余白を掴むとセクション全体、見出し・段落・カードを掴むと個別の文章ブロックを動かす。文字は一字ずつ分割しない。
+- 物理領域は画面全体とし、サイドバーを含めて対象同士に当たり判定を設ける。重力、投げる速度、画面端と床の衝突を扱う。
+- モード解除時は物理演算を止めて元の配置へ戻す。専用リセットボタンも設ける。
+- Spaceで掴む／離す、矢印キーで移動する。`prefers-reduced-motion`では慣性を止めるが、直接操作は残す。
+- 既存リンクとナビゲーションを維持する。本番ChromiumでPCとモバイルの表示・操作を確認する。
+
+## Phase 0 — 調査・計画
+
+| 項目 | 記入内容 |
+| --- | --- |
+| 目的・意図 | 既存のHUDページ構造と一時試作を調査し、通常閲覧を保ったままPhysics Tossを段階導入できるよう、物理モード、対象選択、アクセシビリティを別phaseに分ける。 |
+| 必要リソース・未確認事項 | Next.js 15 / React 19、CSS Modules、Vitest、Testing Library、production Chromium E2Eを確認済み。既存の本番依存に物理エンジンはない。`tmp/content-effects-runtime.js`の試作は作品カードだけを個別に動かし、対象同士の衝突は扱わないため、要求を満たすには衝突計算を追加する必要がある。[Matter.js公式API資料](https://brm.io/matter-js/docs/index.html)は2D剛体・衝突・Runnerを提供しているため候補とし、実装phaseでバンドル影響、クライアント限定ロード、ライセンス、脆弱性を確認する。全画面の多数DOM対象を同期する際の負荷とスクロール・リサイズ時の境界再計算をPhase 1〜3で計測・検証する。 |
+| 作業情報 | Issue: https://github.com/kyobankatu/Portfolio/issues/5 ／ 作業方式: 現チェックアウトから新ブランチ ／ Branch: `5-physics-toss` ／ PR base: `master` ／ 比較基点: `origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a` ／ 作業開始HEAD: `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`。`.gitignore`の既存ローカル変更はこの作業に含めない。 |
+| テスト境界 | 合意済み。本番ビルドをChromiumで開き、通常時の無効状態、トグル、セクション／文章ブロックのドラッグ、重力・対象同士の衝突・画面端／床、リセット、リンク維持、Space／矢印キー、`prefers-reduced-motion`、PC／モバイルを確認する。単体テストでは物理状態遷移・境界・リセット・不正入力、結合テストではDOM対象選択・イベントとリンクの共存を補う。 |
+| CONTENTS検査 | 各phaseで`contents` skillの手順に従い、変更した階層の`CONTENTS.md`を更新してから次の検査を実行する: `python C:\develop\shared\skills\contents\scripts\check_contents.py C:\develop\WebApp\Portfolio --exclude .claude --exclude test-results --exclude playwright-report --exclude tmp`。`.claude`、生成物、試作`tmp`はローカル専用として除外する。Phase 0整備後に実行し、結果を記録する。 |
+| 完了条件 | Issue本文・計画コメント・ローカル計画に合意した範囲と全phaseの目的・意図・編集ファイル・テストケース・完了条件が揃い、Phase 0をcommitする。 |
+
+## Phase 1 — Physics Tossの起動とセクション物理
+
+| 項目 | 記入内容 |
+| --- | --- |
+| 目的 | 初期オフのPhysics Tossボタンとリセットを追加し、オンにするとセクションを掴んで投げられる最小の物理動作を実装する。対象は掴むまで静止させ、操作した対象から物理演算を始める。 |
+| 意図 | まずモードの開始・停止・復元と物理エンジンのライフサイクルを固め、通常閲覧への影響を分離する。 |
+| 編集ファイル | `components/Home.jsx`（Physics Toss／Reset操作とモード状態）、`components/Home.module.css`（操作部と有効時の視覚状態）、`components/physicsTossController.js`（Matter.jsエンジン、DOM同期、境界・クリーンアップ）、`locales/ja.json`・`locales/en.json`（操作ラベル）、`package.json`・`package-lock.json`（物理依存）、`components/CONTENTS.md`・`tests/unit/CONTENTS.md`・`tests/integration/CONTENTS.md`・`tests/e2e/CONTENTS.md`（索引）、`tests/unit/physicsTossController.test.js`、`tests/integration/Home.test.jsx`、`tests/e2e/portfolio.spec.js`。 |
+| テストケース | **単体**: 正常系—対象は掴むまで静止し、投げると重力で移動し、床に留まり、リセットで初期位置へ復元する。異常系—無効な寸法や破棄済みcontrollerへの操作で例外・RAFリークを起こさず、対象内リンクからドラッグを開始しない。**結合**: 初期オフでは通常レイアウト、オンで操作可能、オフで停止・復元、Resetで個別に復元する。**E2E**: 本番画面で初期オフを確認し、PCでセクションをドラッグして投げて移動を確認する。リンク・ナビゲーションは通常どおり操作でき、Resetは有効化時の配置、解除は通常配置に戻す。床境界は単体で検証し、対象同士の衝突はPhase 2でE2Eを含めて検証する。 |
+| 完了条件 | Physics Tossの開始・停止・リセットが機能し、通常時にアニメーションや物理エンジンが走らない。単体／結合／E2E、build、CONTENTS検査が成功しcommitする。 |
+
+## Phase 2 — 文章ブロックとサイドバーの衝突
+
+| 項目 | 記入内容 |
+| --- | --- |
+| 目的 | 見出し・段落・カード・サイドバーの対象を個別の物理オブジェクトとして登録し、対象同士の当たり判定を実装する。セクション余白からはセクション全体を掴めるようにする。 |
+| 意図 | セクション単位から粒度を広げ、ユーザーが選んだヒット領域の優先順位を定義する。子要素を掴んだ時に親セクションを同時操作しないようにする。 |
+| 編集ファイル | `components/Home.jsx`（セクション・文章・カード・サイドバーの対象登録、入れ子のヒット判定）、`components/physicsTossController.js`（複数body登録、ドラッグ制約、衝突、DOM位置同期）、`components/Home.module.css`（hitbox・掴み状態）、`components/CONTENTS.md`、`tests/unit/physicsTossController.test.js`、`tests/integration/Home.test.jsx`、`tests/e2e/portfolio.spec.js`、関連する`tests/**/CONTENTS.md`。 |
+| テストケース | **単体**: 正常系—異なるサイズの対象が重力で落下し、対象同士・壁・床で衝突する。子要素からのhit testは子だけを選び、余白からは親sectionを選ぶ。異常系—pointercancel後に掴み状態を残さず次の操作を受け付け、リンク上のクリックをドラッグに変えない。**結合**: 見出し・段落・カード・sidebar項目の登録とモード操作を確認し、親sectionを同時に動かさない。**E2E**: PCでsection、見出し、project cardを動かし、サイドバーとの衝突、境界、Resetを確認する。カード内リンクとナビゲーションのクリックが動作する。 |
+| 完了条件 | 合意した対象と粒度で画面全体の物理挙動が動作し、ナビ・リンクが維持される。衝突・入れ子hit test・キャンセルの各検証、build、CONTENTS検査が成功しcommitする。 |
+
+## Phase 3 — キーボード・動きの軽減・モバイル対応
+
+| 項目 | 記入内容 |
+| --- | --- |
+| 目的 | Physics Tossをポインター以外からも操作できるようにし、動きを減らす設定と画面サイズ変化に対応する。 |
+| 意図 | 遊びの操作性を保ちながら、アクセシビリティと実画面での安定性を最終段階に仕上げる。 |
+| 編集ファイル | `components/Home.jsx`（Space／矢印キー、状態のARIA通知）、`components/Home.module.css`（focus、reduced-motion、touch affordance）、`components/physicsTossController.js`（キーボード移動、慣性停止、resize／scroll境界更新）、`locales/ja.json`・`locales/en.json`（操作説明と状態ラベル）、`components/CONTENTS.md`・`locales/CONTENTS.md`、`tests/unit/physicsTossController.test.js`、`tests/integration/Home.test.jsx`、`tests/e2e/portfolio.spec.js`、関連する`tests/**/CONTENTS.md`、必要なら`CLAUDE.md`（新しい操作規約）。 |
+| テストケース | **単体**: 正常系—キー入力で掴む・移動・離すと状態が変わり、リリース後に重力で落ちて床で止まる。動きを減らす設定では投げた後の慣性・連続自動更新を停止する。異常系—無効キー、フォーカス外、解除後の入力は状態を壊さない。**結合**: Space／矢印操作、reduced-motion時の直接移動、ARIA状態、resize・言語変更後の物理body再flowとReset基準が同期し、リンク・ナビのキーボード操作を妨げない。**E2E**: PCとタッチ対応390px Chromiumでキー操作、実タッチの横ドラッグと縦スクロール、リリース後の重力、衝突、境界、Reset、移動後の通常リンクを確認する。`prefers-reduced-motion: reduce`では慣性が止まり、直接操作とResetは可能。通常オフでは常時アニメーションがない。 |
+| 完了条件 | PC・モバイルで操作でき、動きを減らす設定に対応し、E2E・単体／結合テスト・build・CONTENTS検査が成功してcommitする。Phase 3 commit時の検証結果は当時の記録として保持し、Phase Nの再検証結果は後述の最新記録に記載する。 |
+
+## Phase N — 最終検証・分野別レビュー
+
+| 項目 | 記入内容 |
+| --- | --- |
+| 目的・意図 | 全画面物理演算、通常閲覧、アクセシビリティ、応答性、説明と実装の一致を比較基点からレビューする。 |
+| 編集ファイル | 最終レビューで修正が承認された場合に限り、該当する実装・テスト・ドキュメントと各階層の`CONTENTS.md`を編集する。計画・レビュー結果は本ファイルとIssue後続コメントに記録する。 |
+| テストケース | `npm run test:unit`、production build、`npm run test:e2e`、`npm audit`、`npm audit --omit=dev`、CONTENTS skillのchecker。E2Eで通常／Physics Toss、section／block／sidebar、衝突、床、Reset、キーボード、リンク、reduced-motion、PC／モバイルを再確認する。未実施項目は理由・代替・未検証範囲を記録する。 |
+| レビュー分野 | frontend／backend／テストケース／md記入漏れ／docs記入漏れ／規約違反／セキュリティを別々のサブエージェントが読み取り専用でレビューする。 |
+| 完了条件 | 全検証と7分野レビュー、必要な承認済み修正ラウンドが完了し、ユーザーが最終成果を了承する。修正が必要な場合は、コード変更前に指摘・修正対象・意図を一覧表でユーザーへ示し、明示承諾を得る。詳細はIssue後続コメントで記録する。 |
+
+## Phaseチェックリスト
+
+- [x] Phase 0：調査・計画をIssueとローカルに記録し、CONTENTS検査を通してcommitする（`fcc3adb`）。
+- [x] Phase 1：Physics Tossの起動・停止・セクション物理を実装し、単体／結合／E2E、build、CONTENTS検査を通してcommitする（`8f45662`）。
+- [x] Phase 2：文章ブロック・サイドバーの物理と衝突を実装し、テスト・build・CONTENTS検査を通してcommitする（`11f043d`）。
+- [x] Phase 3：キーボード・reduced-motion・モバイル対応を実装し、テスト・build・CONTENTS検査を通してcommitする（`c013430`）。
+- [x] Phase N：最終検証・7分野レビュー・ユーザー最終了承を完了する（2026-10-23に利用者が最終承認）。
+
+## Issue運用
+
+Issueの計画コメントには本計画書の全文を掲載する。ローカル計画を更新するたびに、同じコメント本文も計画書全文で置き換えて同期する。レビュー結果、承認された修正計画、修正結果、再レビュー結果は別の後続Issueコメントとして時系列に記録する。Phase Nはユーザーの最終了承後に完了とする。
+
+## Phase N 初回レビュー結果と承認済み修正
+
+7分野の読み取り専用レビューを実施した。セキュリティと規約違反には指摘なし。利用者は次の修正をすべて承諾し、対応を完了した。修正後の7分野再レビューは後続コメントに記録する。
+
+| 分野 | 指摘 | 修正候補 |
+| --- | --- | --- |
+| Backend | section/objectモード切替で移動済み要素の表示位置が戻る可能性がある（`components/physicsTossController.js`）。 | 表示オフセットを保つ再同期を実装し、section→object／object→objectの単体テストを追加。 |
+| Backend | 画面サイズや言語変更で要素の寸法・位置が再flowしても物理bodyとReset基準が初期値のままになる。 | resize／言語変更後にbody形状・位置・Reset基準を再計測。単体テストと本番E2Eで検証。 |
+| Frontend | Physics Toss中に全対象へ`touch-action: none`を設定し、モバイルで縦スクロールしづらくなる。 | `touch-action: pan-y`と方向判定で縦スワイプをスクロールに、横ドラッグを移動に割り当て、本番タッチE2Eで検証。 |
+| Tests | 重力テストがドラッグ移動のみを確認し、リリース後の重力・床停止を証明していない。 | ゼロ速度で離した後の落下と床停止を単体で、通常設定での落下を本番E2Eで検証。 |
+| Tests | モバイルE2Eは390px幅で合成PointerEventを送るだけで、タッチ入力経路を通らない。 | `isMobile`／`hasTouch` Chromium contextとCDP touch inputで縦スクロール・横ドラッグを検証。 |
+| Tests | カードを移動した後にResetしてからリンクを開いている。 | 移動状態でドラッグ由来のクリックを抑止し、次の通常クリックでリンクが開くことをE2Eで検証。 |
+| Docs | `CLAUDE.md`の構成説明に遅延ロードされるphysics controller／Matter.jsが記載されていない。 | クライアント側でオプトイン時だけ初期化する構成を追記。 |
+| Docs | 操作説明は視覚的に隠されていて、画面上のボタンだけでは操作方法が分からない。 | 有効化時にタッチ・マウス・Space／矢印の可視操作ヒントを日英で表示し、統合テストを追加。 |
+
+Markdownレビューではローカル計画とIssue全文コメント、CONTENTS記載の整合を確認し、コード変更前の承諾ゲートを追記した。初回レビュー結果と修正内容はIssue後続コメントに記録し、修正後の7分野レビュー結果を追加する。
+
+## Phase N 初回レビュー修正記録
+
+- 初回レビュー: [Issueコメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6232882657)。比較対象は`origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`..`c0134309af3378fc046e48c7fb07f6df8738cd62`。利用者が修正候補を承諾し、対応済み。
+- 初回修正結果: [Issueコメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6232978108)、commit `dd97991`（`fix: address physics toss review findings`）。
+- 修正後レビュー: 比較対象は`origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`..`dd979916fe9629aa1f73aa1fc451fb679a04716d`。BackendでReset後の子要素再操作時の位置ずれ、MarkdownでPhase commit SHAとレビュー履歴リンク・対象HEAD・修正commit SHAの記録漏れが見つかった。Frontend、テスト、Docs、規約、セキュリティには追加指摘なし。
+- 利用者がこの追加修正を承諾。子要素のReset時に位置・速度・角度・描画基準を初期化し、Reset後の再ドラッグを検証する単体テストを追加。修正はcommit `76bccd1`（`fix: reset physics object render origins`）。
+- 修正後の検証: Vitest 37件、production Chromium E2E 15件、Next.js build、CONTENTS検査（17 directories / 0 findings）、`npm audit`と`npm audit --omit=dev`（各0 vulnerabilities）が成功。
+- 追加テスト: 要素を動かした後にレイアウトをreflowし、Resetして同じ要素を再ドラッグするケースを追加。期待移動量どおりのtranslateになることを確認し、commit `5860c5e`（`test: cover reset after physics reflow`）。
+
+## Phase N 最終再レビュー結果
+
+- 結果: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6233412762)。比較対象は`origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`..`5860c5e85af6cbdac7f26646ba1e1b1a287f8ec0`。
+- 利用者はフォーカス枠の修正を承諾。Physics Toss有効時に物理section/objectへamberの2px `:focus-visible`枠を追加し、`Tab`でobject、`Shift+Tab`でsectionに移動して両方の枠を確認する本番E2Eを追加した。修正commit `c32d268`（`fix: show focus indicators for physics targets`）、section分岐のE2E追加commit `016cf8a`（`test: cover section focus outline`）。`tests/e2e/CONTENTS.md`も更新。
+- 検証結果: Vitest 37件、production Chromium E2E 16件、Next.js build成功、CONTENTS検査17ディレクトリ・指摘0件、`npm audit`／`npm audit --omit=dev`は各0 vulnerabilities。
+- 当時の修正後レビュー: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6233579721)。比較対象は`origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`..`016cf8a`。Backendで1件—Physics Toss有効時にボタン上のSpaceをcontrollerが捕捉し、モード切替／Resetボタンの標準操作を妨げる。規約違反で1件—`CLAUDE.md`の明示波括弧ルールに対して`physicsTossController.js`のifガードが波括弧を省略。Frontend、テストケース、セキュリティには指摘なし。これらは次の承認済み修正ラウンドで対応した。
+- 利用者は修正前一覧の内容を承諾済み。修正commit `94293eb`（nested buttonでSpaceの標準操作を維持、controllerの波括弧）、`cb51c7f`（nested linkでSpaceの標準操作を維持）、`7b440bd`（繰り返しSpace入力によるページスクロールを防止）、`78b07bf`（Home.jsxとE2Eの残る明示波括弧）を反映した。
+
+## Phase N 追加指摘を受けた再レビュー結果（HEAD `78b07bf`）
+
+- 比較対象: `origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`..`78b07bf3e4fce247e6e77f9be2b5085666fb4b4c`。
+- 7分野レビュー: frontend 0件、backend 1件、テストケース1件（追加推奨。上端境界は任意の追加余地）、md記入漏れ1件、docs記入漏れ2件、規約違反0件、セキュリティ0件。レビューは個別のサブエージェントが実施した。
+- 指摘: backendはPhysics Toss有効中のページスクロール後、sticky sidebarの物理body位置が表示位置とずれ、画面上の対象位置で衝突しない可能性（`components/physicsTossController.js`）。テストケースはrepeat Spaceによる実ページスクロール抑止と、nested link上のSpaceのブラウザー標準操作をproduction Chromium E2Eで直接検証していない。上端境界の単体テストも追加候補。md記入漏れは計画書全文をIssueコメントへ同期する手順の明記不足で、本版で追記した。docs記入漏れは古い修正承諾状態とテスト件数の記録で、本版で現況と最新実測値へ更新した。
+- 利用者は修正前一覧をすべて承諾した。承認済み修正と再検証結果は後続節に記録する。Phase Nは未完了。
+- 最新検証: `npm run test:unit` 40件成功、production Chromium E2E 17件成功、`npm run build`成功、`npm audit`と`npm audit --omit=dev`は各0 vulnerabilities、CONTENTS検査17ディレクトリ・指摘0件、`git diff --check`成功。
+- 7分野の再レビュー記録: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6234539412)。[Issue計画コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6231979057)にはこの時点の本計画書全文を同期済み。Phase Nは7分野レビュー記録と利用者の最終了承後に完了とする。ブランチは未push。
+
+## Phase N 追加指摘の承認済み修正と再検証
+
+- 利用者はsticky sidebarのスクロール再計測、スクロール後の回帰検査、repeat Space／nested link Spaceのproduction E2E、上端境界の単体テストをすべて承諾した。
+- `components/physicsTossController.js`でscrollイベント後の物理body再計測をrequestAnimationFrameで集約し、停止時は保留中の計測をcancelする。`tests/unit/physicsTossController.test.js`ではscroll後の対象位置と上端制約を、`tests/e2e/portfolio.spec.js`ではscroll後にsticky sidebar内の対象を掴めること、repeat Spaceのスクロール抑止、nested link上のSpaceの標準既定動作を本番Chromiumで確認する。関連する`tests/unit/CONTENTS.md`と`tests/e2e/CONTENTS.md`を更新した。
+- 修正commit: `8f7b529`（`fix: resync physics bodies after scrolling`）。
+- テスト精度の追加commit: `77c507b`（`test: assert physics scroll interaction outcomes`）でsticky対象の実移動量・表示領域内、nested link上Spaceの実スクロールを確認し、`a76ba96`（`test: assert exact physics top boundary`）で上端の期待translateを`-100px`に厳密化した。
+- 再検証: Vitest 42件、production Chromium E2E 20件、Next.js build成功、`npm audit`／`npm audit --omit=dev`は各0 vulnerabilities、CONTENTS検査17ディレクトリ・指摘0件、`git diff --check`成功。
+- 最新7分野レビュー対象: `origin/master` `ba5bc7d765c4ed5ef4681c619de39ec83db6603a`..`edd3fe037d75d430d858d68a590fcd6e1445575f`。Frontend 0件、Backend 0件、テストケース0件、MD 0件、Docs/CONTENTS 0件、セキュリティ0件。
+- 規約レビュー指摘1件: `tests/unit/physicsTossController.test.js`の`for`ループに波括弧がなく、`CLAUDE.md`の明示ブレース規約に反する。他の規約指摘なし。利用者が修正を承諾し、明示波括弧を追加したcommitは`de9e431`（`style: add explicit braces to physics test loop`）。
+- 指摘修正後の検証: `npm run test:unit` 42件成功、`git diff --check`成功。`for`ループに波括弧があることを確認した。最新HEAD `44ed6e368fb84453e9b44df606028782ab78330a`の規約再レビューは0件で、対象差分の`if`／`for`／`while`／`else`／`catch`に明示ブレース漏れはない。
+- 規約修正の承認記録: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6343788758)。修正後のクリーンな規約レビュー結果: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6343798943)。
+- Phase N完了: 利用者が2026-10-23に最終成果を承認した。最終レビュー・承認記録と公開手順は後続Issueコメントに記載する。Issue計画コメントには本計画書全文を同期する。
+
+- Phase N final acceptance record: https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6344011136

@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 import Home from '../../components/Home.jsx'
 import ja from '../../locales/ja.json'
@@ -47,6 +47,83 @@ describe('portfolio screen', () => {
 
         expect(screen.getByRole('link', { name: /研究テーマ/ })).toHaveAttribute('aria-current', 'location')
         expect(screen.getByRole('status')).toHaveTextContent('イベントカメラとLLMを研究しています。')
+    })
+
+    it('keeps Physics Toss off until requested and restores sections when disabled', () => {
+        render(<Home />)
+        const profile = document.querySelector('#profile')
+        const enableButton = screen.getByRole('button', { name: 'Physics Tossを有効にする' })
+
+        expect(enableButton).toHaveAttribute('aria-pressed', 'false')
+        expect(profile.style.translate).toBe('')
+        expect(screen.queryByRole('button', { name: '配置をリセット' })).not.toBeInTheDocument()
+
+        fireEvent.click(enableButton)
+
+        expect(screen.getByRole('button', { name: 'Physics Tossを無効にする' })).toHaveAttribute('aria-pressed', 'true')
+        expect(screen.getByRole('button', { name: '配置をリセット' })).toBeInTheDocument()
+
+        fireEvent.click(screen.getByRole('button', { name: 'Physics Tossを無効にする' }))
+
+        expect(screen.getByRole('button', { name: 'Physics Tossを有効にする' })).toHaveAttribute('aria-pressed', 'false')
+        expect(profile.style.translate).toBe('')
+    })
+
+    it('registers nested heading, card, and sidebar targets while preserving mode controls', async () => {
+        render(<Home />)
+        const profile = document.querySelector('#profile')
+        const heading = screen.getByRole('heading', { name: 'Profile', exact: true })
+        const card = profile.querySelector('article')
+        const navigationItem = screen.getByRole('navigation').querySelector('a')
+        const enableButton = screen.getByRole('button', { name: 'Physics Tossを有効にする' })
+
+        expect(profile).toHaveAttribute('data-physics-section')
+        expect(heading).toHaveAttribute('data-physics-object')
+        expect(card).toHaveAttribute('data-physics-object')
+        expect(navigationItem).toHaveAttribute('data-physics-object')
+        fireEvent.click(enableButton)
+        const resetButton = screen.getByRole('button', { name: '配置をリセット' })
+        await waitFor(() => expect(resetButton).toBeEnabled())
+        expect(document.querySelector('[data-physics-enabled="true"]')).toBeInTheDocument()
+        fireEvent.click(resetButton)
+        fireEvent.click(screen.getByRole('button', { name: 'Physics Tossを無効にする' }))
+        expect(document.querySelector('[data-physics-enabled="false"]')).toBeInTheDocument()
+    })
+
+    it('connects localized instructions to keyboard targets only while Physics Toss is active', async () => {
+        render(<Home />)
+        const heading = screen.getByRole('heading', { name: 'Profile', exact: true })
+        const enableButton = screen.getByRole('button', { name: 'Physics Tossを有効にする' })
+
+        expect(heading).not.toHaveAttribute('tabindex')
+        fireEvent.click(enableButton)
+        await waitFor(() => expect(heading).toHaveAttribute('tabindex', '0'))
+        expect(heading).toHaveAttribute('aria-describedby', 'physics-instructions')
+        expect(document.getElementById('physics-instructions')).toHaveTextContent('Spaceで掴み')
+
+        fireEvent.keyDown(heading, { key: ' ', code: 'Space' })
+        fireEvent.keyDown(heading, { key: 'ArrowRight' })
+        expect(heading.style.translate).toContain('16px')
+        fireEvent.keyDown(heading, { key: ' ', code: 'Space' })
+        fireEvent.click(screen.getByRole('button', { name: 'Physics Tossを無効にする' }))
+
+        await waitFor(() => expect(heading).not.toHaveAttribute('tabindex'))
+        expect(heading).not.toHaveAttribute('aria-describedby')
+    })
+
+    it('shows localized interaction hints only while Physics Toss is enabled', async () => {
+        render(<Home />)
+        const instructions = screen.getByText(ja.physicsInstructions)
+        expect(instructions.className).toContain('visuallyHidden')
+
+        fireEvent.click(screen.getByRole('button', { name: ja.physicsEnable }))
+        expect(instructions.className).toContain('physicsHint')
+        expect(instructions).toHaveTextContent('縦スワイプ')
+
+        fireEvent.click(screen.getByRole('button', { name: ja.languageToggleLabel }))
+        const englishInstructions = screen.getByText(en.physicsInstructions)
+        expect(englishInstructions.className).toContain('physicsHint')
+        expect(englishInstructions).toHaveTextContent('swipe vertically')
     })
 
     it('keeps the navigation target and selected section in sync', () => {

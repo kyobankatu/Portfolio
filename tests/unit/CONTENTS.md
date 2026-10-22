@@ -5,3 +5,4 @@ Isolated checks for the project content projection and its input validation.
 | 名前 | 役割 | 編集方針 |
 | --- | --- | --- |
 | [portfolioContent.test.js](./portfolioContent.test.js) | Validates project descriptions and section-selection behavior for known and unknown ids | 通常編集可 |
+| [physicsTossController.test.js](./physicsTossController.test.js) | Checks nested target selection, mode-switch position preservation, real gravity and floor settling, collisions, scroll and resize geometry including top-boundary clamping, layout reflow, keyboard input and native button/link Space behavior, motion preferences, touch behavior, reset, and cleanup | 通常編集可 |

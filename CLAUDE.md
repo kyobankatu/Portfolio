@@ -69,6 +69,7 @@ Next.js 15 App Router and React 19. The home page is statically generated at bui
 - `app/page.js` renders the client-side `Home` portfolio screen.
 - `app/globals.css` defines the dark canvas, browser defaults, focus indication, and reduced-motion baseline.
 - `components/Home.jsx` renders the responsive HUD, language switch, section navigation, research, projects, skills, interests, and contacts.
+- `components/physicsTossController.js` owns the client-side Matter.js world and DOM synchronization. `Home.jsx` dynamically imports it only after Physics Toss is enabled; normal viewing does not initialize the physics engine.
 - `components/Home.module.css` contains responsive HUD styles and character motion.
 - `components/portfolioContent.js` defines project and skill data, localized content projection, and section selection validation.
 - `locales/ja.json` and `locales/en.json` contain translated prose, project descriptions, and character introductions. Fixed HUD labels and technical category names may remain English; accessibility labels that describe controls should be localized.

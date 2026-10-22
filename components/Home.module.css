@@ -15,6 +15,18 @@
     grid-template-columns: 280px minmax(0, 1fr);
 }
 
+.visuallyHidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 .sidebar {
     position: sticky;
     top: 0;
@@ -164,6 +176,16 @@
     margin: 0 auto;
 }
 
+.physicsHint {
+    margin: 9px 0 0;
+    padding: 9px 12px;
+    border-left: 2px solid var(--mint);
+    background: var(--panel);
+    color: var(--muted);
+    font-size: 0.74rem;
+    line-height: 1.5;
+}
+
 .topbar {
     min-height: 70px;
     display: flex;
@@ -216,6 +238,48 @@
 .langToggle:hover {
     border-color: var(--mint);
     color: var(--mint);
+}
+
+.physicsButton {
+    min-height: 34px;
+    padding: 0 10px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--text);
+    font: 700 0.62rem ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+}
+
+.physicsButton:hover,
+.physicsButton[aria-pressed="true"] {
+    border-color: var(--mint);
+    color: var(--mint);
+}
+
+.physicsButton:disabled {
+    cursor: wait;
+    opacity: 0.55;
+}
+
+.portfolioShell[data-physics-enabled="true"] [data-physics-section] {
+    position: relative;
+    cursor: grab;
+    will-change: translate;
+}
+
+.portfolioShell[data-physics-enabled="true"] [data-physics-object] {
+    position: relative;
+    cursor: grab;
+    will-change: translate;
+}
+
+.portfolioShell[data-physics-enabled="true"] [data-physics-section]:active {
+    cursor: grabbing;
+}
+
+.portfolioShell[data-physics-enabled="true"] [data-physics-object]:active {
+    cursor: grabbing;
 }
 
 .hero {
@@ -706,11 +770,18 @@
 .primaryButton:focus-visible,
 .secondaryButton:focus-visible,
 .langToggle:focus-visible,
+.physicsButton:focus-visible,
 .brand:focus-visible,
 .navigation a:focus-visible,
 .projectLinks a:focus-visible,
 .textLink:focus-visible,
 .contactLink:focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: 3px;
+}
+
+.portfolioShell[data-physics-enabled="true"] [data-physics-section]:focus-visible,
+.portfolioShell[data-physics-enabled="true"] [data-physics-object]:focus-visible {
     outline: 2px solid var(--amber);
     outline-offset: 3px;
 }
@@ -838,6 +909,8 @@
 
     .topbar {
         min-height: 58px;
+        flex-wrap: wrap;
+        padding: 9px 0;
     }
 
     .breadcrumb {
@@ -846,7 +919,9 @@
     }
 
     .topbarActions {
-        gap: 12px;
+        flex: 1;
+        justify-content: flex-end;
+        gap: 7px;
     }
 
     .statusLabel {
@@ -857,6 +932,17 @@
     .langToggle {
         min-width: 36px;
         height: 32px;
+    }
+
+    .physicsButton {
+        min-height: 32px;
+        padding: 0 7px;
+        font-size: 0.55rem;
+    }
+
+    .physicsHint {
+        margin-top: 7px;
+        font-size: 0.68rem;
     }
 
     .hero h1 {
