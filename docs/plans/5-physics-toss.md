@@ -127,3 +127,5 @@ Markdownレビューではローカル計画とIssue全文コメント、CONTENT
 - 指摘修正後の検証: `npm run test:unit` 42件成功、`git diff --check`成功。`for`ループに波括弧があることを確認した。最新HEAD `44ed6e368fb84453e9b44df606028782ab78330a`の規約再レビューは0件で、対象差分の`if`／`for`／`while`／`else`／`catch`に明示ブレース漏れはない。
 - 規約修正の承認記録: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6343788758)。修正後のクリーンな規約レビュー結果: [Issue後続コメント](https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6343798943)。
 - Phase N完了: 利用者が2026-10-23に最終成果を承認した。最終レビュー・承認記録と公開手順は後続Issueコメントに記載する。Issue計画コメントには本計画書全文を同期する。
+
+- Phase N final acceptance record: https://github.com/kyobankatu/Portfolio/issues/5#issuecomment-6344011136
